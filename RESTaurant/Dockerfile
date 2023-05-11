@@ -1,6 +1,10 @@
 FROM node:latest
-RUN npm install -g @angular/cli
 EXPOSE 4200
-CMD [ "ng", "serve", "--host", "0.0.0.0" ]
-WORKDIR /app
+
 COPY . /app
+WORKDIR /app
+
+RUN npm install
+RUN npm install -g @angular/cli
+
+CMD [ "ng", "serve", "--host", "0.0.0.0" ]
