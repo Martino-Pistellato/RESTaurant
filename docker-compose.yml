@@ -1,11 +1,31 @@
 version: '3'
 services:
-  app:
+  frontend:
     build: 
       context: /RESTaurant
       dockerfile: Dockerfile
-    container_name: app_main
+    container_name: app_frontend
     restart: always
     ports:
       - 4200:4200
+    working_dir: /app
+
+  backend:
+    build: 
+      context: /Backend
+      dockerfile: Dockerfile
+    container_name: app_backend
+    restart: always
+    ports:
+      - 3000:3000
+    working_dir: /app
+
+  db:
+    build: 
+      context: /Database
+      dockerfile: Dockerfile
+    container_name: app_db
+    restart: always
+    ports:
+      - 27017:27017
     working_dir: /app
