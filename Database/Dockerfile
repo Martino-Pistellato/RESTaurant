@@ -7,4 +7,4 @@ WORKDIR /app
 RUN npm install
 RUN npm install ajv mongodb mongoose typescript @types/mongoose @types/mongodb  --save
 RUN npm link mongoose mongodb
-CMD [ "node", "mongoose_test.js" ]
+CMD [ "node", "db_init.js" ]
