@@ -22,7 +22,7 @@ services:
 
   db:
     build: 
-      context: /Database
+      context: /Backend/Database
       dockerfile: Dockerfile
     container_name: app_db
     restart: always

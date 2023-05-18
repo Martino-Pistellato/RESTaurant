@@ -3,7 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.validateUser = exports.getModel = exports.getSchema = void 0;
 var mongoose = require("mongoose");
 var ajv = require("ajv");
-var userSchema = new mongoose.Schema({ name: {
+var userSchema = new mongoose.Schema({
+    name: {
         type: mongoose.SchemaTypes.String,
         required: true
     },
