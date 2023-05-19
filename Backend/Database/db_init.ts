@@ -2,7 +2,7 @@
 //here we close all connections to the db. Maybe we could keep a connection open (singleton like) and use it through the whole application
 
 const {MongoClient} = require('mongodb');
-const user = require('./User');
+import * as user from './User';
 const table = require('./Table');
 const food = require('./Food');
 const order = require('./Order');
@@ -53,36 +53,28 @@ function createDB(){
               role: 'admin'
             });
             my_user.setPassword('123456');
-            my_user.save();
-        })
-        .then(() => {
-            table.getModel().createCollection()
-            .then(() => {
-                console.log("Collection Tables created")
-            })
-            .then(() => {
-                food.getModel().createCollection()
+            my_user.save().then(() => {
+                table.getModel().createCollection()
                 .then(() => {
-                    console.log("Collection Foods created")
+                    console.log("Collection Tables created")
                 })
                 .then(() => {
-                    order.getModel().createCollection()
+                    food.getModel().createCollection()
                     .then(() => {
-                        console.log("Collection Orders created")
+                        console.log("Collection Foods created")
                     })
                     .then(() => {
-                        mongoose.connection.close()
+                        order.getModel().createCollection()
+                        .then(() => {
+                            console.log("Collection Orders created")
+                        })
+                        .then(() => {
+                            mongoose.connection.close()
+                        })
                     })
-                })
 
-            })
+                })
+            });
         })
     })
-    
-    
-    
-    /*.then(() => {
-        mongoose.connection.close()
-    })*/
-
 }

@@ -19,13 +19,3 @@ services:
     ports:
       - 3000:3000
     working_dir: /app
-
-  db:
-    build: 
-      context: /Backend/Database
-      dockerfile: Dockerfile
-    container_name: app_db
-    restart: always
-    ports:
-      - 27017:27017
-    working_dir: /app

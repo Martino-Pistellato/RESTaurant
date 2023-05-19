@@ -11,12 +11,13 @@ mongoose.connect(
     useNewUrlParser: true,
     useUnifiedTopology: true
 }).then(() => {
-    let my_user = user.getModel().create({
+    let my_user = user.newUser({
         name: 'Fernando',
-        email: 'fernando@gmail.com',
-        password: '123456',
+        email: 'fernando@gmail.com',    
         role: 'waiter'
-    }).then((waiter) => {
+    });
+    my_user.setPassword('123456');
+    my_user.save().then((user) => {
         let my_table = table.getModel().create({
             capacity: 4,
             status: 'free'
@@ -32,7 +33,7 @@ mongoose.connect(
                     status: 'pending',
                     orders: food,
                     tables: table,
-                    waiterId: waiter._id
+                    waiterId: user._id
                 });
             });
         });
