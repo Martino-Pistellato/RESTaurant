@@ -1,7 +1,7 @@
 import mongoose = require('mongoose');
-import ajv = require('ajv');
+import Ajv, {JSONSchemaType} from "ajv";
 
-export interface Food {
+export interface Food extends mongoose.Document {
     name: string;
     price: number;
     prepareTime: number; //in minutes
@@ -9,7 +9,7 @@ export interface Food {
     ingredients: string[]; 
 }
 
-const foodSchema = new mongoose.Schema({
+const foodSchema = new mongoose.Schema<Food>({
     name:{
         type: mongoose.SchemaTypes.String,
         required: true
@@ -31,19 +31,19 @@ const foodSchema = new mongoose.Schema({
         required: true
     }
 });
+
 export function getSchema() {
     return foodSchema;
 }
 
-let foodModel: mongoose.Model<mongoose.Document>;
-export function getModel(): mongoose.Model<mongoose.Document> {
-    if (!foodModel) {
-        foodModel = mongoose.model('Food', getSchema());
-    }
-    return foodModel;
-}
+export const foodModel = mongoose.model('Food', getSchema());
 
-const validator = new ajv();
+const validator = new Ajv();
 export function validateFood(food: Food): boolean {
     return validator.validate(foodSchema, food) as boolean;
 };
+
+export function newFood( data ): Food {
+    let food = new foodModel( data );
+    return food;
+}

@@ -1,13 +1,12 @@
 import mongoose = require('mongoose');
-import Ajv, {JSONSchemaType} from "ajv"
-import crypto = require('crypto');
+import Ajv from 'ajv';
+const bcrypt = require("bcrypt")
 
 export interface User extends mongoose.Document {
     name: string;
     email: string;
     role: string;
-    salt: string;
-    digest: string;
+    password: string;
     
     setPassword: (pwd:string)=>void,
     validatePassword: (pwd:string)=>boolean
@@ -26,28 +25,18 @@ const userSchema = new mongoose.Schema<User>({
         type: mongoose.SchemaTypes.String,
         required: true
     },
-    salt:{
-        type: mongoose.SchemaTypes.String,
-        required: false
-    },
-    digest:{
+    password:{
         type: mongoose.SchemaTypes.String,
         required: false
     }
 });
 
-userSchema.methods.setPassword = function( pwd:string ) {
-    this.salt = crypto.randomBytes(16).toString('hex'); // We use a random 16-bytes hex string for salt
-    const hmac = crypto.createHmac('sha512', this.salt );
-    hmac.update( pwd );
-    this.digest = hmac.digest('hex'); // The final digest depends both by the password and the salt
+userSchema.methods.setPassword = function(pwd: string) {
+    this.password = bcrypt.hashSync(pwd, 10);2
 }
 
-userSchema.methods.validatePassword = function( pwd:string ):boolean {
-    const hmac = crypto.createHmac('sha512', this.salt );
-    hmac.update(pwd);
-    const digest = hmac.digest('hex');
-    return (this.digest === digest);
+userSchema.methods.validatePassword = function(pwd: string): boolean {
+    return bcrypt.compareSync(pwd, this.password);
 }
 
 export function getSchema() {

@@ -3,15 +3,16 @@
 
 const {MongoClient} = require('mongodb');
 import * as user from './User';
-const table = require('./Table');
-const food = require('./Food');
-const order = require('./Order');
-const mongoose = require('mongoose');
+import * as food from './Food';
+import * as table from './Table';
+import * as order from './Order';
+import * as mongoose from 'mongoose';
 
 //first, we connect to the cluster
 //Use MongoClient because mongoose gave problem getting the list of databases in the cluster. even if it's possible to use it for this purpose
 const clusterURI = 'mongodb+srv://Furellato:XV5Nbg3sRBz5flZN@restaurant.bqyjdfs.mongodb.net/?retryWrites=true&w=majority';
 const client = new MongoClient(clusterURI);
+const dbURI = 'mongodb+srv://Furellato:XV5Nbg3sRBz5flZN@restaurant.bqyjdfs.mongodb.net/RESTaurant_db?retryWrites=true&w=majority';
 
 client.connect()
 .then(() => {
@@ -22,25 +23,21 @@ client.connect()
 function searchDB(client){
     client.db().admin().listDatabases()
     .then((list) => {
-        let isDBPresent = false
+        let isDBPresent = false;
         list.databases.forEach(db => {
             if(db.name === 'RESTaurant_db')
-                isDBPresent = true
+                isDBPresent = true;
         });
         if(!isDBPresent)
-            createDB()
+            createDB();
         else
-            console.log("DB already initialized")
-    }).then(() => {
-        client.close()
-    });
+            console.log("DB already initialized");
+     }).then(() => { client.close(); });
 }
 
 function createDB(){
-    console.log("DB not found, let's create it")
+    console.log("DB not found, let's create it");
 
-    let dbURI = 'mongodb+srv://Furellato:XV5Nbg3sRBz5flZN@restaurant.bqyjdfs.mongodb.net/RESTaurant_db?retryWrites=true&w=majority'
-    
     //by simply connecting to the db, we create it
     mongoose.connect(dbURI)
     .then(() => {
@@ -54,27 +51,23 @@ function createDB(){
             });
             my_user.setPassword('123456');
             my_user.save().then(() => {
-                table.getModel().createCollection()
+                table.tableModel.createCollection()
                 .then(() => {
-                    console.log("Collection Tables created")
-                })
-                .then(() => {
-                    food.getModel().createCollection()
-                    .then(() => {
-                        console.log("Collection Foods created")
-                    })
-                    .then(() => {
-                        order.getModel().createCollection()
-                        .then(() => {
-                            console.log("Collection Orders created")
-                        })
-                        .then(() => {
-                            mongoose.connection.close()
-                        })
-                    })
+                    console.log("Collection Tables created");
 
-                })
-            });
-        })
-    })
+                    food.foodModel.createCollection()
+                    .then(() => {
+                        console.log("Collection Foods created");
+
+                        order.orderModel.createCollection()
+                        .then(() => {
+                            console.log("Collection Orders created");
+                            
+                            mongoose.connection.close();                        
+                        });   
+                    });
+                });
+            });            
+        });
+    });
 }
