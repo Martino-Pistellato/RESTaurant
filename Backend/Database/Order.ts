@@ -5,7 +5,7 @@ import * as table from './Table';
 
 export interface Order extends mongoose.Document{
     status: string,
-    orders: food.Food[],
+    orders: food.Food[], //maybe is better Foods and Beverages
     tables: table.Table[],
     waiterId: mongoose.ObjectId
 }

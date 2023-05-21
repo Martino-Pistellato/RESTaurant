@@ -1,10 +1,12 @@
 import mongoose = require('mongoose');
-import Ajv, {JSONSchemaType} from "ajv";
+import Ajv from "ajv";
 
 export interface Table extends mongoose.Document{
     capacity: number;
     isFree: boolean;
     //isReserved: boolean;
+
+    changeStatus: () => void;
 }
 
 const tableSchema = new mongoose.Schema<Table>({
@@ -24,6 +26,8 @@ export function getSchema() {
 }
 
 export const tableModel = mongoose.model('Table', getSchema());
+
+tableSchema.methods.changeStatus = function() { this.isFree = !this.isFree; }
 
 const validator = new Ajv();
 export function validateTable(table: Table): boolean {
