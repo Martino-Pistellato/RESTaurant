@@ -55,17 +55,53 @@ function createDB(){
                 .then(() => {
                     console.log("Collection Tables created");
 
-                    food.foodModel.createCollection()
-                    .then(() => {
-                        console.log("Collection Foods created");
-
-                        order.orderModel.createCollection()
-                        .then(() => {
-                            console.log("Collection Orders created");
-                            
-                            mongoose.connection.close();                        
-                        });   
+                    let my_table1 = table.newTable({
+                        number: 1,
+                        capacity: 4,
+                        isFree: true,
+                        waiterID: null
                     });
+                    my_table1.save().then(() => {
+                        console.log("prima tabella creata");
+                        let my_table2 = table.newTable({
+                            number: 2,
+                            capacity: 2,
+                            isFree: true,
+                            waiterID: null
+                        });
+                        my_table2.save().then(() => {
+                        console.log("seconda tabella creata");
+                            food.foodModel.createCollection()
+                            .then(() => {
+                                console.log("Collection Foods created");
+        
+                                let my_food1 = food.newFood({
+                                    name: "Pizza",
+                                    price: 5,
+                                    type: "food",
+                                    ingredients: ["tomato", "mozzarella", "ham"],
+                                    prepareTime: 10});
+                                my_food1.save().then(() => {
+                                    console.log("prima pietanza creata");
+                                    let my_food2 = food.newFood({
+                                        name: "Pasta",
+                                        price: 4,
+                                        type: "food",
+                                        ingredients: ["pesto"],
+                                        prepareTime: 5});
+                                    my_food2.save().then(() => {
+                                        console.log("seconda pietanza creata");
+                                        order.orderModel.createCollection()
+                                        .then(() => {
+                                            console.log("Collection Orders created");
+                                            
+                                            mongoose.connection.close();                        
+                                        });   
+                                    });
+                                });
+                            });
+                        });
+                    });     
                 });
             });            
         });

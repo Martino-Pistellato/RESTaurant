@@ -1,30 +1,33 @@
-import * as mongoose from 'mongoose';
+import mongoose = require('mongoose');
 import Ajv from 'ajv';
-import * as food from './Food';
-import * as table from './Table';
 
 export interface Order extends mongoose.Document{
-    status: string,
-    orders: food.Food[], //maybe is better Foods and Beverages
-    tables: table.Table[],
-    waiterId: mongoose.ObjectId
+    foods:          string[], 
+    beverages:      string[],
+    drinks_ready:   boolean,
+    foods_ready:    boolean
+    tables:         string[],
 }
 
 const orderSchema = new mongoose.Schema<Order>({
-    status:{
-        type: mongoose.SchemaTypes.String,
+    foods:{
+        type: [mongoose.SchemaTypes.String], 
         required: true
     },
-    orders:{
-        type: [mongoose.SchemaTypes.Mixed], //this or food.getSchema()?
+    beverages:{
+        type: [mongoose.SchemaTypes.String], 
+        required: true
+    },
+    drinks_ready:{
+        type: mongoose.SchemaTypes.Boolean,
+        required: true
+    },
+    foods_ready:{
+        type: mongoose.SchemaTypes.Boolean,
         required: true
     },
     tables:{
-        type: [mongoose.SchemaTypes.Mixed], //table.getSchema()
-        required: true
-    },
-    waiterId:{
-        type: mongoose.SchemaTypes.String,
+        type: [mongoose.SchemaTypes.String], 
         required: true
     }
 });

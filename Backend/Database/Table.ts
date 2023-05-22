@@ -2,14 +2,20 @@ import mongoose = require('mongoose');
 import Ajv from "ajv";
 
 export interface Table extends mongoose.Document{
-    capacity: number;
-    isFree: boolean;
+    number: number,
+    waiterId: string | null,
+    capacity: number,
+    isFree: boolean,
     //isReserved: boolean;
 
-    changeStatus: () => void;
+    changeStatus: (waiterID: string) => void
 }
 
 const tableSchema = new mongoose.Schema<Table>({
+    number:{
+        type: mongoose.SchemaTypes.Number,
+        required: true
+    },
     capacity:{
         type: mongoose.SchemaTypes.Number,
         required: true
@@ -19,7 +25,19 @@ const tableSchema = new mongoose.Schema<Table>({
         required: true,
         default: true
     },
+    waiterId:{
+        type: mongoose.SchemaTypes.String,
+        required: true,
+        default: null
+    }
 });
+
+tableSchema.methods.changeStatus = function(waiterID: string) { 
+    this.isFree = !this.isFree; 
+    
+    if (this.isFree) this.waiterId = null;
+    else this.waiterId = waiterID;
+}
 
 export function getSchema() {
     return tableSchema;
@@ -27,7 +45,7 @@ export function getSchema() {
 
 export const tableModel = mongoose.model('Table', getSchema());
 
-tableSchema.methods.changeStatus = function() { this.isFree = !this.isFree; }
+
 
 const validator = new Ajv();
 export function validateTable(table: Table): boolean {

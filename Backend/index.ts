@@ -1,6 +1,7 @@
 import * as user from './Database/User'
 import * as table from './Database/Table'
 import * as food from './Database/Food'
+import * as order from './Database/Order'
 import jsonwebtoken = require('jsonwebtoken');  // JWT generation
 import fs = require('fs');
 import https = require('https');                // HTTPS module
@@ -87,7 +88,8 @@ app.get('/login', passport.authenticate('basic', { session: false }),(req, res) 
   let tokendata = {
     name: req.user.name,  
     role: req.user.role,
-    email: req.user.email
+    email: req.user.email,
+    id : req.user._id
   };
   let token_signed = jsonwebtoken.sign(tokendata, process.env.JWT_SECRET, { expiresIn: '24h' } );
   res.cookie('token', token_signed, {httpOnly: true, secure: true, sameSite: 'none'});
@@ -128,16 +130,29 @@ app.get('/tables', (req, res) => {
   });  
 })
 
-app.put('/tables/:id', (req, res) => {
+app.get('/tables/:waiterID', (req, res) => {
+  jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
+    if (error) 
+      return res.status(401).json({ error: true, errormessage: "An error occurred" });
+    else if (! (payload.role === 'waiter' || payload.role === 'cashier'))
+      return res.status(401).json({ error: true, errormessage: "Unauthorized" });
+    else{
+      table.tableModel.find({waiterId: req.params.waiterID}).then((table) => { res.send(table); });
+      //app.redirect('/orders');
+    }
+  });  
+})
+
+app.put('/tables/:tableID', (req, res) => {
   jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
     if (error) 
       return res.status(401).json({ error: true, errormessage: "An error occurred" });
     else if (! (payload.role === 'waiter' || payload.role === 'admin'))
       return res.status(401).json({ error: true, errormessage: "Unauthorized" });
     else{
-      table.tableModel.findOne({id: req.params.id}).then((table) => { 
-        table.changeStatus();
-        res.send(table); 
+      table.tableModel.findOne({_id: req.params.tableID}).then((table) => { 
+        table.changeStatus(payload.id);
+        table.save().then((table) => { res.send(table); });
       });
     }
   });  
@@ -161,30 +176,67 @@ app.post('/tables', (req, res) => {
 
 //--------------------FOOD--------------------
 
-app.get('/foods/', (req, res) => {
+app.get('/foods', (req, res) => {
   jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
     if (error) 
       return res.status(401).json({ error: true, errormessage: "An error occurred" });
     else if (! (payload.role === 'waiter'))
       return res.status(401).json({ error: true, errormessage: "Unauthorized" });
     else{
-      food.foodModel.find().then((foods) => { res.send(foods); });
+      food.foodModel.find().then((foods) => { 
+        res.send(foods); 
+      });
     }
   });  
 })
 
-app.put('/tables/:orderID/:foodID', (req, res) => {
+//--------------------ORDERS--------------------
+
+app.get('/orders', (req, res) => {
+  jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
+    if (error) 
+      return res.status(401).json({ error: true, errormessage: "An error occurred" });
+    else if (! (payload.role === 'waiter'))
+      return res.status(401).json({ error: true, errormessage: "Unauthorized" });
+    else{
+      order.orderModel.find().then((order) => { res.send(order); });
+    }
+  });  
+})
+
+app.post('/orders', (req, res) => {
+  jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
+    if (error) 
+      return res.status(401).json({ error: true, errormessage: "An error occurred" });
+    else if (! (payload.role === 'waiter'))
+      return res.status(401).json({ error: true, errormessage: "Unauthorized" });
+    else{
+      if (req.body.tables.length == 0)
+        return res.status(401).json({ error: true, errormessage: "No tables selected" });
+      else{
+        let my_order = order.newOrder({
+          tables: req.body.tables,
+          foods: req.body.foods,
+          beverages: req.body.beverages,
+          drinks_ready: false,
+          foods_ready: false
+        });
+        my_order.save().then((order) => { 
+          res.send(order); 
+        });
+      }      
+    }
+  });  
+})
+
+app.put('/orders', (req, res) => {
   jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
     if (error) 
       return res.status(401).json({ error: true, errormessage: "An error occurred" });
     else if (! (payload.role === 'waiter' || payload.role === 'admin'))
       return res.status(401).json({ error: true, errormessage: "Unauthorized" });
     else{
-      food.foodModel.findOne({id: req.params.foodID}).then((food) => { 
-        //i think it's better to create a local array of foods and when it's complete then the order is created
-      });
+      //update orders
     }
   });  
 })
-
-
