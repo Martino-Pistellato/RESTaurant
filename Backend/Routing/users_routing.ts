@@ -57,4 +57,15 @@ router.post('/', (req, res) => {
     });  
 })
 
+router.delete('/:userID', (req, res) => {
+    jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
+        if (error) 
+            return res.status(401).json({ error: true, errormessage: "An error occurred" });
+        else if (payload.role !== roleTypes.ADMIN)
+            return res.status(401).json({ error: true, errormessage: "Unauthorized" });
+        else{
+            user.userModel.findAndDelete({_id: req.params.userID}).then(() => { res.send("User deleted"); });
+        }
+    });  
+})
 export default router;

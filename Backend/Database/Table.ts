@@ -46,8 +46,6 @@ export function getSchema() {
 
 export const tableModel = mongoose.model('Table', getSchema());
 
-
-
 const validator = new Ajv();
 export function validateTable(table: Table): boolean {
     return validator.validate(tableSchema, table) as boolean;

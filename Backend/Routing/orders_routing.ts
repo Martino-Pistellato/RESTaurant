@@ -1,9 +1,7 @@
 import { roleTypes } from '../Database/User'
 import * as order from '../Database/Order'
-import https = require('https');  
 import jsonwebtoken = require('jsonwebtoken');  // JWT generation
 import { Router } from 'express';
-import { Food } from '../Database/Food';
 import { tableModel } from '../Database/Table';
 
 const router = Router();
@@ -41,7 +39,7 @@ router.post('/', (req, res) => {
         else if (payload.role !== roleTypes.ADMIN && payload.role !== roleTypes.WAITER)
             return res.status(401).json({ error: true, errormessage: "Unauthorized" });
         else{
-            if (req.body.tables.length == 0)
+            if (req.body.tables.length === 0)
                 return res.status(401).json({ error: true, errormessage: "No tables selected" });
             else{
                 let my_order = order.newOrder({ tables: req.body.tables });
@@ -97,7 +95,7 @@ router.delete('/:orderID', (req, res) => {
             .populate('tables')
             .then((order) => { 
                 let total = 0;
-                
+
                 order.foods_prepared.forEach((food) => { total += food['price']; });
                 order.beverages_prepared.forEach((beverage) => { total += beverage['price']; });
 

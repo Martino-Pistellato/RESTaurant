@@ -61,6 +61,17 @@ router.post('/', (req, res) => {
         }
     });  
 })
-  
+
+router.delete('/:tableID', (req, res) => {
+    jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
+        if (error) 
+            return res.status(401).json({ error: true, errormessage: "An error occurred" });
+        else if (payload.role != roleTypes.ADMIN)
+            return res.status(401).json({ error: true, errormessage: "Unauthorized" });
+        else{
+            table.tableModel.deleteOne({_id: req.params.tableID}).then((table) => { res.send("table deleted"); });
+        }
+    });  
+})  
 
 export default router;
