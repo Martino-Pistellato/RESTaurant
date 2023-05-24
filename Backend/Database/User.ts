@@ -2,10 +2,18 @@ import mongoose = require('mongoose');
 import Ajv from 'ajv';
 const bcrypt = require("bcrypt")
 
+export enum roleTypes{
+    ADMIN,
+    CASHIER,
+    BARMAN,
+    COOK,
+    WAITER
+}
+
 export interface User extends mongoose.Document {
     name: string;
-    email: string;
-    role: string;
+    email: string; //make it primary key
+    role: roleTypes;
     password: string;
     
     setPassword: (pwd:string)=>void,
@@ -19,10 +27,11 @@ const userSchema = new mongoose.Schema<User>({
     },
     email:{
         type: mongoose.SchemaTypes.String,
-        required: true
+        required: true,
+        unique: true
     },
     role:{ 
-        type: mongoose.SchemaTypes.String,
+        type: mongoose.SchemaTypes.Mixed,
         required: true
     },
     password:{
@@ -32,7 +41,7 @@ const userSchema = new mongoose.Schema<User>({
 });
 
 userSchema.methods.setPassword = function(pwd: string) {
-    this.password = bcrypt.hashSync(pwd, 10);2
+    this.password = bcrypt.hashSync(pwd, 10);
 }
 
 userSchema.methods.validatePassword = function(pwd: string): boolean {

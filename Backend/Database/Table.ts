@@ -14,7 +14,8 @@ export interface Table extends mongoose.Document{
 const tableSchema = new mongoose.Schema<Table>({
     number:{
         type: mongoose.SchemaTypes.Number,
-        required: true
+        required: true,
+        unique: true
     },
     capacity:{
         type: mongoose.SchemaTypes.Number,
@@ -27,7 +28,7 @@ const tableSchema = new mongoose.Schema<Table>({
     },
     waiterId:{
         type: mongoose.SchemaTypes.String,
-        required: true,
+        required: false,
         default: null
     }
 });

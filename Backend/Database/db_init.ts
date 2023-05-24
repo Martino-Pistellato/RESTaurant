@@ -47,7 +47,7 @@ function createDB(){
             let my_user = user.newUser({
               email: 'pippo@gmail',
               name: 'pippo',
-              role: 'admin'
+              role: user.roleTypes.ADMIN
             });
             my_user.setPassword('123456');
             my_user.save().then(() => {
@@ -78,7 +78,7 @@ function createDB(){
                                 let my_food1 = food.newFood({
                                     name: "Pizza",
                                     price: 5,
-                                    type: "food",
+                                    type: food.foodTypes.FIRST_COURSE,
                                     ingredients: ["tomato", "mozzarella", "ham"],
                                     prepareTime: 10});
                                 my_food1.save().then(() => {
@@ -86,7 +86,7 @@ function createDB(){
                                     let my_food2 = food.newFood({
                                         name: "Pasta",
                                         price: 4,
-                                        type: "food",
+                                        type: food.foodTypes.FIRST_COURSE,
                                         ingredients: ["pesto"],
                                         prepareTime: 5});
                                     my_food2.save().then(() => {

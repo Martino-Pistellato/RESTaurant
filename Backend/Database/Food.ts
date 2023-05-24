@@ -14,7 +14,6 @@ export interface Food extends mongoose.Document {
     name:           string;
     price:          number;
     prepareTime:    number; //in minutes
-    //notes: string;   
     ingredients:    string[]; 
     type:           foodTypes;
 }
@@ -32,10 +31,6 @@ const foodSchema = new mongoose.Schema<Food>({
         type: mongoose.SchemaTypes.Number,
         required: true
     },
-    // notes:{ 
-    //     type: mongoose.SchemaTypes.String,
-    //     required: true
-    // },
     ingredients:{ 
         type: [mongoose.SchemaTypes.String],
         required: true

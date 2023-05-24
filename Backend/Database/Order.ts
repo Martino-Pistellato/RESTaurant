@@ -2,33 +2,63 @@ import mongoose = require('mongoose');
 import Ajv from 'ajv';
 
 export interface Order extends mongoose.Document{
-    foods:          string[], 
-    beverages:      string[],
-    drinks_ready:   boolean,
-    foods_ready:    boolean
+    foods_ordered:          string[], 
+    beverages_ordered:      string[],
+
+    foods_prepared:         string[],
+    beverages_prepared:     string[],
+
+    // drinks_ready:   boolean,
+    // foods_ready:    boolean,
+
     tables:         string[],
+    notes:          string
+    
+    //maybe we should have a "closed" or "payed" field to distinguish between old and new orders?
+    //maybe we should have a "date" field to distinguish between old and new orders (or today orders)?
 }
 
 const orderSchema = new mongoose.Schema<Order>({
-    foods:{
+    foods_ordered:{
         type: [mongoose.SchemaTypes.String], 
-        required: true
+        required: false,
+        default: [],
+        ref : 'Food'
     },
-    beverages:{
+    beverages_ordered:{
         type: [mongoose.SchemaTypes.String], 
-        required: true
+        required: false,
+        default: [],
+        ref : 'Food'
     },
-    drinks_ready:{
-        type: mongoose.SchemaTypes.Boolean,
-        required: true
+    foods_prepared:{
+        type: [mongoose.SchemaTypes.String], 
+        required: false,
+        default: [],
+        ref : 'Food'
     },
-    foods_ready:{
-        type: mongoose.SchemaTypes.Boolean,
-        required: true
+    beverages_prepared:{
+        type: [mongoose.SchemaTypes.String], 
+        required: false,
+        default: [],
+        ref : 'Food'
     },
+    // drinks_ready:{
+    //     type: mongoose.SchemaTypes.Boolean,
+    //     required: true
+    // },
+    // foods_ready:{
+    //     type: mongoose.SchemaTypes.Boolean,
+    //     required: true
+    // },
     tables:{
         type: [mongoose.SchemaTypes.String], 
-        required: true
+        required: true,
+        ref: 'Table'
+    },
+    notes:{
+        type: mongoose.SchemaTypes.String, 
+        required: false
     }
 });
 
