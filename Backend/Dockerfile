@@ -4,7 +4,7 @@ EXPOSE 3000
 COPY . /app
 WORKDIR /app
 
-RUN npm install
+RUN npm install npm@6
 RUN npm link mongoose mongodb
 
 RUN npx tsc Database/db_init.ts

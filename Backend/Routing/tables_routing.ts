@@ -5,6 +5,7 @@ import { Router } from 'express';
 
 const router = Router();
 
+//Get all tables route
 router.get('/', (req, res) => {
     jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
         if (error) 
@@ -16,7 +17,8 @@ router.get('/', (req, res) => {
         }
     });  
 })
-  
+
+//Get all tables that a certain waiter will serve for the night --> useful to select a table before taking its order
 router.get('/:waiterID', (req, res) => { //this is useful because clients do not order as soon as they're seated
     jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
         if (error) 
@@ -29,7 +31,8 @@ router.get('/:waiterID', (req, res) => { //this is useful because clients do not
         }
     });  
 })
-  
+
+//Used to change status of a table form occupied to free and viceversa
 router.put('/:tableID', (req, res) => { //TODO: questo ne occupa/libera uno solo alla volta
     jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
         if (error) 
@@ -44,7 +47,8 @@ router.put('/:tableID', (req, res) => { //TODO: questo ne occupa/libera uno solo
         }
     });  
 })
-  
+
+//Create new table route
 router.post('/', (req, res) => {
     jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
         if (error) 
@@ -62,6 +66,7 @@ router.post('/', (req, res) => {
     });  
 })
 
+//Delete table route
 router.delete('/:tableID', (req, res) => {
     jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
         if (error) 

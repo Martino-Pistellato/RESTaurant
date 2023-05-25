@@ -5,6 +5,9 @@ import cors = require('cors');
 import { Server } from "socket.io";
 import express = require('express');
 import cookieParser = require('cookie-parser');
+import jsonwebtoken = require('jsonwebtoken');  // JWT generation
+import passport = require('passport');           
+import passportHTTP = require('passport-http');
 import users_router from './Routing/users_routing';
 import foods_router from './Routing/foods_routing';
 import orders_router from './Routing/orders_routing';
@@ -44,6 +47,39 @@ let server = https.createServer({
 }, app);
 let ios = new Server(server);
 server.listen(3000, () => console.log("HTTPS Server started on port 3000"));
+
+passport.use( new passportHTTP.BasicStrategy(
+    function(username, password, done) {
+        console.log("New login attempt from " + username );
+
+        user.userModel.findOne({ email: username }).then((user)=>{
+            if( !user ) 
+                return done(null,false,{statusCode: 500, error: true, errormessage:"Invalid user"});
+
+            if(user.validatePassword(password))
+                return done(null, user);
+
+            return done(null,false,{statusCode: 500, error: true, errormessage:"Invalid password"});
+        });
+    }
+));
+
+//Login route
+app.get('/', passport.authenticate('basic', { session: false }),(req, res) => {
+    console.log("Login granted. Generating token" );
+
+    let tokendata = {
+        name: req.user.name,  
+        role: req.user.role,
+        email: req.user.email,
+        id : req.user._id
+    };
+    let token_signed = jsonwebtoken.sign(tokendata, process.env.JWT_SECRET, { expiresIn: '24h' } );
+    res.cookie('token', token_signed, {httpOnly: true, secure: true, sameSite: 'none'});
+
+    //app.redirect('/home');
+    return res.status(200).json({ error: false, errormessage: "", token: token_signed });
+})
 
 //TODO: add @login_required (or something like that)
 //TODO: add logout

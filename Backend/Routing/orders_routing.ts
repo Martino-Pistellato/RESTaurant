@@ -6,6 +6,7 @@ import { tableModel } from '../Database/Table';
 
 const router = Router();
 
+//Get orders that a certain waiter took (why do we use payload here, but not when getting tables a certain waiter serves?)
 router.get('/', (req, res) => {
     jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
         if (error) 
@@ -31,7 +32,8 @@ router.get('/', (req, res) => {
         }
     });  
 })
-  
+
+//Create new order route
 router.post('/', (req, res) => {
     jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
         if (error) 
@@ -52,7 +54,8 @@ router.post('/', (req, res) => {
         }
     });  
 })
-  
+
+//Add foods or drinks to a certain order
 router.put('/:orderID', (req, res) => { //we use cookie, not orderID
     jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
         if (error) 
@@ -81,7 +84,8 @@ router.put('/:orderID', (req, res) => { //we use cookie, not orderID
         }
     });  
 })
-  
+
+//Delete order and create recipe route
 router.delete('/:orderID', (req, res) => {
     jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
         if (error) 
@@ -109,8 +113,8 @@ router.delete('/:orderID', (req, res) => {
                 let receipe = {
                     order: order['_id'],
                     tables: order.tables.map((table) => { return table['number']; }),
-                    foods: order.foods_prepared.map((food) => { return food['name']; }),
-                    beverages: order.beverages_prepared.map((beverage) => { return beverage['name']; }),
+                    foods: order.foods_prepared.map((food) => { return food['name']; }), //should we also show the price?
+                    beverages: order.beverages_prepared.map((beverage) => { return beverage['name']; }), //price?
                     total: total
                 }
                 

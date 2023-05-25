@@ -5,6 +5,7 @@ import { Router } from 'express';
 
 const router = Router();
 
+//Get all foods and drinks in the menu route
 router.get('/', (req, res) => {
     jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
         if (error) 
@@ -18,6 +19,7 @@ router.get('/', (req, res) => {
     });  
 })
 
+//Create new food/drink route
 router.post('/', (req, res) => {
     jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
         if (error) 
@@ -37,6 +39,7 @@ router.post('/', (req, res) => {
     });  
 })
 
+//Delete food/drink route
 router.delete('/:foodID', (req, res) => {
     jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
         if (error) 
