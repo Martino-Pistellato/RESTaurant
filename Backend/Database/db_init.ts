@@ -69,14 +69,87 @@ function createDB(){
 
 function populateUsers() : Promise<Function>{
     return new Promise(function(resolve, reject){
-        let my_user = user.newUser({
-            email: 'pippo@gmail',
-            name: 'pippo',
+        let my_admin = user.newUser({
+            email: 'admin@admin.RESTaurant.it',
+            name: 'admin',
             role: user.roleTypes.ADMIN
         });
-        my_user.setPassword('123456');
-        my_user.save();
-        console.log("Users populated")
+        my_admin.setPassword('123456');
+
+        let my_waiter = user.newUser({
+            email: 'alfredo@waiter.RESTaurant.it',
+            name: 'Alfredo Comencini',
+            role: user.roleTypes.WAITER
+        });
+        my_waiter.setPassword('123456');
+
+        let my_waiter2 = user.newUser({
+            email: 'rita@waiter.RESTaurant.it',
+            name: 'Rita Tebani',
+            role: user.roleTypes.WAITER
+        });
+        my_waiter2.setPassword('123456');
+
+        let my_cook = user.newUser({
+            email: 'vincenzo@cook.RESTaurant.it',
+            name: 'Vincenzo Succulenti',
+            role: user.roleTypes.COOK
+        });
+        my_cook.setPassword('123456');
+
+        let my_cook2 = user.newUser({
+            email: 'anna@cook.RESTaurant.it',
+            name: 'Anna Pigna',
+            role: user.roleTypes.COOK
+        });
+        my_cook2.setPassword('123456');
+
+        let my_bartender = user.newUser({
+            email: 'federico@bar.RESTaurant.it',
+            name: 'Federico La Rossi',
+            role: user.roleTypes.BARMAN
+        });
+        my_bartender.setPassword('123456');
+
+        let my_bartender2 = user.newUser({
+            email: 'susanna@bar.RESTaurant.it',
+            name: 'Susanna Stretti',
+            role: user.roleTypes.BARMAN
+        });
+        my_bartender2.setPassword('123456');
+
+        let my_cashier = user.newUser({
+            email: 'laura@cash.RESTaurant.it',
+            name: 'Laura Frimi',
+            role: user.roleTypes.CASHIER
+        });
+        my_cashier.setPassword('123456');
+
+        my_admin.save()
+        .then(() => {
+            my_waiter.save()
+            .then(() => {
+                my_waiter2.save()
+                .then(() => {
+                    my_cook.save()
+                    .then(() => {
+                        my_cook2.save()
+                        .then(() => {
+                            my_bartender.save()
+                            .then(() => {
+                                my_bartender2.save()
+                                .then(() => {
+                                    my_cashier.save().
+                                    then(() => {
+                                        console.log("Users populated")
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
     });
 }
 
@@ -153,7 +226,7 @@ function populateFoods() : Promise<Function>{
             prepareTime: 10
         });
         let my_food4 = food.newFood({
-            name: "Pasta al Pesto",
+            name: "Pasta with Pesto",
             price: 5,
             type: food.foodTypes.FIRST_COURSE,
             ingredients: ["pasta", "pesto"],
@@ -202,18 +275,25 @@ function populateFoods() : Promise<Function>{
             prepareTime: 5
         });
         let my_food11 = food.newFood({
-            name: "Beer",
+            name: "Beer 1lt",
             price: 5,
             type: food.foodTypes.DRINK,
             ingredients: ["hops", "wheat"],
             prepareTime: 0
         });
         let my_food12 = food.newFood({
-            name: "Water",
+            name: "Water 1lt",
             price: 3,
             type: food.foodTypes.DRINK,
             ingredients: ["water"],
             prepareTime: 0
+        });
+        let my_food13 = food.newFood({
+            name: "Americano",
+            price: 5,
+            type: food.foodTypes.DRINK,
+            ingredients: ["Campari", "vermouth", "seltz", "orange"],
+            prepareTime: 5
         });
     
         my_food1.save()
@@ -238,9 +318,12 @@ function populateFoods() : Promise<Function>{
                                             .then(() => {
                                                 my_food11.save()
                                                 .then(() => {
-                                                    my_food12.save()
-                                                    .then(() => {
-                                                        console.log("Foods populated")
+                                                    my_food12.save().
+                                                    then(() => {
+                                                        my_food13.save()
+                                                        .then(() => {
+                                                            console.log("Foods populated")
+                                                        });                                          
                                                     });
                                                 });
                                             });

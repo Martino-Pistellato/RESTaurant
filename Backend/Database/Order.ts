@@ -23,6 +23,8 @@ export interface Order extends mongoose.Document{
         foods:              orderStatus,
         beverages:          orderStatus
     }
+
+    insertionDate:          Date
     
     //maybe we should have a "closed" or "payed" field to distinguish between old and new orders?
     //maybe we should have a "date" field to distinguish between old and new orders (or today orders)?
@@ -77,7 +79,13 @@ const orderSchema = new mongoose.Schema<Order>({
             foods: orderStatus.RECEIVED,
             beverages: orderStatus.RECEIVED
         }
+    },
+    insertionDate:{
+        type: mongoose.SchemaTypes.Date,
+        required: false,
+        default: new Date()
     }
+    
 });
 
 export function getSchema() {

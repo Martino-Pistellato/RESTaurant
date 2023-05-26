@@ -85,6 +85,39 @@ router.get('/', (req, res) => {
     });  
 })
 
+router.get('/totalprofit', (req, res) => {
+    jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
+        if (error) 
+            return res.status(401).json({ error: true, errormessage: "An error occurred" });
+        else{
+            if(payload.role !== roleTypes.CASHIER)
+                return res.status(401).json({ error: true, errormessage: "Unauthorized" });
+            else{
+                order.orderModel.find()
+                .populate('foods_ordered')
+                .populate('beverages_ordered')
+                .then((orders) => { 
+                    let total = 0;
+                    let today = new Date()
+                    let todayStart = new Date(today.setHours(0,0,0,0))
+                    let todayEnd = new Date(today.setHours(23,59,59,59))
+                    
+                    
+                    orders.forEach((order) => {
+                        if(todayStart <= order.insertionDate && todayEnd >= order.insertionDate){
+                            order.foods_prepared.forEach((food) => { total += food['price']; });
+                            order.beverages_prepared.forEach((beverage) => { total += beverage['price']; });
+                        }
+                    });
+
+                    res.send(total); 
+                });   
+            }
+        }
+    });  
+})
+
+
 //Create new order route
 router.post('/', (req, res) => {
     jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
