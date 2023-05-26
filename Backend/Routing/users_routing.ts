@@ -32,7 +32,7 @@ router.delete('/:userID', (req, res) => {
         else if (payload.role !== roleTypes.ADMIN)
             return res.status(401).json({ error: true, errormessage: "Unauthorized" });
         else{
-            user.userModel.findAndDelete({_id: req.params.userID}).then(() => { res.send("User deleted"); });
+            user.userModel.findOneAndDelete({_id: req.params.userID}).then(() => { res.send("User deleted"); });
         }
     });  
 })

@@ -6,27 +6,27 @@ import { Router } from 'express';
 const router = Router();
 
 //Get all tables route
-router.get('/', (req, res) => {
+router.get('/all', (req, res) => {
     jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
         if (error) 
             return res.status(401).json({ error: true, errormessage: "An error occurred" });
         else if (payload.role !== roleTypes.ADMIN && payload.role !== roleTypes.WAITER && payload.role !== roleTypes.CASHIER)
             return res.status(401).json({ error: true, errormessage: "Unauthorized" });
         else{
-            table.tableModel.find().then((tables) => { res.send(tables); });
+            table.tableModel.find().populate('waiterId').then((tables) => { res.send(tables); });
         }
     });  
 })
 
 //Get all tables that a certain waiter will serve for the night --> useful to select a table before taking its order
-router.get('/:waiterID', (req, res) => { //this is useful because clients do not order as soon as they're seated
+router.get('/', (req, res) => { //this is useful because clients do not order as soon as they're seated
     jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
         if (error) 
             return res.status(401).json({ error: true, errormessage: "An error occurred" });
         else if (payload.role !== roleTypes.WAITER)
             return res.status(401).json({ error: true, errormessage: "Unauthorized" });
         else{
-            table.tableModel.find({waiterId: req.params.waiterID}).then((table) => { res.send(table); });
+            table.tableModel.find({waiterId: payload.id}).then((table) => { res.send(table); });
             //app.redirect('/orders'); in POST
         }
     });  
@@ -37,7 +37,7 @@ router.put('/:tableID', (req, res) => { //TODO: questo ne occupa/libera uno solo
     jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
         if (error) 
             return res.status(401).json({ error: true, errormessage: "An error occurred" });
-        else if (payload.role !== roleTypes.ADMIN && payload.role !== roleTypes.WAITER && payload.role !== roleTypes.CASHIER)
+        else if (payload.role !== roleTypes.ADMIN && payload.role !== roleTypes.WAITER)
             return res.status(401).json({ error: true, errormessage: "Unauthorized" });
         else{
             table.tableModel.findOne({_id: req.params.tableID}).then((table) => { 

@@ -1,6 +1,11 @@
 import mongoose = require('mongoose');
 import Ajv from 'ajv';
 
+export enum orderStatus {
+    RECEIVED,
+    PREPARING
+}
+
 export interface Order extends mongoose.Document{
     foods_ordered:          string[], 
     beverages_ordered:      string[],
@@ -11,8 +16,13 @@ export interface Order extends mongoose.Document{
     // drinks_ready:   boolean,
     // foods_ready:    boolean,
 
-    tables:         string[],
-    notes:          string
+    tables:                 string[],
+    notes:                  string,
+
+    status: {
+        foods:              orderStatus,
+        beverages:          orderStatus
+    }
     
     //maybe we should have a "closed" or "payed" field to distinguish between old and new orders?
     //maybe we should have a "date" field to distinguish between old and new orders (or today orders)?
@@ -59,6 +69,14 @@ const orderSchema = new mongoose.Schema<Order>({
     notes:{
         type: mongoose.SchemaTypes.String, 
         required: false
+    },
+    status:{
+        type: mongoose.SchemaTypes.Mixed,
+        required: false,
+        default: {
+            foods: orderStatus.RECEIVED,
+            beverages: orderStatus.RECEIVED
+        }
     }
 });
 

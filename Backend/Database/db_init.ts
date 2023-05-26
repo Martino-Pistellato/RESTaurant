@@ -52,9 +52,9 @@ function createDB(){
                     order.orderModel.createCollection()
                     .then(() => {
                         console.log("Collection Orders created");
-                        populateUsers.then(() => {
-                            populateTables.then(() => {
-                                populateFoods.then(() => {
+                        populateUsers().then(() => {
+                            populateTables().then(() => {
+                                populateFoods().then(() => {
                                     mongoose.connection.close();
                                     console.log("Connection closed")
                                 })
@@ -67,174 +67,181 @@ function createDB(){
     });
 }    
 
-let populateUsers = new Promise(function(resolve, reject){
-    let my_user = user.newUser({
-        email: 'pippo@gmail',
-        name: 'pippo',
-        role: user.roleTypes.ADMIN
-      });
-      my_user.setPassword('123456');
-      my_user.save();
-      console.log("Users populated")
-});
+function populateUsers() : Promise<Function>{
+    return new Promise(function(resolve, reject){
+        let my_user = user.newUser({
+            email: 'pippo@gmail',
+            name: 'pippo',
+            role: user.roleTypes.ADMIN
+        });
+        my_user.setPassword('123456');
+        my_user.save();
+        console.log("Users populated")
+    });
+}
 
-let populateTables = new Promise(function(resolve, reject){
-    let my_table1 = table.newTable({
-        number: 1,
-        capacity: 2,
-    });
-    let my_table2 = table.newTable({
-        number: 2,
-        capacity: 2,
-    });
-    let my_table3 = table.newTable({
-        number: 3,
-        capacity: 4
-    });
-    let my_table4 = table.newTable({
-        number: 4,
-        capacity: 4
-    });
-    let my_table5 = table.newTable({
-        number: 5,
-        capacity: 4
-    });
-    let my_table6 = table.newTable({
-        number: 6,
-        capacity: 8
-    });
-    my_table1.save()
-    .then(() => {
-        my_table2.save()
+function populateTables() : Promise<Function>{
+    return new Promise(function(resolve, reject){
+        let my_table1 = table.newTable({
+            number: 1,
+            capacity: 2,
+        });
+        let my_table2 = table.newTable({
+            number: 2,
+            capacity: 2,
+        });
+        let my_table3 = table.newTable({
+            number: 3,
+            capacity: 4
+        });
+        let my_table4 = table.newTable({
+            number: 4,
+            capacity: 4
+        });
+        let my_table5 = table.newTable({
+            number: 5,
+            capacity: 4
+        });
+        let my_table6 = table.newTable({
+            number: 6,
+            capacity: 8
+        });
+        my_table1.save()
         .then(() => {
-            my_table3.save()
+            my_table2.save()
             .then(() => {
-                my_table4.save()
+                my_table3.save()
                 .then(() => {
-                    my_table5.save()
+                    my_table4.save()
                     .then(() => {
-                        my_table6.save()
+                        my_table5.save()
                         .then(() => {
-                            console.log("Tables populated")
+                            my_table6.save()
+                            .then(() => {
+                                console.log("Tables populated")
+                            });
                         });
                     });
                 });
             });
         });
     });
-});
+}
 
-let populateFoods = new Promise(function(resolve, reject){
-    let my_food1 = food.newFood({
-        name: "Olive Ascolane",
-        price: 3,
-        type: food.foodTypes.APPETIZER,
-        ingredients: ["olives", "meat", "bread", "cheese", "eggs"],
-        prepareTime: 7
-    });
-    let my_food2 = food.newFood({
-        name: "Bruschette",
-        price: 3,
-        type: food.foodTypes.APPETIZER,
-        ingredients: ["olives", "tomatoes", "bread", "olive oil"],
-        prepareTime: 5
-    });
-    let my_food3 = food.newFood({
-        name: "Pizza Margherita",
-        price: 5,
-        type: food.foodTypes.FIRST_COURSE,
-        ingredients: ["tomato sauce", "mozzarella"],
-        prepareTime: 10
-    });
-    let my_food4 = food.newFood({
-        name: "Pasta al Pesto",
-        price: 5,
-        type: food.foodTypes.FIRST_COURSE,
-        ingredients: ["pasta", "pesto"],
-        prepareTime: 10
-    });
-    let my_food5 = food.newFood({
-        name: "Cotoletta alla Milanese",
-        price: 8,
-        type: food.foodTypes.SECOND_COURSE,
-        ingredients: ["eggs", "chicken", "flour", "breadcrumbs", "lemon"],
-        prepareTime: 10
-    });
-    let my_food6 = food.newFood({
-        name: "Parmigiana",
-        price: 7,
-        type: food.foodTypes.SECOND_COURSE,
-        ingredients: ["eggplants", "mozzarella", "tomato sauce", "olive oil", "basil", "parmisan cheese"],
-        prepareTime: 10
-    });
-    let my_food7 = food.newFood({
-        name: "French Fries",
-        price: 4,
-        type: food.foodTypes.SIDE_DISH,
-        ingredients: ["potatoes"],
-        prepareTime: 5
-    });
-    let my_food8 = food.newFood({
-        name: "Salad",
-        price: 4,
-        type: food.foodTypes.SIDE_DISH,
-        ingredients: ["salad", "tomatoes", "carrots"],
-        prepareTime: 5
-    });
-    let my_food9 = food.newFood({
-        name: "Crème Brûlée",
-        price: 5,
-        type: food.foodTypes.DESSERT,
-        ingredients: ["fresh cream", "milk", "sugar", "eggs", "vanilla"],
-        prepareTime: 6
-    });
-    let my_food10 = food.newFood({
-        name: "Tiramisù",
-        price: 5,
-        type: food.foodTypes.DESSERT,
-        ingredients: ["mascarpone", "coffee", "eggs", "biscuits"],
-        prepareTime: 5
-    });
-    let my_food11 = food.newFood({
-        name: "Beer",
-        price: 5,
-        type: food.foodTypes.DRINK,
-        ingredients: ["hops", "wheat"],
-        prepareTime: 0
-    });
-    let my_food12 = food.newFood({
-        name: "Water",
-        price: 3,
-        type: food.foodTypes.DRINK,
-        ingredients: ["water"],
-        prepareTime: 0
-    });
 
-    my_food1.save()
-    .then(() => {
-        my_food2.save()
+function populateFoods() : Promise<Function>{
+    return new Promise(function(resolve, reject){
+        let my_food1 = food.newFood({
+            name: "Olive Ascolane",
+            price: 3,
+            type: food.foodTypes.APPETIZER,
+            ingredients: ["olives", "meat", "bread", "cheese", "eggs"],
+            prepareTime: 7
+        });
+        let my_food2 = food.newFood({
+            name: "Bruschette",
+            price: 3,
+            type: food.foodTypes.APPETIZER,
+            ingredients: ["olives", "tomatoes", "bread", "olive oil"],
+            prepareTime: 5
+        });
+        let my_food3 = food.newFood({
+            name: "Pizza Margherita",
+            price: 5,
+            type: food.foodTypes.FIRST_COURSE,
+            ingredients: ["tomato sauce", "mozzarella"],
+            prepareTime: 10
+        });
+        let my_food4 = food.newFood({
+            name: "Pasta al Pesto",
+            price: 5,
+            type: food.foodTypes.FIRST_COURSE,
+            ingredients: ["pasta", "pesto"],
+            prepareTime: 10
+        });
+        let my_food5 = food.newFood({
+            name: "Cotoletta alla Milanese",
+            price: 8,
+            type: food.foodTypes.SECOND_COURSE,
+            ingredients: ["eggs", "chicken", "flour", "breadcrumbs", "lemon"],
+            prepareTime: 10
+        });
+        let my_food6 = food.newFood({
+            name: "Parmigiana",
+            price: 7,
+            type: food.foodTypes.SECOND_COURSE,
+            ingredients: ["eggplants", "mozzarella", "tomato sauce", "olive oil", "basil", "parmisan cheese"],
+            prepareTime: 10
+        });
+        let my_food7 = food.newFood({
+            name: "French Fries",
+            price: 4,
+            type: food.foodTypes.SIDE_DISH,
+            ingredients: ["potatoes"],
+            prepareTime: 5
+        });
+        let my_food8 = food.newFood({
+            name: "Salad",
+            price: 4,
+            type: food.foodTypes.SIDE_DISH,
+            ingredients: ["salad", "tomatoes", "carrots"],
+            prepareTime: 5
+        });
+        let my_food9 = food.newFood({
+            name: "Crème Brûlée",
+            price: 5,
+            type: food.foodTypes.DESSERT,
+            ingredients: ["fresh cream", "milk", "sugar", "eggs", "vanilla"],
+            prepareTime: 6
+        });
+        let my_food10 = food.newFood({
+            name: "Tiramisù",
+            price: 5,
+            type: food.foodTypes.DESSERT,
+            ingredients: ["mascarpone", "coffee", "eggs", "biscuits"],
+            prepareTime: 5
+        });
+        let my_food11 = food.newFood({
+            name: "Beer",
+            price: 5,
+            type: food.foodTypes.DRINK,
+            ingredients: ["hops", "wheat"],
+            prepareTime: 0
+        });
+        let my_food12 = food.newFood({
+            name: "Water",
+            price: 3,
+            type: food.foodTypes.DRINK,
+            ingredients: ["water"],
+            prepareTime: 0
+        });
+    
+        my_food1.save()
         .then(() => {
-            my_food3.save()
+            my_food2.save()
             .then(() => {
-                my_food4.save()
+                my_food3.save()
                 .then(() => {
-                    my_food5.save()
+                    my_food4.save()
                     .then(() => {
-                        my_food6.save()
+                        my_food5.save()
                         .then(() => {
-                            my_food7.save()
+                            my_food6.save()
                             .then(() => {
-                                my_food8.save()
+                                my_food7.save()
                                 .then(() => {
-                                    my_food9.save()
+                                    my_food8.save()
                                     .then(() => {
-                                        my_food10.save()
+                                        my_food9.save()
                                         .then(() => {
-                                            my_food11.save()
+                                            my_food10.save()
                                             .then(() => {
-                                                my_food12.save()
+                                                my_food11.save()
                                                 .then(() => {
-                                                    console.log("Foods populated")
+                                                    my_food12.save()
+                                                    .then(() => {
+                                                        console.log("Foods populated")
+                                                    });
                                                 });
                                             });
                                         });
@@ -247,5 +254,4 @@ let populateFoods = new Promise(function(resolve, reject){
             });
         });
     });
-});
-
+}

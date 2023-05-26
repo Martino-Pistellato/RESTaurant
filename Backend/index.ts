@@ -8,6 +8,8 @@ import cookieParser = require('cookie-parser');
 import jsonwebtoken = require('jsonwebtoken');  // JWT generation
 import passport = require('passport');           
 import passportHTTP = require('passport-http');
+
+import { userModel } from './Database/User';
 import users_router from './Routing/users_routing';
 import foods_router from './Routing/foods_routing';
 import orders_router from './Routing/orders_routing';
@@ -52,7 +54,7 @@ passport.use( new passportHTTP.BasicStrategy(
     function(username, password, done) {
         console.log("New login attempt from " + username );
 
-        user.userModel.findOne({ email: username }).then((user)=>{
+        userModel.findOne({ email: username }).then((user)=>{
             if( !user ) 
                 return done(null,false,{statusCode: 500, error: true, errormessage:"Invalid user"});
 
@@ -65,7 +67,7 @@ passport.use( new passportHTTP.BasicStrategy(
 ));
 
 //Login route
-app.get('/', passport.authenticate('basic', { session: false }),(req, res) => {
+app.get('/login', passport.authenticate('basic', { session: false }),(req, res) => {
     console.log("Login granted. Generating token" );
 
     let tokendata = {

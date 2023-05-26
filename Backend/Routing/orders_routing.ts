@@ -5,6 +5,7 @@ import { Router } from 'express';
 import { tableModel } from '../Database/Table';
 
 const router = Router();
+const orderStatus = order.orderStatus;
 
 //Get orders that a certain waiter took (why do we use payload here, but not when getting tables a certain waiter serves?)
 router.get('/', (req, res) => {
@@ -12,9 +13,41 @@ router.get('/', (req, res) => {
         if (error) 
             return res.status(401).json({ error: true, errormessage: "An error occurred" });
         else{
-            if (payload.role != roleTypes.WAITER)
-                order.orderModel.find().then((order) => { res.send(order); }); 
-            else
+            if (payload.role === roleTypes.COOK)
+                order.orderModel
+                .find()
+                .select('foods_ordered')
+                .populate('foods_ordered')
+                .then((orders) => { 
+                    orders.forEach((order) => {
+                        if (order.foods_ordered.length === 0) orders.splice(orders.indexOf(order),1);
+                        else {
+                            let total_queue_time = 0;
+                            order.foods_ordered.forEach((food) => { total_queue_time += food['prepareTime']; });
+                            order['total_queue_time'] = total_queue_time;
+                        }
+                    });
+                    orders.sort((a, b) => { return a['total_queue_time'] - b['total_queue_time']; });
+                    res.send(orders); 
+                }); 
+            else if (payload.role === roleTypes.BARMAN)
+                order.orderModel
+                .find()
+                .select('beverages_ordered')
+                .populate('beverages_ordered')
+                .then((orders) => { 
+                    orders.forEach((order) => {
+                        if (order.beverages_ordered.length === 0) orders.splice(orders.indexOf(order),1);
+                        else {
+                            let total_queue_time = 0;
+                            order.beverages_ordered.forEach((food) => { total_queue_time += food['prepareTime']; });
+                            order['total_queue_time'] = total_queue_time;
+                        }
+                    });
+                    orders.sort((a, b) => { return a['total_queue_time'] - b['total_queue_time']; });
+                    res.send(orders); 
+                });
+            else if (payload.role === roleTypes.WAITER)
                 order.orderModel.find().populate({
                     path: 'tables',
                     match: { waiterId: payload.id }
@@ -28,7 +61,26 @@ router.get('/', (req, res) => {
                     });
         
                     res.send(my_orders); 
-                });    
+                });  
+            else
+                order.orderModel.find()
+                .populate('foods_ordered')
+                .populate('beverages_ordered')
+                .populate('tables')
+                .then((orders) => { 
+                    orders.forEach((order) => {
+                        let total_queue_time = 0;
+
+                        order.foods_ordered.forEach((food) => { total_queue_time += food['prepareTime']; });
+                        order.beverages_ordered.forEach((beverage) => { total_queue_time += beverage['prepareTime']; });
+
+                        order['total_queue_time'] = total_queue_time;
+                    });
+
+                    orders.sort((a, b) => { return a['total_queue_time'] - b['total_queue_time']; });
+
+                    res.send(orders); 
+                });   
         }
     });  
 })
@@ -63,17 +115,35 @@ router.put('/:orderID', (req, res) => { //we use cookie, not orderID
         else if (payload.role !== roleTypes.COOK && payload.role !== roleTypes.BARMAN && payload.role !== roleTypes.WAITER)
             return res.status(401).json({ error: true, errormessage: "Unauthorized" });
         else{
-            if (payload.role == roleTypes.COOK)
-                order.orderModel.findOne({_id: req.params.orderID}).then((order) => {
-                    order.foods_prepared.push(...order.foods_ordered);
-                    order.foods_ordered = [];
-                    order.save().then((order) => { res.send(order); }); //maybe add a notification for the waiter
+            if (payload.role === roleTypes.COOK)
+                order.orderModel.findOne({_id: req.params.orderID}).then((my_order) => {
+                    if (my_order.status.foods === orderStatus.RECEIVED){
+                        my_order.status.foods = orderStatus.PREPARING;
+                        my_order.markModified('status');
+                        my_order.save().then((order_saved) => { res.send(order_saved); });
+                    }
+                    else {
+                        my_order.foods_prepared.push(...my_order.foods_ordered);
+                        my_order.foods_ordered = [];
+                        my_order.status.foods = orderStatus.RECEIVED;
+                        my_order.markModified('status');
+                        my_order.save().then((order_saved) => { res.send(order_saved); }); //maybe add a notification for the waiter
+                    }
                 });
-            else if (payload.role == roleTypes.BARMAN)
-                order.orderModel.findOne({_id: req.params.orderID}).then((order) => {
-                    order.beverages_prepared.push(...order.beverages_ordered);
-                    order.beverages_ordered = [];
-                    order.save().then((order) => { res.send(order); }); //maybe add a notification for the waiter
+            else if (payload.role === roleTypes.BARMAN)
+                order.orderModel.findOne({_id: req.params.orderID}).then((my_order) => {
+                    if (my_order.status.beverages === orderStatus.RECEIVED){
+                        my_order.status.beverages = orderStatus.PREPARING;
+                        my_order.markModified('status');
+                        my_order.save().then((order_saved) => { res.send(order_saved); });
+                    }
+                    else {
+                        my_order.beverages_prepared.push(...my_order.beverages_ordered);
+                        my_order.beverages_ordered = [];
+                        my_order.status.beverages = orderStatus.RECEIVED;
+                        my_order.markModified('status');
+                        my_order.save().then((order_saved) => { res.send(order_saved); }); //maybe add a notification for the waiter
+                    }
                 });
             else 
                 order.orderModel.findOne({_id: req.params.orderID}).then((order) => {
@@ -113,8 +183,14 @@ router.delete('/:orderID', (req, res) => {
                 let receipe = {
                     order: order['_id'],
                     tables: order.tables.map((table) => { return table['number']; }),
-                    foods: order.foods_prepared.map((food) => { return food['name']; }), //should we also show the price?
-                    beverages: order.beverages_prepared.map((beverage) => { return beverage['name']; }), //price?
+                    foods: {
+                        name: order.foods_prepared.map((food) => { return food['name']; }),
+                        price: order.foods_prepared.map((food) => { return food['price']; })
+                    },
+                    beverages: {
+                        name: order.beverages_prepared.map((beverage) => { return beverage['name']; }),
+                        price: order.beverages_prepared.map((beverage) => { return beverage['price']; })
+                    },
                     total: total
                 }
                 

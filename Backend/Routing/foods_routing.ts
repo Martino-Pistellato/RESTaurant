@@ -47,7 +47,7 @@ router.delete('/:foodID', (req, res) => {
         else if (payload.role !== roleTypes.ADMIN) //add cooks?
             return res.status(401).json({ error: true, errormessage: "Unauthorized" });
         else{
-            food.foodModel.findAndDelete({_id: req.params.foodID}).then(() => { res.send("Food deleted"); });
+            food.foodModel.findOneAndDelete({_id: req.params.foodID}).then(() => { res.send("Food deleted"); });
         }
     });  
 })
