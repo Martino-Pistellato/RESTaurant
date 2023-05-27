@@ -34,19 +34,19 @@ router.get('/', (req, res) => {
             else if (payload.role === roleTypes.BARMAN)
                 order.orderModel
                 .find()
-                .select('beverages_ordered')
+                .select('beverages_ordered insertionDate')
                 .populate('beverages_ordered')
                 .then((orders) => { 
-                    orders.forEach((order) => {
-                        if (order.beverages_ordered.length === 0 || ((new Date(order.insertionDate as Date).setHours(0,0,0,0) < new Date().setHours(0,0,0,0)))) 
-                            orders.splice(orders.indexOf(order),1);
+                    orders.forEach((my_order) => {
+                        if (my_order.beverages_ordered.length === 0 || ((new Date(my_order.insertionDate as Date).setHours(0,0,0,0) < new Date().setHours(0,0,0,0)))) 
+                            orders.splice(orders.indexOf(my_order),1);
                         else {
                             let total_queue_time = 0;
-                            order.beverages_ordered.forEach((food) => { total_queue_time += food['prepareTime']; });
-                            order['total_queue_time'] = total_queue_time;
+                            my_order.beverages_ordered.forEach((food) => { total_queue_time += food['prepareTime']; });
+                            my_order['total_queue_time'] = total_queue_time;
                         }
                     });                    
-                    orders.sort((a, b) => { return a['insertionDate.getTime()'] - b['insertionDate.getTime()']; });
+                    orders.sort((a, b) => { return a.insertionDate.getTime() - b.insertionDate.getTime(); });
                     res.send(orders); 
                 }); 
             else if (payload.role === roleTypes.WAITER)
@@ -58,12 +58,12 @@ router.get('/', (req, res) => {
                 .then((orders) => { 
                     let my_orders = [];
 
-                    orders.forEach((order) => {
-                    if (order.tables.length > 0 && (new Date(order.insertionDate as Date).setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)))
-                        my_orders.push(order);
+                    orders.forEach((my_order) => {
+                    if (my_order.tables.length > 0 && (new Date(my_order.insertionDate as Date).setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)))
+                        my_orders.push(my_order);
                     });
 
-                    my_orders.sort((a, b) => { return a['insertionDate.getTime()'] - b['insertionDate.getTime()']; });
+                    my_orders.sort((a, b) => { return a.insertionDate.getTime() - b.insertionDate.getTime(); });
                     res.send(my_orders); 
                 });  
             else
@@ -72,20 +72,20 @@ router.get('/', (req, res) => {
                 .populate('beverages_ordered')
                 .populate('tables')
                 .then((orders) => { 
-                    orders.forEach((order) => {
-                        if (new Date(order.insertionDate as Date).setHours(0,0,0,0) < new Date().setHours(0,0,0,0)) 
-                            orders.splice(orders.indexOf(order),1);
+                    orders.forEach((my_order) => {
+                        if (new Date(my_order.insertionDate as Date).setHours(0,0,0,0) < new Date().setHours(0,0,0,0)) 
+                            orders.splice(orders.indexOf(my_order),1);
                         else {
                             let total_queue_time = 0;
 
-                            order.foods_ordered.forEach((food) => { total_queue_time += food['prepareTime']; });
-                            order.beverages_ordered.forEach((beverage) => { total_queue_time += beverage['prepareTime']; });
+                            my_order.foods_ordered.forEach((food) => { total_queue_time += food['prepareTime']; });
+                            my_order.beverages_ordered.forEach((beverage) => { total_queue_time += beverage['prepareTime']; });
 
-                            order['total_queue_time'] = total_queue_time;
+                            my_order['total_queue_time'] = total_queue_time;
                         }
                     });
 
-                    orders.sort((a, b) => { return a['insertionDate.getTime()'] - b['insertionDate.getTime()']; });
+                    orders.sort((a, b) => { return a.insertionDate.getTime() - b.insertionDate.getTime(); });
                     res.send(orders); 
                 });   
         }
