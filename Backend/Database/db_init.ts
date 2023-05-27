@@ -295,7 +295,7 @@ function populateFoods() : Promise<void>{
             name: "Americano",
             price: 5,
             type: food.foodTypes.DRINK,
-            ingredients: ["Campari", "vermouth", "seltz", "orange"],
+            ingredients: ["campari", "vermouth", "seltz", "orange"],
             prepareTime: 5
         });
     

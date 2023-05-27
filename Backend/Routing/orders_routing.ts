@@ -38,7 +38,7 @@ router.get('/', (req, res) => {
                 .populate('beverages_ordered')
                 .then((orders) => { 
                     orders.forEach((order) => {
-                        if (order.beverages_ordered.length === 0 || ((new Date(order.insertionDate as Date).setHours(0,0,0,0) < new Date().setHours(0,0,0,0))) 
+                        if (order.beverages_ordered.length === 0 || ((new Date(order.insertionDate as Date).setHours(0,0,0,0) < new Date().setHours(0,0,0,0)))) 
                             orders.splice(orders.indexOf(order),1);
                         else {
                             let total_queue_time = 0;
@@ -189,7 +189,7 @@ router.put('/:orderID', (req, res) => { //we use cookie, not orderID
                     else {
                         order.beverages_ordered.push(...req.body.beverages);
                         order.foods_ordered.push(...req.body.foods);
-                        order.insertionDate = new Date();
+                        order.insertionDate = new Date()
                         order.save().then((order) => { res.send(order); }); //maybe add a notification for the cooks/barmans
                     }
                 });
