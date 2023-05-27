@@ -68,7 +68,7 @@ function createDB(){
     });
 }    
 
-function populateUsers() : Promise<Function>{
+function populateUsers() : Promise<void>{
     return new Promise(function(resolve, reject){
         let my_admin = user.newUser({
             email: 'admin@admin.RESTaurant.it',
@@ -143,6 +143,7 @@ function populateUsers() : Promise<Function>{
                                     my_cashier.save().
                                     then(() => {
                                         console.log("Users populated")
+                                        return resolve();
                                     });
                                 });
                             });
@@ -154,7 +155,7 @@ function populateUsers() : Promise<Function>{
     });
 }
 
-function populateTables() : Promise<Function>{
+function populateTables() : Promise<void>{
     return new Promise(function(resolve, reject){
         let my_table1 = table.newTable({
             number: 1,
@@ -193,6 +194,7 @@ function populateTables() : Promise<Function>{
                             my_table6.save()
                             .then(() => {
                                 console.log("Tables populated")
+                                return resolve();
                             });
                         });
                     });
@@ -203,7 +205,7 @@ function populateTables() : Promise<Function>{
 }
 
 
-function populateFoods() : Promise<Function>{
+function populateFoods() : Promise<void>{
     return new Promise(function(resolve, reject){
         let my_food1 = food.newFood({
             name: "Olive Ascolane",
@@ -324,6 +326,8 @@ function populateFoods() : Promise<Function>{
                                                         my_food13.save()
                                                         .then(() => {
                                                             console.log("Foods populated")
+                                                            return resolve();
+
                                                         });                                          
                                                     });
                                                 });

@@ -16,18 +16,19 @@ router.get('/', (req, res) => {
             if (payload.role === roleTypes.COOK)
                 order.orderModel
                 .find()
-                .select('foods_ordered')
+                .select('foods_ordered insertionDate')
                 .populate('foods_ordered')
                 .then((orders) => { 
-                    orders.forEach((order) => {
-                        if (order.foods_ordered.length === 0) orders.splice(orders.indexOf(order),1);
+                    orders.forEach((my_order) => {
+                        if (my_order.foods_ordered.length === 0 || (new Date(my_order.insertionDate as Date).setHours(0,0,0,0) < new Date().setHours(0,0,0,0))) 
+                            orders.splice(orders.indexOf(my_order),1);
                         else {
                             let total_queue_time = 0;
-                            order.foods_ordered.forEach((food) => { total_queue_time += food['prepareTime']; });
-                            order['total_queue_time'] = total_queue_time;
+                            my_order.foods_ordered.forEach((food) => { total_queue_time += food['prepareTime']; });
+                            my_order['total_queue_time'] = total_queue_time;
                         }
-                    });
-                    orders.sort((a, b) => { return a['total_queue_time'] - b['total_queue_time']; });
+                    });               
+                    orders.sort((a, b) => { return a.insertionDate.getTime() - b.insertionDate.getTime(); });
                     res.send(orders); 
                 }); 
             else if (payload.role === roleTypes.BARMAN)
@@ -37,18 +38,20 @@ router.get('/', (req, res) => {
                 .populate('beverages_ordered')
                 .then((orders) => { 
                     orders.forEach((order) => {
-                        if (order.beverages_ordered.length === 0) orders.splice(orders.indexOf(order),1);
+                        if (order.beverages_ordered.length === 0 || ((new Date(order.insertionDate as Date).setHours(0,0,0,0) < new Date().setHours(0,0,0,0))) 
+                            orders.splice(orders.indexOf(order),1);
                         else {
                             let total_queue_time = 0;
                             order.beverages_ordered.forEach((food) => { total_queue_time += food['prepareTime']; });
                             order['total_queue_time'] = total_queue_time;
                         }
-                    });
-                    orders.sort((a, b) => { return a['total_queue_time'] - b['total_queue_time']; });
+                    });                    
+                    orders.sort((a, b) => { return a['insertionDate.getTime()'] - b['insertionDate.getTime()']; });
                     res.send(orders); 
-                });
+                }); 
             else if (payload.role === roleTypes.WAITER)
-                order.orderModel.find().populate({
+                order.orderModel.find()
+                .populate({
                     path: 'tables',
                     match: { waiterId: payload.id }
                 })
@@ -56,10 +59,11 @@ router.get('/', (req, res) => {
                     let my_orders = [];
 
                     orders.forEach((order) => {
-                    if (order.tables.length > 0)
+                    if (order.tables.length > 0 && (new Date(order.insertionDate as Date).setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)))
                         my_orders.push(order);
                     });
-        
+
+                    my_orders.sort((a, b) => { return a['insertionDate.getTime()'] - b['insertionDate.getTime()']; });
                     res.send(my_orders); 
                 });  
             else
@@ -69,16 +73,19 @@ router.get('/', (req, res) => {
                 .populate('tables')
                 .then((orders) => { 
                     orders.forEach((order) => {
-                        let total_queue_time = 0;
+                        if (new Date(order.insertionDate as Date).setHours(0,0,0,0) < new Date().setHours(0,0,0,0)) 
+                            orders.splice(orders.indexOf(order),1);
+                        else {
+                            let total_queue_time = 0;
 
-                        order.foods_ordered.forEach((food) => { total_queue_time += food['prepareTime']; });
-                        order.beverages_ordered.forEach((beverage) => { total_queue_time += beverage['prepareTime']; });
+                            order.foods_ordered.forEach((food) => { total_queue_time += food['prepareTime']; });
+                            order.beverages_ordered.forEach((beverage) => { total_queue_time += beverage['prepareTime']; });
 
-                        order['total_queue_time'] = total_queue_time;
+                            order['total_queue_time'] = total_queue_time;
+                        }
                     });
 
-                    orders.sort((a, b) => { return a['total_queue_time'] - b['total_queue_time']; });
-
+                    orders.sort((a, b) => { return a['insertionDate.getTime()'] - b['insertionDate.getTime()']; });
                     res.send(orders); 
                 });   
         }
@@ -88,32 +95,29 @@ router.get('/', (req, res) => {
 router.get('/totalprofit', (req, res) => {
     jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
         if (error) 
-            return res.status(500).json({ error: true, errormessage: "An error occurred" });
-        else{
-            if(payload.role !== roleTypes.CASHIER)
-                return res.status(401).json({ error: true, errormessage: "Unauthorized" });
-            else{
-                order.orderModel.find()
-                .populate('foods_ordered')
-                .populate('beverages_ordered')
-                .then((orders) => { 
-                    let total = 0;
-                    let today = new Date()
-                    let todayStart = new Date(today.setHours(0,0,0,0))
-                    let todayEnd = new Date(today.setHours(23,59,59,59))
-                    
-                    
-                    orders.forEach((order) => {
-                        if(todayStart <= order.insertionDate && todayEnd >= order.insertionDate){
-                            order.foods_prepared.forEach((food) => { total += food['price']; });
-                            order.beverages_prepared.forEach((beverage) => { total += beverage['price']; });
-                        }
-                    });
+            return res.sendStatus(500).json({ error: true, errormessage: "An error occurred" });
+        else if (payload.role !== roleTypes.CASHIER)
+            return res.sendStatus(401).json({ error: true, errormessage: "Unauthorized" });
+        else
+            order.orderModel.find()
+            .populate('foods_prepared')
+            .populate('beverages_prepared')
+            .then((orders) => { 
+                let total = 0;
+                let today = new Date()
+                let todayStart = new Date(today.setHours(0,0,0,0))
+                let todayEnd = new Date(today.setHours(23,59,59,59))
+                
+                
+                orders.forEach((order) => {
+                    if(todayStart <= order.insertionDate && todayEnd >= order.insertionDate){
+                        order.foods_prepared.forEach((food) => { total += food['price']; });
+                        order.beverages_prepared.forEach((beverage) => { total += beverage['price']; });
+                    }
+                });
 
-                    res.send(total); 
-                });   
-            }
-        }
+                res.send({total: total}); 
+            });
     });  
 })
 
@@ -180,10 +184,14 @@ router.put('/:orderID', (req, res) => { //we use cookie, not orderID
                 });
             else 
                 order.orderModel.findOne({_id: req.params.orderID}).then((order) => {
-                    //should we check if nothing has been selected from menu?
-                    order.beverages_ordered.push(...req.body.beverages);
-                    order.foods_ordered.push(...req.body.foods);
-                    order.save().then((order) => { res.send(order); }); //maybe add a notification for the cooks/barmans
+                    if (req.body.beverages.length === 0 && req.body.foods.length === 0)
+                        return res.status(400).json({ error: true, errormessage: "No foods or beverages selected" });
+                    else {
+                        order.beverages_ordered.push(...req.body.beverages);
+                        order.foods_ordered.push(...req.body.foods);
+                        order.insertionDate = new Date();
+                        order.save().then((order) => { res.send(order); }); //maybe add a notification for the cooks/barmans
+                    }
                 });
         }
     });  
@@ -209,7 +217,7 @@ router.delete('/:orderID', (req, res) => {
 
                 order.tables.forEach((table) => { 
                     tableModel.findOne({_id: table['_id']}).then((table) => {
-                        table.changeStatus(null);
+                        table.changeStatus(null, 0);
                         table.save();
                     });
                 });

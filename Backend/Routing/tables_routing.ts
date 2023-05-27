@@ -33,16 +33,21 @@ router.get('/', (req, res) => { //this is useful because clients do not order as
 })
 
 //Used to change status of a table form occupied to free and viceversa
-router.put('/:tableID', (req, res) => { //TODO: questo ne occupa/libera uno solo alla volta
+router.put('/', (req, res) => { //TODO: questo ne occupa/libera uno solo alla volta
     jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
         if (error) 
             return res.status(500).json({ error: true, errormessage: "An error occurred" });
         else if (payload.role !== roleTypes.ADMIN && payload.role !== roleTypes.WAITER)
             return res.status(401).json({ error: true, errormessage: "Unauthorized" });
         else{
-            table.tableModel.findOne({_id: req.params.tableID}).then((table) => { 
-                table.changeStatus(payload.id);
-                table.save().then((table) => { res.send(table); });
+            table.tableModel.findOne({_id: req.body.tableID}).then((table) => { 
+                try {
+                    table.changeStatus(payload.id, req.body.occupancy);
+                    table.save().then((table) => { res.send(table); });
+                } 
+                catch (error) {
+                    return res.status(500).json({ error: true, errormessage: error.message });
+                }
             });
         }
     });  

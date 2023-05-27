@@ -6,9 +6,10 @@ export interface Table extends mongoose.Document{
     capacity: number,
     isFree: boolean,
     waiterId: string | null,
+    occupancy: number
     //isReserved: boolean;
 
-    changeStatus: (waiterID: string) => void
+    changeStatus: (waiterID: string, occupancy: number) => void
 }
 
 const tableSchema = new mongoose.Schema<Table>({
@@ -30,14 +31,27 @@ const tableSchema = new mongoose.Schema<Table>({
         type: mongoose.SchemaTypes.String,
         required: false,
         default: null
+    },
+    occupancy:{
+        type: mongoose.SchemaTypes.Number,
+        required: false,
+        default: 0
     }
 });
 
-tableSchema.methods.changeStatus = function(waiterID: string) { 
-    this.isFree = !this.isFree; 
+tableSchema.methods.changeStatus = function(waiterID: string, occupancy: number) { 
+    if (occupancy > this.capacity) throw new Error("Occupancy cannot be greater than capacity");
     
-    if (this.isFree) this.waiterId = null;
-    else this.waiterId = waiterID;
+    this.isFree = !this.isFree; 
+
+    if (this.isFree) {
+        this.waiterId = null;
+        this.occupancy = 0;
+    }
+    else {
+        this.waiterId = waiterID;
+        this.occupancy = occupancy;
+    }
 }
 
 export function getSchema() {
