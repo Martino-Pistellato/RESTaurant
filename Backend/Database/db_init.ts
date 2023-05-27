@@ -52,6 +52,7 @@ function createDB(){
                     order.orderModel.createCollection()
                     .then(() => {
                         console.log("Collection Orders created");
+                        //populate collections with some datas
                         populateUsers().then(() => {
                             populateTables().then(() => {
                                 populateFoods().then(() => {

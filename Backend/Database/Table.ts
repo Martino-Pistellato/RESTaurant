@@ -3,9 +3,9 @@ import Ajv from "ajv";
 
 export interface Table extends mongoose.Document{
     number: number,
-    waiterId: string | null,
     capacity: number,
     isFree: boolean,
+    waiterId: string | null,
     //isReserved: boolean;
 
     changeStatus: (waiterID: string) => void
@@ -23,7 +23,7 @@ const tableSchema = new mongoose.Schema<Table>({
     },
     isFree:{
         type: mongoose.SchemaTypes.Boolean,
-        required: true,
+        required: false,
         default: true
     },
     waiterId:{

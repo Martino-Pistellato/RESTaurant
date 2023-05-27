@@ -9,7 +9,7 @@ const router = Router();
 router.get('/all', (req, res) => {
     jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
         if (error) 
-            return res.status(401).json({ error: true, errormessage: "An error occurred" });
+            return res.status(500).json({ error: true, errormessage: "An error occurred" });
         else if (payload.role !== roleTypes.ADMIN && payload.role !== roleTypes.WAITER && payload.role !== roleTypes.CASHIER)
             return res.status(401).json({ error: true, errormessage: "Unauthorized" });
         else{
@@ -22,7 +22,7 @@ router.get('/all', (req, res) => {
 router.get('/', (req, res) => { //this is useful because clients do not order as soon as they're seated
     jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
         if (error) 
-            return res.status(401).json({ error: true, errormessage: "An error occurred" });
+            return res.status(500).json({ error: true, errormessage: "An error occurred" });
         else if (payload.role !== roleTypes.WAITER)
             return res.status(401).json({ error: true, errormessage: "Unauthorized" });
         else{
@@ -36,7 +36,7 @@ router.get('/', (req, res) => { //this is useful because clients do not order as
 router.put('/:tableID', (req, res) => { //TODO: questo ne occupa/libera uno solo alla volta
     jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
         if (error) 
-            return res.status(401).json({ error: true, errormessage: "An error occurred" });
+            return res.status(500).json({ error: true, errormessage: "An error occurred" });
         else if (payload.role !== roleTypes.ADMIN && payload.role !== roleTypes.WAITER)
             return res.status(401).json({ error: true, errormessage: "Unauthorized" });
         else{
@@ -52,14 +52,13 @@ router.put('/:tableID', (req, res) => { //TODO: questo ne occupa/libera uno solo
 router.post('/', (req, res) => {
     jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
         if (error) 
-            return res.status(401).json({ error: true, errormessage: "An error occurred" });
+            return res.status(500).json({ error: true, errormessage: "An error occurred" });
         else if (payload.role != roleTypes.ADMIN)
             return res.status(401).json({ error: true, errormessage: "Unauthorized" });
         else{
             let my_table = table.newTable({
                 capacity: req.body.capacity,
                 number: req.body.number,
-                isFree: true
             }); 
             my_table.save().then((table) => { res.send(table); });
         }
@@ -70,7 +69,7 @@ router.post('/', (req, res) => {
 router.delete('/:tableID', (req, res) => {
     jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
         if (error) 
-            return res.status(401).json({ error: true, errormessage: "An error occurred" });
+            return res.status(500).json({ error: true, errormessage: "An error occurred" });
         else if (payload.role != roleTypes.ADMIN)
             return res.status(401).json({ error: true, errormessage: "Unauthorized" });
         else{

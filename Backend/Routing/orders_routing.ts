@@ -11,7 +11,7 @@ const orderStatus = order.orderStatus;
 router.get('/', (req, res) => {
     jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
         if (error) 
-            return res.status(401).json({ error: true, errormessage: "An error occurred" });
+            return res.status(500).json({ error: true, errormessage: "An error occurred" });
         else{
             if (payload.role === roleTypes.COOK)
                 order.orderModel
@@ -88,7 +88,7 @@ router.get('/', (req, res) => {
 router.get('/totalprofit', (req, res) => {
     jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
         if (error) 
-            return res.status(401).json({ error: true, errormessage: "An error occurred" });
+            return res.status(500).json({ error: true, errormessage: "An error occurred" });
         else{
             if(payload.role !== roleTypes.CASHIER)
                 return res.status(401).json({ error: true, errormessage: "Unauthorized" });
@@ -122,12 +122,12 @@ router.get('/totalprofit', (req, res) => {
 router.post('/', (req, res) => {
     jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
         if (error) 
-            return res.status(401).json({ error: true, errormessage: "An error occurred" });
+            return res.status(500).json({ error: true, errormessage: "An error occurred" });
         else if (payload.role !== roleTypes.ADMIN && payload.role !== roleTypes.WAITER)
             return res.status(401).json({ error: true, errormessage: "Unauthorized" });
         else{
             if (req.body.tables.length === 0)
-                return res.status(401).json({ error: true, errormessage: "No tables selected" });
+                return res.status(400).json({ error: true, errormessage: "No tables selected" });
             else{
                 let my_order = order.newOrder({ tables: req.body.tables });
                 my_order.save().then((order) => { 
@@ -144,7 +144,7 @@ router.post('/', (req, res) => {
 router.put('/:orderID', (req, res) => { //we use cookie, not orderID
     jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
         if (error) 
-            return res.status(401).json({ error: true, errormessage: "An error occurred" });
+            return res.status(500).json({ error: true, errormessage: "An error occurred" });
         else if (payload.role !== roleTypes.COOK && payload.role !== roleTypes.BARMAN && payload.role !== roleTypes.WAITER)
             return res.status(401).json({ error: true, errormessage: "Unauthorized" });
         else{
@@ -180,6 +180,7 @@ router.put('/:orderID', (req, res) => { //we use cookie, not orderID
                 });
             else 
                 order.orderModel.findOne({_id: req.params.orderID}).then((order) => {
+                    //should we check if nothing has been selected from menu?
                     order.beverages_ordered.push(...req.body.beverages);
                     order.foods_ordered.push(...req.body.foods);
                     order.save().then((order) => { res.send(order); }); //maybe add a notification for the cooks/barmans
@@ -192,7 +193,7 @@ router.put('/:orderID', (req, res) => { //we use cookie, not orderID
 router.delete('/:orderID', (req, res) => {
     jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
         if (error) 
-            return res.status(401).json({ error: true, errormessage: "An error occurred" });
+            return res.status(500).json({ error: true, errormessage: "An error occurred" });
         else if (payload.role !== roleTypes.ADMIN && payload.role !== roleTypes.CASHIER)
             return res.status(401).json({ error: true, errormessage: "Unauthorized" });
         else{

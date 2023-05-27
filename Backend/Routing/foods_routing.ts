@@ -9,7 +9,7 @@ const router = Router();
 router.get('/', (req, res) => {
     jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
         if (error) 
-            return res.status(401).json({ error: true, errormessage: "An error occurred" });
+            return res.status(500).json({ error: true, errormessage: "An error occurred" });
         else if (payload.role !== roleTypes.ADMIN && payload.role !== roleTypes.WAITER) //TODO: add cooks?
             return res.status(401).json({ error: true, errormessage: "Unauthorized" });
         else{
@@ -23,7 +23,7 @@ router.get('/', (req, res) => {
 router.post('/', (req, res) => {
     jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
         if (error) 
-            return res.status(401).json({ error: true, errormessage: "An error occurred" });
+            return res.status(500).json({ error: true, errormessage: "An error occurred" });
         else if (payload.role !== roleTypes.ADMIN) //TODO: add cooks?
             return res.status(401).json({ error: true, errormessage: "Unauthorized" });
         else{
@@ -43,7 +43,7 @@ router.post('/', (req, res) => {
 router.delete('/:foodID', (req, res) => {
     jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (error, payload) => {
         if (error) 
-            return res.status(401).json({ error: true, errormessage: "An error occurred" });
+            return res.status(500).json({ error: true, errormessage: "An error occurred" });
         else if (payload.role !== roleTypes.ADMIN) //add cooks?
             return res.status(401).json({ error: true, errormessage: "Unauthorized" });
         else{
