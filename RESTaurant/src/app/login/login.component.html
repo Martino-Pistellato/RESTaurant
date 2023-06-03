@@ -1,6 +1,6 @@
-<form method="get">
-    <input type = "text" placeholder="Username">
-    <input type = "password" placeholder="Password">
-    <input type = "submit" placeholder="Login">
+<form>
+    <input #email type = "text" placeholder="Email">
+    <input #password type = "password" placeholder="Password">
+    <button type="button" (click)="login(email.value, password.value)">Login</button>
 </form>
 <!-- redirect to home -->

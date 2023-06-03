@@ -37,7 +37,7 @@ if( !process.env.JWT_SECRET ) {
 mongoose.connect('mongodb+srv://Furellato:XV5Nbg3sRBz5flZN@restaurant.bqyjdfs.mongodb.net/RESTaurant_db?retryWrites=true&w=majority');
 
 const app = express();
-app.use( cors() );
+app.use( cors({origin: "https://localhost:4200"}) );
 app.use( express.json( ) );
 app.use( cookieParser() );
 
@@ -54,10 +54,10 @@ let ios = new Server(server);
 server.listen(3000, () => console.log("HTTPS Server started on port 3000"));
 
 passport.use( new passportHTTP.BasicStrategy(
-    function(username, password, done) {
-        console.log("New login attempt from " + username );
+    function(email, password, done) {
+        console.log("New login attempt from " + email );
 
-        userModel.findOne({ email: username }).then((user)=>{
+        userModel.findOne({ email: email }).then((user)=>{
             if( !user ) 
                 return done(null,false,{statusCode: 500, error: true, errormessage:"Invalid user"});
 
@@ -83,7 +83,7 @@ app.get('/login', passport.authenticate('basic', { session: false }),(req, res) 
     res.cookie('token', token_signed, {httpOnly: true, secure: true, sameSite: 'none'});
 
     //app.redirect('/home');
-    return res.status(200).json({ error: false, errormessage: "", token: token_signed });
+    res.send({token: token_signed});
 })
 
 //TODO: add @login_required (or something like that)

@@ -4,9 +4,11 @@ import { LoginComponent } from './login/login.component';
 import { OrdersComponent } from './orders/orders.component';
 import { TablesComponent } from './tables/tables.component';
 import { FoodsComponent } from './foods/foods.component';
+import { HomeComponent } from './home/home.component';
 import { CreateUserComponent } from './create-user/create-user.component';
 
 const routes: Routes = [
+  { path: 'home', component:  HomeComponent },
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component:  LoginComponent },
   { path: 'orders', component:  OrdersComponent },
