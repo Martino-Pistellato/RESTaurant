@@ -1,0 +1,11 @@
+{
+    "/": {
+        "target": "https://backend:3000",
+        "secure": false,
+        "changeOrigin": true,
+        "rejectUnauthorized": false,
+        "strictSSL": true,
+        "logLevel": "debug",
+        "withCredentials": true
+    }
+}

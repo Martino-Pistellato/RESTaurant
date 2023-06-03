@@ -31,6 +31,9 @@ if( !process.env.JWT_SECRET ) {
     process.exit(-1);
 }
 
+//process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = "0";
+
+
 mongoose.connect('mongodb+srv://Furellato:XV5Nbg3sRBz5flZN@restaurant.bqyjdfs.mongodb.net/RESTaurant_db?retryWrites=true&w=majority');
 
 const app = express();
