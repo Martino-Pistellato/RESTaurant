@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, throwError, catchError  } from 'rxjs';
 import jwt_decode from "jwt-decode";
 
-export enum roleTypes{
+export enum RoleTypes{
   ADMIN,
   CASHIER,
   BARMAN,
@@ -17,14 +17,14 @@ export interface Token{
 
 export interface TokenData{
   name:   string,  
-  role:   roleTypes,
+  role:   RoleTypes,
   email:  string,
   id :    string
 };
 
 export interface User{
   name:       string,  
-  role:       roleTypes,
+  role:       RoleTypes,
   email:      string,
   id :        string,
   password:   string
@@ -34,19 +34,19 @@ export interface User{
   providedIn: 'root'
 })
 export class UsersService {
-  private token: string;
-  private user_data: TokenData | null;
+  private _token: string;
+  private _user_data: TokenData | null;
 
   constructor(private http: HttpClient) { 
     const loadedtoken = localStorage.getItem('user_token');
 
     if ( !loadedtoken || loadedtoken.length < 1 ) {
       console.log("No token found in local storage");
-      this.token = "";
-      this.user_data = null;
+      this._token = "";
+      this._user_data = null;
     } else {
-      this.token = loadedtoken as string;
-      this.user_data = jwt_decode<TokenData>(this.token);
+      this._token = loadedtoken as string;
+      this._user_data = jwt_decode<TokenData>(this.token);
       console.log("JWT loaded from local storage.")
     }
   }
@@ -63,12 +63,30 @@ export class UsersService {
     return this.http.get('https://localhost:3000/login',  options).pipe(
       tap( (data) => {
         console.log("Login successful");
-        this.token = (data as Token).token;
-        this.user_data = jwt_decode<TokenData>(this.token);
-        //localStorage.setItem('user_token', this.token);
+        this._token = (data as Token).token;
+        this._user_data = jwt_decode<TokenData>(this._token);
+        localStorage.setItem('user_token', this._token);
+      }),
+      catchError( (err) => {
+        console.log("Login failed");
+        return throwError(()=>{ return err });
       })
     );
   }
 
+  get role(): RoleTypes | null{
+    if(this._user_data)
+      return this._user_data.role;
+    else
+      return null;
+  }
+
+  get token() : string{
+    return this._token;
+  }
+
+  get user_data() : TokenData | null{
+    return this._user_data;
+  }
   //todo: add a logout function
 }

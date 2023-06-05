@@ -1,1 +1,8 @@
 <p>tables works!</p>
+<div class="container">
+    <ul>
+        <li *ngFor="let table of tables">
+            <button (click)="changeStatus(table.number)">tavolo: {{table.number}}, libero: {{table.isFree}}</button>
+        </li>
+    </ul>
+</div>

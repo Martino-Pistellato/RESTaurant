@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { UsersService } from '../services/users/users.service';
+import { UsersService, RoleTypes } from '../services/users/users.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -8,11 +8,13 @@ import { Router } from '@angular/router';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-  public errmessage = undefined;
-  
+  public errmessage: string | undefined = undefined;
+  public role: RoleTypes | null = null;
+
   constructor( private us: UsersService, private router: Router  ) { }
 
   ngOnInit() {
+    this.role = this.us.role;
   }
 
   login(mail: string, password: string) {
@@ -24,8 +26,13 @@ export class LoginComponent {
       },
       error: (err) => {
         console.log('Login error: ' + JSON.stringify(err));
-        this.errmessage = err.message;
-
+        
+        if(err.status === 401)
+          this.errmessage = "Invalid credentials";
+        else if(err.status === 500)
+          this.errmessage = "Server error";
+        else
+          this.errmessage = err.message;
       }
     });
 

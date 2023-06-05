@@ -9,7 +9,7 @@ import jsonwebtoken = require('jsonwebtoken');  // JWT generation
 import passport = require('passport');           
 import passportHTTP = require('passport-http');
 
-import { userModel } from './Database/User';
+import { userModel, roleTypes } from './Database/User';
 import users_router from './Routing/users_routing';
 import foods_router from './Routing/foods_routing';
 import orders_router from './Routing/orders_routing';
@@ -17,10 +17,37 @@ import tables_router from './Routing/tables_routing';
 
 const result = require('dotenv').config();
 const { expressjwt: jwt } = require('express-jwt');
-let auth = jwt({
+export const auth = jwt({
     secret: process.env.JWT_SECRET, 
     algorithms: ["HS256"]
 });
+
+passport.use( new passportHTTP.BasicStrategy(
+    function(email, password, done) {
+        console.log("New login attempt from " + email );
+
+        userModel.findOne({ email: email }).then((user)=>{
+            if( !user ) 
+                return done(null,false,{statusCode: 500, error: true, errormessage:"Invalid user"});
+
+            if(user.validatePassword(password))
+                return done(null, user);
+
+            return done(null,false,{statusCode: 500, error: true, errormessage:"Invalid password"});
+        });
+    }
+));
+
+export function authorize(roles: roleTypes[] = []) {
+    return [
+        auth,
+        (req: any, res: any, next: any) => {
+            if (roles.length && !roles.includes(req.auth.role)) 
+                return res.status(401).json({error: true, errormessage: 'Unhautorized'});
+            next();
+        }
+    ];
+}
 
 if( result.error ) {
     console.log("Unable to load \".env\" file. Please provide one to store the JWT secret key");
@@ -30,9 +57,6 @@ if( !process.env.JWT_SECRET ) {
     console.log("\".env\" file loaded but JWT_SECRET=<secret> key-value pair was not found");
     process.exit(-1);
 }
-
-//process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = "0";
-
 
 mongoose.connect('mongodb+srv://Furellato:XV5Nbg3sRBz5flZN@restaurant.bqyjdfs.mongodb.net/RESTaurant_db?retryWrites=true&w=majority');
 
@@ -53,22 +77,6 @@ let server = https.createServer({
 let ios = new Server(server);
 server.listen(3000, () => console.log("HTTPS Server started on port 3000"));
 
-passport.use( new passportHTTP.BasicStrategy(
-    function(email, password, done) {
-        console.log("New login attempt from " + email );
-
-        userModel.findOne({ email: email }).then((user)=>{
-            if( !user ) 
-                return done(null,false,{statusCode: 500, error: true, errormessage:"Invalid user"});
-
-            if(user.validatePassword(password))
-                return done(null, user);
-
-            return done(null,false,{statusCode: 500, error: true, errormessage:"Invalid password"});
-        });
-    }
-));
-
 //Login route
 app.get('/login', passport.authenticate('basic', { session: false }),(req, res) => {
     console.log("Login granted. Generating token" );
@@ -79,12 +87,16 @@ app.get('/login', passport.authenticate('basic', { session: false }),(req, res) 
         email: req.user.email,
         id : req.user._id
     };
-    let token_signed = jsonwebtoken.sign(tokendata, process.env.JWT_SECRET, { expiresIn: '24h' } );
-    res.cookie('token', token_signed, {httpOnly: true, secure: true, sameSite: 'none'});
+    let token_signed = jsonwebtoken.sign(tokendata, process.env.JWT_SECRET, { expiresIn: '10m' } );
+    res.cookie('token', token_signed, {httpOnly: true, secure: true, sameSite: 'none'});//TODO: we can eliminate it
 
     //app.redirect('/home');
     res.send({token: token_signed});
 })
+
+
+
+
 
 //TODO: add @login_required (or something like that)
 //TODO: add logout
