@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { TablesService, Table } from '../services/tables/tables.service';
-import { UsersService, RoleTypes } from '../services/users/users.service';
+import { TablesService, Table } from '../../services/tables-services/tables.service';
+import { UsersService, RoleTypes } from '../../services/users-services/users.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -43,4 +43,27 @@ export class TablesComponent {
       }
     });
   }
+
+  createTable(capacity: Number, number: Number): void {
+    this.tablesService.createTable(capacity, number).subscribe({
+      next: (table) => {
+        this.getAllTables();
+      },
+      error: (err) => {
+        console.log('Error: ' + JSON.stringify(err));
+      }
+    });
+  }
+
+  deleteTable(tableNumber: Number): void {
+    this.tablesService.deleteTable(tableNumber).subscribe({
+      next: (table) => {
+        this.getAllTables();
+      },
+      error: (err) => {
+        console.log('Error: ' + JSON.stringify(err));
+      }
+    });
+  }
+
 }

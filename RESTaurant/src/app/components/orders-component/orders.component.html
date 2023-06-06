@@ -1,0 +1,18 @@
+<div class="container">
+    <ul> Tavoli che hanno già ordinato
+        <li *ngFor="let table of tablesWithOrders">
+            <button (click)="selectTable(table)"> tavolo: {{table.number}}
+            </button>
+        </li>
+    </ul>
+</div>
+<div class="container">
+    <ul> Tavoli che devono ancora ordinare
+        <li *ngFor="let table of tablesWithoutOrders">
+            <button (click)="selectTable(table)">tavolo: {{table.number}}
+            </button>
+        </li>
+    </ul>
+</div>
+<button (click)="getOrderId()">Avanti</button>
+<a routerLink="/home"><button > home </button></a>

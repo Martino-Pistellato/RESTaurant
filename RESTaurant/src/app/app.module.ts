@@ -4,12 +4,12 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { LoginComponent } from './login/login.component';
-import { HomeComponent } from './home/home.component';
-import { CreateUserComponent } from './create-user/create-user.component';
-import { TablesComponent } from './tables/tables.component';
-import { OrdersComponent } from './orders/orders.component';
-import { FoodsComponent } from './foods/foods.component';
+import { LoginComponent } from './components/login-component/login.component';
+import { HomeComponent } from './components/home-component/home.component';
+import { CreateUserComponent } from './components/create-user-component/create-user.component';
+import { TablesComponent } from './components/tables-component/tables.component';
+import { OrdersComponent } from './components/orders-component/orders.component';
+import { FoodsComponent } from './components/foods-component/foods.component';
 
 @NgModule({
   declarations: [
