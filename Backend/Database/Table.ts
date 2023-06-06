@@ -39,19 +39,26 @@ const tableSchema = new mongoose.Schema<Table>({
     }
 });
 
+//handle case of cashier freeing table --> what about admin?
 tableSchema.methods.changeStatus = function(waiterID: string, occupancy: number) { 
     if (occupancy > this.capacity) throw new Error("Occupancy cannot be greater than capacity");
     
-    this.isFree = !this.isFree; 
-
-    if (this.isFree) {
-        this.waiterId = null;
-        this.occupancy = 0;
+    if(!this.isFree){
+        if(this.waiterId == waiterID || waiterID == null){
+            this.isFree = true
+            this.waiterId = null;
+            this.occupancy = 0;
+        }
+        else{
+            throw new Error("You cannot free a table you're not serving!");
+        }
     }
-    else {
+    else{
+        this.isFree = false
         this.waiterId = waiterID;
         this.occupancy = occupancy;
     }
+
 }
 
 export function getSchema() {
