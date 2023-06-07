@@ -8,6 +8,16 @@
     <button class="btn btn-primary" routerLink="/tables">Vedi tavoli</button>
     <button class="btn btn-primary" routerLink="/orders">Vedi ordini</button>
 </div>
+
+<div class="container" *ngIf="role === 1">
+    <button class="btn btn-primary" routerLink="/tables">Vedi tavoli</button>
+    <button class="btn btn-primary" routerLink="/orders">Vedi ordini</button>
+</div>
+
+<div class="container" *ngIf="role === 2 || role === 3">
+    <button class="btn btn-primary" routerLink="/orders">Vedi ordini</button>
+</div>
+
 <div class="container" *ngIf="role === 4">
     <button class="btn btn-primary" routerLink="/tables">Vedi tavoli</button>
     <button class="btn btn-primary" routerLink="/orders">Vedi ordini</button>

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { TablesService, Table } from 'src/app/services/tables-services/tables.service';
-import { OrdersService, Order } from 'src/app/services/orders-services/orders.service';
+import { OrdersService, Order, OrderStatus } from 'src/app/services/orders-services/orders.service';
 import { UsersService, RoleTypes } from 'src/app/services/users-services/users.service';
 
 @Component({
@@ -14,11 +14,18 @@ export class OrdersComponent {
   private myOrders: Order[] = [];
   private tablesWithOrders: Table[] = [];
 
+  public role: RoleTypes;
+
+  //USED FOR WAITERS  
   public tablesWithoutOrders: Table[] = [];
   public selectedTables: Table[] = [];
   public shownSelectedTables: string = '';
   public shownOrders: Order[] = [];
-  public role: RoleTypes;
+
+  //FOR COOKS AND BARMEN
+  public arrivedOrders: Order[] = [];
+  public preparingOrders: Order[] = [];
+  public showFoods: Order[] = [];
 
   constructor(private tablesService: TablesService, 
               private ordersService: OrdersService,
@@ -39,6 +46,7 @@ export class OrdersComponent {
               this.dispatchTables(); 
             }
           );
+        else this.dispatchOrders();       
       }
     );
   }
@@ -60,6 +68,41 @@ export class OrdersComponent {
         return true;
       });
     });
+  }
+
+  dispatchOrders(): void {
+    this.preparingOrders = [];
+    this.arrivedOrders = [];
+    this.showFoods = [];
+
+    this.ordersService.getOrders().subscribe(
+      (orders) => { 
+        this.myOrders = orders;
+
+        if (this.role === RoleTypes.BARMAN)
+          this.myOrders.forEach((order)=>{
+            if(order.status.beverages === OrderStatus.PREPARING)
+              this.preparingOrders.push(order);
+            else
+              this.arrivedOrders.push(order);
+          });
+        else if (this.role === RoleTypes.COOK)
+          this.myOrders.forEach((order)=>{
+            console.log(order);
+            if(order.status.foods === OrderStatus.PREPARING)
+              this.preparingOrders.push(order);
+            else
+              this.arrivedOrders.push(order);
+          });
+      }
+    );
+  }
+
+  showFood(order: Order): void {
+    if(this.showFoods.includes(order))
+      this.showFoods.splice(this.showFoods.indexOf(order),1);
+    else
+      this.showFoods.push(order);
   }
 
   selectTable(table: Table, order: Order | null): void {
@@ -101,7 +144,11 @@ export class OrdersComponent {
     }
   }
 
-  changePage(route: string): void{
+  updateOrder(order: Order): void{
+    this.ordersService.updateOrder(order).subscribe((updated_order) => this.dispatchOrders());
+  }
+
+  changePage(route: string): void {
     this.selectedTables = [];
     this.dispatchTables();
     this.router.navigate([route]);

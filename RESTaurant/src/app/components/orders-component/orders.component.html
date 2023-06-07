@@ -2,28 +2,30 @@
 
 <div class="container" *ngIf="role === 0 || role === 1">
     <p> ADMIN o CASHIER </p>
-
-    <button (click)="getOrderId()"> Avanti </button>
 </div>
 
 <div class="container" *ngIf="role === 2 || role === 3">
-    <ul> Ordini arrivati
-        <ng-container *ngFor="let order of shownOrders">
-            <li *ngFor="let table of order.tables">
-                <span></span>
-                <button (click)="selectTable(table, order)"> Prendi in carico </button>
+    <p>Ordini arrivati</p>
+    <ul *ngFor="let order of arrivedOrders" (click)="showFood(order)"> 
+        <p>Tavoli: <span *ngFor="let table of order.tables">{{table.number}} </span></p>
+        <ng-container *ngIf="showFoods.includes(order)">
+            <li *ngFor="let food of ((role === 3) ? order.foods_ordered : order.beverages_ordered)">
+                <span>{{food.name}}</span>
             </li>
         </ng-container>
+        <button (click)="updateOrder(order)"> Prendi in carico </button>
     </ul>
 
-    <div class="container">
-        <ul> Ordini presi in carico
-            <li *ngFor="let table of tablesWithoutOrders">
-                <button (click)="selectTable(table, null)">tavolo: {{table.number}}
-                </button>
+    <p>Ordini in preparazione</p>
+    <ul *ngFor="let order of preparingOrders" (click)="showFood(order)"> 
+        <p>Tavoli: <span *ngFor="let table of order.tables">{{table.number}} </span></p>
+        <ng-container *ngIf="showFoods.includes(order)">
+            <li *ngFor="let food of ((role === 3) ? order.foods_ordered : order.beverages_ordered)">
+                <span>{{food.name}}</span>
             </li>
-        </ul>
-    </div>
+        </ng-container>
+        <button (click)="updateOrder(order)"> Termina </button>
+    </ul>
 </div>
 
 <div class="container" *ngIf="role === 4">

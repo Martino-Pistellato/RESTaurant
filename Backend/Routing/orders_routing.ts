@@ -12,8 +12,9 @@ router.get('/', my_authorize([]), (req, res) => {
     if (req.auth.role === roleTypes.COOK)
         order.orderModel
             .find()
-            .select('foods_ordered insertionDate')
+            .select('foods_ordered insertionDate status tables')
             .populate('foods_ordered')
+            .populate('tables')
             .then((orders) => {
                 orders.forEach((my_order) => {
                     if (my_order.foods_ordered.length === 0 || (new Date(my_order.insertionDate as Date).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0)))
@@ -30,8 +31,9 @@ router.get('/', my_authorize([]), (req, res) => {
     else if (req.auth.role === roleTypes.BARMAN)
         order.orderModel
             .find()
-            .select('beverages_ordered insertionDate')
+            .select('beverages_ordered insertionDate status tables')
             .populate('beverages_ordered')
+            .populate('tables')
             .then((orders) => {
                 orders.forEach((my_order) => {
                     if (my_order.beverages_ordered.length === 0 || ((new Date(my_order.insertionDate as Date).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0))))
