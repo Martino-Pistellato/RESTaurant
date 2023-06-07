@@ -1,5 +1,33 @@
-<p>Tavoli selezionati: {{shownSelectedTables}}</p>
-<div class="container">
+<p>--ORDINI--</p>
+
+<div class="container" *ngIf="role === 0 || role === 1">
+    <p> ADMIN o CASHIER </p>
+
+    <button (click)="getOrderId()"> Avanti </button>
+</div>
+
+<div class="container" *ngIf="role === 2 || role === 3">
+    <ul> Ordini arrivati
+        <ng-container *ngFor="let order of shownOrders">
+            <li *ngFor="let table of order.tables">
+                <span></span>
+                <button (click)="selectTable(table, order)"> Prendi in carico </button>
+            </li>
+        </ng-container>
+    </ul>
+
+    <div class="container">
+        <ul> Ordini presi in carico
+            <li *ngFor="let table of tablesWithoutOrders">
+                <button (click)="selectTable(table, null)">tavolo: {{table.number}}
+                </button>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="container" *ngIf="role === 4">
+    <p>Tavoli selezionati: {{shownSelectedTables}}</p>
     <ul> Tavoli che hanno già ordinato
         <ng-container *ngFor="let order of shownOrders">
             <li *ngFor="let table of order.tables">
@@ -7,14 +35,19 @@
             </li>
         </ng-container>
     </ul>
+
+    <div class="container">
+        <ul> Tavoli che devono ancora ordinare
+            <li *ngFor="let table of tablesWithoutOrders">
+                <button (click)="selectTable(table, null)">tavolo: {{table.number}}
+                </button>
+            </li>
+        </ul>
+    </div>
+
+    <button (click)="getOrderId()"> Avanti </button>
 </div>
-<div class="container">
-    <ul> Tavoli che devono ancora ordinare
-        <li *ngFor="let table of tablesWithoutOrders">
-            <button (click)="selectTable(table, null)">tavolo: {{table.number}}
-            </button>
-        </li>
-    </ul>
-</div>
-<button (click)="getOrderId()">Avanti</button>
-<a routerLink="/home"><button > home </button></a>
+
+
+
+<a routerLink="/home"><button > Home </button></a>

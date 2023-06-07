@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { TablesService, Table } from 'src/app/services/tables-services/tables.service';
 import { OrdersService, Order } from 'src/app/services/orders-services/orders.service';
+import { UsersService, RoleTypes } from 'src/app/services/users-services/users.service';
 
 @Component({
   selector: 'app-orders',
@@ -17,19 +18,27 @@ export class OrdersComponent {
   public selectedTables: Table[] = [];
   public shownSelectedTables: string = '';
   public shownOrders: Order[] = [];
+  public role: RoleTypes;
 
-  constructor(private tablesService: TablesService, private ordersService: OrdersService, private router: Router) { }
+  constructor(private tablesService: TablesService, 
+              private ordersService: OrdersService,
+              private usersService: UsersService, 
+              private router: Router) {
+    this.role = (this.usersService.role as RoleTypes);
+  }
 
   ngOnInit(): void {
-    this.tablesService.getMyTables().subscribe(
-      (tables) => { 
-        this.myTables = tables; 
-        this.ordersService.getOrders().subscribe(
-          (orders) => { 
-            this.myOrders = orders;  
-            this.dispatchTables();
-          }
-        );      
+    this.ordersService.getOrders().subscribe(
+      (orders) => { 
+        this.myOrders = orders;
+
+        if (this.role === RoleTypes.WAITER) 
+          this.tablesService.getMyTables().subscribe(
+            (tables) => { 
+              this.myTables = tables; 
+              this.dispatchTables(); 
+            }
+          );
       }
     );
   }
@@ -78,11 +87,18 @@ export class OrdersComponent {
   }
 
   getOrderId(): void { //alfredo@waiter.RESTaurant.it
+    if (this.selectedTables.length === 0) return;
+
     if (this.shownOrders.length === 0)
       this.ordersService.createOrder([...this.selectedTables.map((table) => { return ''+table._id })])
-      .subscribe((order) => { this.changePage('home'); });
-    else //this.shownOrder.at(0) contains the order related to the selected tables
-      this.changePage('home');//we should send somehow the orderId 
+      .subscribe((order) => { 
+        this.ordersService.selectedOrder = order._id;
+        this.changePage('foods'); 
+      });
+    else{ 
+      this.ordersService.selectedOrder = (this.shownOrders.at(0) as Order)._id;
+      this.changePage('foods');
+    }
   }
 
   changePage(route: string): void{

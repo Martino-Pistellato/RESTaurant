@@ -4,6 +4,7 @@ import { Observable, catchError  } from 'rxjs';
 import { Table } from '../tables-services/tables.service';
 import { UsersService } from '../users-services/users.service';
 import { handleError, createOptions } from 'src/app/utils';
+import { Food } from '../foods-services/foods.service';
 
 export enum orderStatus {
   RECEIVED,
@@ -34,6 +35,7 @@ export interface Order{
   providedIn: 'root'
 })
 export class OrdersService {
+  public selectedOrder: string = '';
 
   constructor(private http: HttpClient, private usersService: UsersService) { }
 
@@ -49,4 +51,14 @@ export class OrdersService {
     );
   }
 
+  updateOrder(foods: Food[], beverages: Food[]): Observable<Order>{
+    console.log(foods);
+    console.log(beverages);
+    return this.http.put<Order>('https://localhost:3000/orders/'+this.selectedOrder, {
+      foods: foods,
+      beverages: beverages,
+    }, createOptions({}, this.usersService.token)).pipe(
+      catchError(handleError)
+    );
+  }
 }

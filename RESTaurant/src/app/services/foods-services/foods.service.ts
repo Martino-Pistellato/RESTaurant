@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
-import { HttpClient} from '@angular/common/http';
-import {Observable} from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Observable, catchError } from 'rxjs';
+import { UsersService } from '../users-services/users.service';
+import { handleError, createOptions } from 'src/app/utils';
 
-export enum foodTypes{
+export enum FoodTypes{
   APPETIZER,
   FIRST_COURSE,
   SECOND_COURSE,
@@ -12,12 +14,12 @@ export enum foodTypes{
 }
 
 export interface Food{
-  id:             string;
+  _id:             string;
   name:           string;
   price:          number;
   prepareTime:    number; //in minutes
   ingredients:    string[]; 
-  type:           foodTypes;
+  type:           FoodTypes;
 }
 
 
@@ -26,18 +28,23 @@ export interface Food{
 })
 export class FoodsService {
 
-  constructor(private http:HttpClient) { }
+  constructor(private http:HttpClient, private usersService: UsersService) { }
 
   getFoods(): Observable<Food[]>{
-    //how do cookies work? is it already sent with the request?
-    return this.http.get<Food[]>('/foods');
+    return this.http.get<Food[]>('https://localhost:3000/foods', createOptions({},this.usersService.token)).pipe(
+      catchError(handleError)
+    );
   }
 
   addFood(food: Food){
-    return this.http.post('/foods', food);
+    return this.http.post('https://localhost:3000/foods', food,  createOptions({},this.usersService.token)).pipe(
+      catchError(handleError)
+    );
   }
 
   deleteFood(foodID: string){
-    return this.http.delete('/foods/' + foodID);
+    return this.http.delete('https://localhost:3000/foods/' + foodID,  createOptions({},this.usersService.token)).pipe(
+      catchError(handleError)
+    );
   }
 }

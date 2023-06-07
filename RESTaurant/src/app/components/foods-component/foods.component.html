@@ -1,1 +1,14 @@
-<p>foods works!</p>
+<div class="container" *ngIf="role === 4">
+    <p>Cibi selezionati: {{selectedFoods.length}}</p>
+    <p>Bevande selezionate: {{selectedBeverages.length}}</p>
+
+    <ul>
+        <li *ngFor="let food of foods">
+            <button (click)="removeFood(food)">-</button>
+            <span> {{food.name}} </span>
+            <button (click)="addFood(food)">+</button>
+        </li>
+    </ul>
+    <button (click)="updateOrder()">Aggiungi all'ordine</button>
+</div>
+

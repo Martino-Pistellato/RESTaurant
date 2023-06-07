@@ -19,14 +19,14 @@ export interface TokenData{
   name:   string,  
   role:   RoleTypes,
   email:  string,
-  id :    string
+  id:    string
 };
 
 export interface User{
   name:       string,  
   role:       RoleTypes,
   email:      string,
-  id :        string,
+  id:         string,
   password:   string
 };
 
