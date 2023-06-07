@@ -1,15 +1,17 @@
+<p>Tavoli selezionati: {{shownSelectedTables}}</p>
 <div class="container">
     <ul> Tavoli che hanno già ordinato
-        <li *ngFor="let table of tablesWithOrders">
-            <button (click)="selectTable(table)"> tavolo: {{table.number}}
-            </button>
-        </li>
+        <ng-container *ngFor="let order of shownOrders">
+            <li *ngFor="let table of order.tables">
+                <button (click)="selectTable(table, order)"> tavolo: {{table.number}} </button>
+            </li>
+        </ng-container>
     </ul>
 </div>
 <div class="container">
     <ul> Tavoli che devono ancora ordinare
         <li *ngFor="let table of tablesWithoutOrders">
-            <button (click)="selectTable(table)">tavolo: {{table.number}}
+            <button (click)="selectTable(table, null)">tavolo: {{table.number}}
             </button>
         </li>
     </ul>
