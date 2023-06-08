@@ -38,15 +38,12 @@
         </ng-container>
     </ul>
 
-    <div class="container">
-        <ul> Tavoli che devono ancora ordinare
-            <li *ngFor="let table of tablesWithoutOrders">
-                <button (click)="selectTable(table, null)">tavolo: {{table.number}}
-                </button>
-            </li>
-        </ul>
-    </div>
-
+    <ul> Tavoli che devono ancora ordinare
+        <li *ngFor="let table of tablesWithoutOrders">
+            <button (click)="selectTable(table, null)">tavolo: {{table.number}}
+            </button>
+        </li>
+    </ul>
     <button (click)="getOrderId()"> Avanti </button>
 </div>
 

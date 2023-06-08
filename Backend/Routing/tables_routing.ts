@@ -2,10 +2,10 @@ import { roleTypes } from '../Database/User'
 import * as table from '../Database/Table'
 import { Router } from 'express';
 import { my_authorize } from '../utils';
+import * as order from '../Database/Order'
 
 // const result = require('dotenv').config();
 const router = Router();
-const { expressjwt: jwt } = require('express-jwt');
 //Get all tables route
 router.get('/all', my_authorize([roleTypes.WAITER,roleTypes.ADMIN,roleTypes.CASHIER]), (req, res, next) => {
     table.tableModel.find().populate('waiterId').then((tables) => { res.send(tables); });
@@ -21,8 +21,17 @@ router.get('/', my_authorize([roleTypes.WAITER]), (req, res, next) => { //client
 router.put('/', my_authorize([roleTypes.WAITER, roleTypes.ADMIN]), (req, res, next) => { //ne occupa/libera uno alla volta
     table.tableModel.findOne({number: req.body.tableNumber}).then((table) => { 
         try {
-            table.changeStatus(req.auth.id, req.body.occupancy);
-            table.save().then((table) => { res.send(table); });
+            order.orderModel.find().then((orders)=>{
+                if (orders.every((order)=>!order.tables.includes(table._id))){
+                    table.changeStatus(req.auth.id, req.body.occupancy);
+                    table.save().then((table) => { res.send(table); });
+                }
+                else
+                    return res.status(500).json({ 
+                        error: true, 
+                        errormessage: "Non è possibile liberare un tavolo il cui ordine non è ancora evaso" 
+                    });
+            })
         } 
         catch (error) {
             return res.status(500).json({ error: true, errormessage: error.message });

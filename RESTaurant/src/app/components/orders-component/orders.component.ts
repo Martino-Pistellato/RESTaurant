@@ -12,11 +12,11 @@ import { UsersService, RoleTypes } from 'src/app/services/users-services/users.s
 export class OrdersComponent {
   private myTables: Table[] = [];
   private myOrders: Order[] = [];
-  private tablesWithOrders: Table[] = [];
-
+  
   public role: RoleTypes;
 
   //USED FOR WAITERS  
+  private tablesWithOrders: Table[] = [];
   public tablesWithoutOrders: Table[] = [];
   public selectedTables: Table[] = [];
   public shownSelectedTables: string = '';
@@ -53,9 +53,8 @@ export class OrdersComponent {
 
   dispatchTables(): void{
     this.tablesWithOrders = [];
-    this.tablesWithoutOrders = [];
-    this.tablesWithoutOrders = this.myTables.slice();
-    this.shownOrders = this.myOrders.slice();
+    this.tablesWithoutOrders = [...this.myTables];
+    this.shownOrders = [...this.myOrders];
 
     this.myOrders.forEach((order) => {
       this.tablesWithOrders.push(...order.tables);
@@ -83,15 +82,14 @@ export class OrdersComponent {
           this.myOrders.forEach((order)=>{
             if(order.status.beverages === OrderStatus.PREPARING)
               this.preparingOrders.push(order);
-            else
+            else if(order.status.beverages === OrderStatus.RECEIVED)
               this.arrivedOrders.push(order);
           });
         else if (this.role === RoleTypes.COOK)
           this.myOrders.forEach((order)=>{
-            console.log(order);
             if(order.status.foods === OrderStatus.PREPARING)
               this.preparingOrders.push(order);
-            else
+            else if(order.status.foods === OrderStatus.RECEIVED)
               this.arrivedOrders.push(order);
           });
       }

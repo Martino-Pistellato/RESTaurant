@@ -16,17 +16,18 @@ router.get('/', my_authorize([]), (req, res) => {
             .populate('foods_ordered')
             .populate('tables')
             .then((orders) => {
+                let orders_to_return = [...orders];
                 orders.forEach((my_order) => {
                     if (my_order.foods_ordered.length === 0 || (new Date(my_order.insertionDate as Date).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0)))
-                        orders.splice(orders.indexOf(my_order), 1);
+                        orders_to_return.splice(orders_to_return.indexOf(my_order), 1);
                     else {
                         let total_queue_time = 0;
                         my_order.foods_ordered.forEach((food) => { total_queue_time += food['prepareTime']; });
-                        my_order['total_queue_time'] = total_queue_time;
+                        orders_to_return['total_queue_time'] = total_queue_time;
                     }
                 });
-                orders.sort((a, b) => { return a.insertionDate.getTime() - b.insertionDate.getTime(); });
-                res.send(orders);
+                orders_to_return.sort((a, b) => { return a.insertionDate.getTime() - b.insertionDate.getTime(); });
+                res.send(orders_to_return);
             });
     else if (req.auth.role === roleTypes.BARMAN)
         order.orderModel
@@ -35,17 +36,18 @@ router.get('/', my_authorize([]), (req, res) => {
             .populate('beverages_ordered')
             .populate('tables')
             .then((orders) => {
+                let orders_to_return = [...orders];
                 orders.forEach((my_order) => {
                     if (my_order.beverages_ordered.length === 0 || ((new Date(my_order.insertionDate as Date).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0))))
-                        orders.splice(orders.indexOf(my_order), 1);
+                        orders_to_return.splice(orders_to_return.indexOf(my_order), 1);
                     else {
                         let total_queue_time = 0;
                         my_order.beverages_ordered.forEach((food) => { total_queue_time += food['prepareTime']; });
-                        my_order['total_queue_time'] = total_queue_time;
+                        orders_to_return['total_queue_time'] = total_queue_time;
                     }
                 });
-                orders.sort((a, b) => { return a.insertionDate.getTime() - b.insertionDate.getTime(); });
-                res.send(orders);
+                orders_to_return.sort((a, b) => { return a.insertionDate.getTime() - b.insertionDate.getTime(); });
+                res.send(orders_to_return);
             });
     else if (req.auth.role === roleTypes.WAITER)
         order.orderModel.find()
@@ -70,21 +72,22 @@ router.get('/', my_authorize([]), (req, res) => {
             .populate('beverages_ordered')
             .populate('tables')
             .then((orders) => {
+                let orders_to_return = [...orders];
                 orders.forEach((my_order) => {
                     if (new Date(my_order.insertionDate as Date).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0))
-                        orders.splice(orders.indexOf(my_order), 1);
+                        orders_to_return.splice(orders_to_return.indexOf(my_order), 1);
                     else {
                         let total_queue_time = 0;
 
                         my_order.foods_ordered.forEach((food) => { total_queue_time += food['prepareTime']; });
                         my_order.beverages_ordered.forEach((beverage) => { total_queue_time += beverage['prepareTime']; });
 
-                        my_order['total_queue_time'] = total_queue_time;
+                        orders_to_return['total_queue_time'] = total_queue_time;
                     }
                 });
 
-                orders.sort((a, b) => { return a.insertionDate.getTime() - b.insertionDate.getTime(); });
-                res.send(orders);
+                orders_to_return.sort((a, b) => { return a.insertionDate.getTime() - b.insertionDate.getTime(); });
+                res.send(orders_to_return);
             });
 })
 
@@ -128,10 +131,10 @@ router.put('/:orderID', my_authorize([roleTypes.COOK, roleTypes.BARMAN, roleType
                 my_order.markModified('status');
                 my_order.save().then((order_saved) => { res.send(order_saved); });
             }
-            else {
+            else if (my_order.status.foods === orderStatus.PREPARING) {
                 my_order.foods_prepared.push(...my_order.foods_ordered);
                 my_order.foods_ordered = [];
-                my_order.status.foods = orderStatus.RECEIVED;
+                my_order.status.foods = orderStatus.TERMINATED;
                 my_order.markModified('status');
                 my_order.save().then((order_saved) => { res.send(order_saved); }); //maybe add a notification for the waiter
             }
@@ -143,10 +146,10 @@ router.put('/:orderID', my_authorize([roleTypes.COOK, roleTypes.BARMAN, roleType
                 my_order.markModified('status');
                 my_order.save().then((order_saved) => { res.send(order_saved); });
             }
-            else {
+            else if (my_order.status.foods === orderStatus.PREPARING){
                 my_order.beverages_prepared.push(...my_order.beverages_ordered);
                 my_order.beverages_ordered = [];
-                my_order.status.beverages = orderStatus.RECEIVED;
+                my_order.status.beverages = orderStatus.TERMINATED;
                 my_order.markModified('status');
                 my_order.save().then((order_saved) => { res.send(order_saved); }); //maybe add a notification for the waiter
             }
@@ -158,7 +161,14 @@ router.put('/:orderID', my_authorize([roleTypes.COOK, roleTypes.BARMAN, roleType
             else {
                 order.beverages_ordered.push(...req.body.beverages);
                 order.foods_ordered.push(...req.body.foods);
-                order.insertionDate = new Date()
+                order.insertionDate = new Date();
+
+                if(req.body.foods.length !== 0)
+                    order.status.foods = orderStatus.RECEIVED;
+                if(req.body.beverages.length !== 0)
+                    order.status.beverages = orderStatus.RECEIVED;
+                order.markModified('status');
+                
                 order.save().then((order) => { res.send(order); }); //maybe add a notification for the cooks/barmans
             }
         });

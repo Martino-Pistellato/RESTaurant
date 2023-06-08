@@ -3,7 +3,8 @@ import Ajv from 'ajv';
 
 export enum orderStatus {
     RECEIVED,
-    PREPARING
+    PREPARING,
+    TERMINATED
 }
 
 export interface Order extends mongoose.Document{

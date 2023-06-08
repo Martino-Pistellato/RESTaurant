@@ -8,7 +8,8 @@ import { Food } from '../foods-services/foods.service';
 
 export enum OrderStatus {
   RECEIVED,
-  PREPARING
+  PREPARING,
+  TERMINATED
 }
 
 export interface Order{

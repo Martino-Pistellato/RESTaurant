@@ -1,7 +1,10 @@
 import { Component } from '@angular/core';
+import {MatDialog, MatDialogConfig} from "@angular/material/dialog";
+
 import { TablesService, Table } from '../../services/tables-services/tables.service';
 import { UsersService, RoleTypes } from '../../services/users-services/users.service';
 import { Router } from '@angular/router';
+import { TableOccupancyDialogComponent } from '../table-occupancy-dialog/table-occupancy-dialog.component';
 
 @Component({
   selector: 'app-tables',
@@ -12,7 +15,10 @@ export class TablesComponent {
   tables: Table[] = [];
   role: RoleTypes | null = null;
 
-  constructor(private tablesService: TablesService, private usersService: UsersService, private router: Router) { }
+  constructor(private tablesService: TablesService, 
+              private usersService: UsersService, 
+              private router: Router,
+              private dialog: MatDialog) { }
 
   ngOnInit(): void {
     this.role = this.usersService.role;
@@ -20,6 +26,28 @@ export class TablesComponent {
       this.router.navigate(['home']);
     else 
       this.getAllTables();
+  }
+
+  openDialog(table: Table) {
+    if (!table.isFree){
+      this.changeStatus(table.number, 0);
+      return;
+    }
+    
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.disableClose = true;
+    dialogConfig.autoFocus = true;
+
+    dialogConfig.data = {
+        table: table,
+        occupancy: 0
+    };
+
+    const dialogRef = this.dialog.open(TableOccupancyDialogComponent, dialogConfig);
+
+    dialogRef.afterClosed().subscribe(
+        data => {if(data) this.changeStatus(table.number, data)}
+    ); 
   }
 
   getAllTables(): void {
@@ -33,8 +61,8 @@ export class TablesComponent {
     });
   }
   
-  changeStatus(tableNumber: Number): void {
-    this.tablesService.changeStatus(tableNumber).subscribe({
+  changeStatus(tableNumber: Number, occupancy: Number): void {
+    this.tablesService.changeStatus(tableNumber, occupancy).subscribe({
       next: (table) => {
         this.getAllTables();
       },

@@ -33,10 +33,10 @@ export class TablesService {
     );
   }
 
-  changeStatus(tableNumber: Number): Observable<Table>{
+  changeStatus(tableNumber: Number, occupancy: Number): Observable<Table>{
     return this.http.put<Table>('https://localhost:3000/tables',{
       tableNumber: tableNumber,
-      occupancy: 1
+      occupancy: occupancy
     }, createOptions({},this.usersService.token))
     .pipe( catchError(handleError) );
   }
