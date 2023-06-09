@@ -30,7 +30,8 @@ const tableSchema = new mongoose.Schema<Table>({
     waiterId:{
         type: mongoose.SchemaTypes.String,
         required: false,
-        default: null
+        default: null,
+        ref: 'User'
     },
     occupancy:{
         type: mongoose.SchemaTypes.Number,

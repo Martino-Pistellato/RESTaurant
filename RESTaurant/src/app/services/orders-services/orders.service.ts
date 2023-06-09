@@ -28,7 +28,24 @@ export interface Order{
       beverages:          OrderStatus
   },
 
-  insertionDate:          Date
+  insertionDate:          Date,
+  total_queue_time:       number,
+  payed:                  boolean
+}
+
+export interface Receipt {
+  date: Date,
+  order: string,
+  tables: number[],
+  foods: {
+      name: string,
+      price: number
+  }[],
+  beverages: {
+      name: string,
+      price: number
+  }[],
+  total: number
 }
 
 
@@ -43,7 +60,7 @@ export class OrdersService {
   updateOrder(foods: Food[], beverages: Food[]): Observable<Order>;
   updateOrder(order: Order): Observable<Order>;
 
-  updateOrder(firstItem: Food[] | Order, secondItem?: Food[]): Observable<Order> {
+  updateOrder(firstItem: Food[] | Order, secondItem?: Food[]): Observable<Order>{
     if (this.usersService.role === RoleTypes.WAITER)
       return this.http.put<Order>('https://localhost:3000/orders/'+this.selectedOrder, {
         foods: firstItem as Food[],
@@ -51,7 +68,7 @@ export class OrdersService {
       }, createOptions({}, this.usersService.token)).pipe(
         catchError(handleError)
       );
-    else 
+    else
       return this.http.put<Order>('https://localhost:3000/orders/'+(firstItem as Order)._id, {}, createOptions({},this.usersService.token)).pipe(
         catchError(handleError)
       );
@@ -65,6 +82,12 @@ export class OrdersService {
 
   createOrder(tables: string[]): Observable<Order>{
     return this.http.post<Order>('https://localhost:3000/orders', {tables: tables}, createOptions({},this.usersService.token)).pipe(
+      catchError(handleError)
+    );
+  }
+
+  pay(order: Order): Observable<Receipt>{
+    return this.http.put<Receipt>('https://localhost:3000/orders/'+order._id, {}, createOptions({},this.usersService.token)).pipe(
       catchError(handleError)
     );
   }

@@ -23,6 +23,7 @@ import { TablesComponent } from './components/tables-component/tables.component'
 import { OrdersComponent } from './components/orders-component/orders.component';
 import { FoodsComponent } from './components/foods-component/foods.component';
 import { TableOccupancyDialogComponent } from './components/table-occupancy-dialog/table-occupancy-dialog.component';
+import { ReceiptDialogComponent } from './components/receipt-dialog/receipt-dialog.component';
 
 @NgModule({
   declarations: [
@@ -34,6 +35,7 @@ import { TableOccupancyDialogComponent } from './components/table-occupancy-dial
     OrdersComponent,
     FoodsComponent,
     TableOccupancyDialogComponent,
+    ReceiptDialogComponent,
   ],
   imports: [
     BrowserModule,

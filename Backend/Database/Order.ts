@@ -14,9 +14,6 @@ export interface Order extends mongoose.Document{
     foods_prepared:         string[],
     beverages_prepared:     string[],
 
-    // drinks_ready:   boolean,
-    // foods_ready:    boolean,
-
     tables:                 string[],
     notes:                  string,
 
@@ -26,9 +23,9 @@ export interface Order extends mongoose.Document{
     },
 
     insertionDate:          Date,
+    total_queue_time:       number
     
-    //maybe we should have a "closed" or "payed" field to distinguish between old and new orders?
-    //maybe we should have a "date" field to distinguish between old and new orders (or today orders)?
+    payed:                 boolean
 }
 
 const orderSchema = new mongoose.Schema<Order>({
@@ -56,14 +53,6 @@ const orderSchema = new mongoose.Schema<Order>({
         default: [],
         ref : 'Food'
     },
-    // drinks_ready:{
-    //     type: mongoose.SchemaTypes.Boolean,
-    //     required: true
-    // },
-    // foods_ready:{
-    //     type: mongoose.SchemaTypes.Boolean,
-    //     required: true
-    // },
     tables:{
         type: [mongoose.SchemaTypes.String], 
         required: true,
@@ -77,14 +66,24 @@ const orderSchema = new mongoose.Schema<Order>({
         type: mongoose.SchemaTypes.Mixed,
         required: false,
         default: {
-            foods: orderStatus.RECEIVED,
-            beverages: orderStatus.RECEIVED
+            foods: orderStatus.TERMINATED,
+            beverages: orderStatus.TERMINATED
         }
     },
     insertionDate:{
         type: mongoose.SchemaTypes.Date,
         required: false,
         default: new Date()
+    },
+    total_queue_time:{
+        type: mongoose.SchemaTypes.Number,
+        required: false,
+        default: 0
+    },
+    payed:{
+        type: mongoose.SchemaTypes.Boolean,
+        required: false,
+        default: false
     }
 });
 

@@ -12,3 +12,5 @@ tavoli: get --> /tables/free oppure /tables/occupied oppure /tables/all in GET  
 cibo: get, post (solo cuoco)
 
 TODO: notifiche, cassieri
+
+modifiche agli ordini, rimuovere cibi se non ancora preparati

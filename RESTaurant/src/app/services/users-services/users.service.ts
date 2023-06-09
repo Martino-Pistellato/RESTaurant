@@ -26,7 +26,7 @@ export interface User{
   name:       string,  
   role:       RoleTypes,
   email:      string,
-  id:         string,
+  _id:        string,
   password:   string
 };
 

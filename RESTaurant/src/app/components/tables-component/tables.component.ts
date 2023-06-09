@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import {MatDialog, MatDialogConfig} from "@angular/material/dialog";
 
 import { TablesService, Table } from '../../services/tables-services/tables.service';
-import { UsersService, RoleTypes } from '../../services/users-services/users.service';
+import { UsersService, RoleTypes, User } from '../../services/users-services/users.service';
 import { Router } from '@angular/router';
 import { TableOccupancyDialogComponent } from '../table-occupancy-dialog/table-occupancy-dialog.component';
 
@@ -26,6 +26,10 @@ export class TablesComponent {
       this.router.navigate(['home']);
     else 
       this.getAllTables();
+  }
+
+  getWaiterName(table: Table): string{
+    return (table.waiterId as User).name;
   }
 
   openDialog(table: Table) {

@@ -2,14 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, catchError  } from 'rxjs';
 import { handleError, createOptions } from 'src/app/utils';
-import { UsersService } from '../users-services/users.service';
+import { UsersService, User } from '../users-services/users.service';
 
 export interface Table{
   _id:        string,
   number:     number,
   capacity:   number,
   isFree:     boolean,
-  waiterId:   string | null,
+  waiterId:   string | null | User,
   occupancy:  number
 }
 

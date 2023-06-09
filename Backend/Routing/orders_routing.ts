@@ -23,7 +23,7 @@ router.get('/', my_authorize([]), (req, res) => {
                     else {
                         let total_queue_time = 0;
                         my_order.foods_ordered.forEach((food) => { total_queue_time += food['prepareTime']; });
-                        orders_to_return['total_queue_time'] = total_queue_time;
+                        my_order.total_queue_time = total_queue_time;
                     }
                 });
                 orders_to_return.sort((a, b) => { return a.insertionDate.getTime() - b.insertionDate.getTime(); });
@@ -43,7 +43,7 @@ router.get('/', my_authorize([]), (req, res) => {
                     else {
                         let total_queue_time = 0;
                         my_order.beverages_ordered.forEach((food) => { total_queue_time += food['prepareTime']; });
-                        orders_to_return['total_queue_time'] = total_queue_time;
+                        my_order.total_queue_time = total_queue_time;
                     }
                 });
                 orders_to_return.sort((a, b) => { return a.insertionDate.getTime() - b.insertionDate.getTime(); });
@@ -70,6 +70,8 @@ router.get('/', my_authorize([]), (req, res) => {
         order.orderModel.find()
             .populate('foods_ordered')
             .populate('beverages_ordered')
+            .populate('foods_prepared')
+            .populate('beverages_prepared')
             .populate('tables')
             .then((orders) => {
                 let orders_to_return = [...orders];
@@ -82,7 +84,7 @@ router.get('/', my_authorize([]), (req, res) => {
                         my_order.foods_ordered.forEach((food) => { total_queue_time += food['prepareTime']; });
                         my_order.beverages_ordered.forEach((beverage) => { total_queue_time += beverage['prepareTime']; });
 
-                        orders_to_return['total_queue_time'] = total_queue_time;
+                        my_order.total_queue_time = total_queue_time;
                     }
                 });
 
@@ -102,6 +104,7 @@ router.get('/totalprofit', my_authorize([roleTypes.CASHIER]), (req, res) => {
         let todayEnd = new Date(today.setHours(23, 59, 59, 59))
 
         orders.forEach((order) => {
+            //check if payed
             if (todayStart <= order.insertionDate && todayEnd >= order.insertionDate) {
                 order.foods_prepared.forEach((food) => { total += food['price']; });
                 order.beverages_prepared.forEach((beverage) => { total += beverage['price']; });
@@ -123,7 +126,7 @@ router.post('/', my_authorize([roleTypes.ADMIN, roleTypes.WAITER]), (req, res) =
 })
 
 //Add foods or drinks to a certain order
-router.put('/:orderID', my_authorize([roleTypes.COOK, roleTypes.BARMAN, roleTypes.WAITER]), (req, res) => { 
+router.put('/:orderID', my_authorize([roleTypes.COOK, roleTypes.BARMAN, roleTypes.WAITER, roleTypes.CASHIER]), (req, res) => { 
     if (req.auth.role === roleTypes.COOK)
         order.orderModel.findOne({ _id: req.params.orderID }).then((my_order) => {
             if (my_order.status.foods === orderStatus.RECEIVED) {
@@ -135,6 +138,7 @@ router.put('/:orderID', my_authorize([roleTypes.COOK, roleTypes.BARMAN, roleType
                 my_order.foods_prepared.push(...my_order.foods_ordered);
                 my_order.foods_ordered = [];
                 my_order.status.foods = orderStatus.TERMINATED;
+                my_order.total_queue_time = 0;
                 my_order.markModified('status');
                 my_order.save().then((order_saved) => { res.send(order_saved); }); //maybe add a notification for the waiter
             }
@@ -146,15 +150,16 @@ router.put('/:orderID', my_authorize([roleTypes.COOK, roleTypes.BARMAN, roleType
                 my_order.markModified('status');
                 my_order.save().then((order_saved) => { res.send(order_saved); });
             }
-            else if (my_order.status.foods === orderStatus.PREPARING){
+            else if (my_order.status.beverages === orderStatus.PREPARING){
                 my_order.beverages_prepared.push(...my_order.beverages_ordered);
                 my_order.beverages_ordered = [];
                 my_order.status.beverages = orderStatus.TERMINATED;
+                my_order.total_queue_time = 0;
                 my_order.markModified('status');
                 my_order.save().then((order_saved) => { res.send(order_saved); }); //maybe add a notification for the waiter
             }
         });
-    else
+    else if (req.auth.role === roleTypes.WAITER)
         order.orderModel.findOne({ _id: req.params.orderID }).then((order) => {
             if (req.body.beverages.length === 0 && req.body.foods.length === 0)
                 return res.status(400).json({ error: true, errormessage: "No foods or beverages selected" });
@@ -172,43 +177,43 @@ router.put('/:orderID', my_authorize([roleTypes.COOK, roleTypes.BARMAN, roleType
                 order.save().then((order) => { res.send(order); }); //maybe add a notification for the cooks/barmans
             }
         });
+    else 
+        order.orderModel.findOne({ _id: req.params.orderID })
+        .populate('foods_prepared')
+        .populate('beverages_prepared')
+        .populate('tables')
+        .then((order) => {
+            let total = 0;
+
+            order.foods_prepared.forEach((food) => { total += food['price']; });
+            order.beverages_prepared.forEach((beverage) => { total += beverage['price']; });
+
+            order.tables.forEach((table) => {
+                tableModel.findOne({ _id: table['_id'] }).then((table) => {
+                    table.changeStatus(null, 0);
+                    table.save();
+                });
+            });
+
+            let receipe = {
+                date: new Date(),
+                order: order['_id'],
+                tables: [...order.tables.map((table) => { return table['number']; })],
+                foods: [...order.foods_prepared.map((food) => {return {name: food['name'], price: food['price']};})],
+                beverages: [...order.beverages_prepared.map((drink) => {return {name: drink['name'], price: drink['price']};})],
+                total: total
+            }
+
+            order['payed'] = true;
+            order.save().then((saved_order) => {
+                res.send(receipe);
+            })
+        });
 })
 
 //Delete order and create recipe route
 router.delete('/:orderID', my_authorize([roleTypes.ADMIN, roleTypes.CASHIER]), (req, res) => {
-    order.orderModel.findOneAndDelete({ _id: req.params.orderID })
-    .populate('foods_prepared')
-    .populate('beverages_prepared')
-    .populate('tables')
-    .then((order) => {
-        let total = 0;
-
-        order.foods_prepared.forEach((food) => { total += food['price']; });
-        order.beverages_prepared.forEach((beverage) => { total += beverage['price']; });
-
-        order.tables.forEach((table) => {
-            tableModel.findOne({ _id: table['_id'] }).then((table) => {
-                table.changeStatus(null, 0);
-                table.save();
-            });
-        });
-
-        let receipe = {
-            order: order['_id'],
-            tables: order.tables.map((table) => { return table['number']; }),
-            foods: {
-                name: order.foods_prepared.map((food) => { return food['name']; }),
-                price: order.foods_prepared.map((food) => { return food['price']; })
-            },
-            beverages: {
-                name: order.beverages_prepared.map((beverage) => { return beverage['name']; }),
-                price: order.beverages_prepared.map((beverage) => { return beverage['price']; })
-            },
-            total: total
-        }
-
-        res.send(receipe);
-    });
+    
 })
 
 export default router;

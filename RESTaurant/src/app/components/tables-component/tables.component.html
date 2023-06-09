@@ -1,11 +1,31 @@
 <p>-- TAVOLI --</p>
+
 <div class="container">
-    <ul>
-        <li *ngFor="let table of tables">
-            <button mat-raised-button (click)="openDialog(table)">tavolo: {{table.number}}, libero: {{table.isFree}}</button>
-            <br>
-            <br>
-        </li>
-    </ul>
+    <mat-accordion style="display: flex; flex-direction: row; flex-wrap: wrap; padding: 10px;">
+        <mat-card   *ngFor="let table of tables" hideToggle 
+                    style="width:300px; margin: 10px;" 
+                    [style.background]="table.isFree ? 'rgb(150, 236, 110)':'rgb(245, 84, 84)'">
+            <mat-card-header>
+                <mat-card-title>
+                    Tavolo {{table.number}} 
+                </mat-card-title>
+                <mat-card-subtitle *ngIf="!table.isFree">Cameriere: {{getWaiterName(table)}}</mat-card-subtitle>
+                <mat-card-subtitle *ngIf="table.isFree">Libero</mat-card-subtitle>
+            </mat-card-header>
+
+            <mat-card-content>
+                <p>Posti occupati: {{table.occupancy}}</p>
+                <p>Posti totali: {{table.capacity}}</p>
+            </mat-card-content>
+            
+            <mat-card-actions *ngIf="role===4">
+                <button  *ngIf="table.isFree" mat-raised-button (click)="openDialog(table)"> Occupa tavolo </button>
+                <button  *ngIf="!table.isFree" mat-raised-button (click)="openDialog(table)"> Libera tavolo </button>
+            </mat-card-actions>
+        </mat-card>
+    </mat-accordion>
 </div>
+
+<br>
+
 <a routerLink="/home"><button mat-raised-button> HOME </button></a>

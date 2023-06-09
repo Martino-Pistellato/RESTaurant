@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
+import { ReceiptDialogComponent } from '../receipt-dialog/receipt-dialog.component';
 import { TablesService, Table } from 'src/app/services/tables-services/tables.service';
-import { OrdersService, Order, OrderStatus } from 'src/app/services/orders-services/orders.service';
+import { OrdersService, Order, OrderStatus, Receipt } from 'src/app/services/orders-services/orders.service';
 import { UsersService, RoleTypes } from 'src/app/services/users-services/users.service';
 
 @Component({
@@ -11,25 +13,29 @@ import { UsersService, RoleTypes } from 'src/app/services/users-services/users.s
 })
 export class OrdersComponent {
   private myTables: Table[] = [];
-  private myOrders: Order[] = [];
+  protected myOrders: Order[] = [];
   
-  public role: RoleTypes;
+  protected role: RoleTypes;
 
   //USED FOR WAITERS  
   private tablesWithOrders: Table[] = [];
-  public tablesWithoutOrders: Table[] = [];
-  public selectedTables: Table[] = [];
-  public shownSelectedTables: string = '';
-  public shownOrders: Order[] = [];
+  protected tablesWithoutOrders: Table[] = [];
+  protected selectedTables: Table[] = [];
+  protected shownSelectedTables: string = '';
+  protected shownOrders: Order[] = [];
 
   //FOR COOKS AND BARMEN
-  public arrivedOrders: Order[] = [];
-  public preparingOrders: Order[] = [];
+  protected arrivedOrders: Order[] = [];
+  protected preparingOrders: Order[] = [];
+
+  //FOR CASHIER
+  protected terminatedOrders: Order[] = [];
 
   constructor(private tablesService: TablesService, 
               private ordersService: OrdersService,
               private usersService: UsersService, 
-              private router: Router) {
+              private router: Router,
+              private dialog: MatDialog) {
     this.role = (this.usersService.role as RoleTypes);
   }
 
@@ -71,6 +77,7 @@ export class OrdersComponent {
   dispatchOrders(): void {
     this.preparingOrders = [];
     this.arrivedOrders = [];
+    this.terminatedOrders = [];
 
     this.ordersService.getOrders().subscribe(
       (orders) => { 
@@ -90,6 +97,16 @@ export class OrdersComponent {
             else if(order.status.foods === OrderStatus.RECEIVED)
               this.arrivedOrders.push(order);
           });
+        else {
+          this.myOrders.forEach((order)=>{
+            if(order.status.foods === OrderStatus.RECEIVED || order.status.beverages === OrderStatus.RECEIVED)
+              this.arrivedOrders.push(order);
+            else if(order.status.foods === OrderStatus.PREPARING || order.status.beverages === OrderStatus.PREPARING)
+              this.preparingOrders.push(order);
+            else if (!order.payed)
+              this.terminatedOrders.push(order);
+          });
+        }
       }
     );
   }
@@ -134,12 +151,32 @@ export class OrdersComponent {
   }
 
   updateOrder(order: Order): void{
-    this.ordersService.updateOrder(order).subscribe((updated_order) => this.dispatchOrders());
+    this.ordersService.updateOrder(order).subscribe((updated_order: Order) => this.dispatchOrders());
   }
 
   changePage(route: string): void {
     this.selectedTables = [];
     this.dispatchTables();
     this.router.navigate([route]);
+  }
+
+  openDialog(receipt: Receipt) {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.disableClose = true;
+    dialogConfig.autoFocus = true;
+
+    dialogConfig.data = {
+        receipt: receipt
+    };
+
+    const dialogRef = this.dialog.open(ReceiptDialogComponent, dialogConfig);
+
+    dialogRef.afterClosed().subscribe(
+        data => this.dispatchOrders()
+    ); 
+  }
+
+  pay(order: Order): void{
+    this.ordersService.pay(order).subscribe((receipt)=>{ this.openDialog(receipt) });
   }
 }
