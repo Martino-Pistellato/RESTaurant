@@ -1,25 +1,64 @@
-<p>home works!</p>
-<p>your role is {{role}}</p>
-<button class="btn btn-primary" routerLink="/login">Logout</button>
+<br>
+
+<div>
+    <button mat-raised-button routerLink="/login">Logout</button>
+    <span *ngIf="role === 0">  You are an: Admin</span>
+    <span *ngIf="role === 1">  You are a Cashier</span>
+    <span *ngIf="role === 2">  You are a Barman</span>
+    <span *ngIf="role === 3">  You are a Cook</span>
+    <span *ngIf="role === 4">  You are a Waiter</span>
+</div>
+
+<br>
 
 <div class="container" *ngIf="role === 0">
-    <button class="btn btn-primary" routerLink="/foods">Menu</button>
-    <button class="btn btn-primary" routerLink="/users">Gestisci utente</button>
-    <button class="btn btn-primary" routerLink="/tables">Vedi tavoli</button>
-    <button class="btn btn-primary" routerLink="/orders">Vedi ordini</button>
+    <table>
+        <tr>
+            <td align="right" width="150px">
+                <button mat-raised-button routerLink="/foods" style="width: 100%">Menu</button>
+            </td>
+            <td>
+                <button mat-raised-button routerLink="/users" style="width: 100%">Gestisci utenti</button>
+            </td>
+        </tr>
+        <tr>
+            <td align="right">
+                <button mat-raised-button routerLink="/tables" style="width: 100%">Vedi tavoli</button>
+            </td>
+            <td width="150px">
+                <button mat-raised-button routerLink="/orders" style="width: 100%">Vedi ordini</button>
+            </td>
+        </tr>
+    </table>    
 </div>
 
 <div class="container" *ngIf="role === 1">
-    <button class="btn btn-primary" routerLink="/tables">Vedi tavoli</button>
-    <button class="btn btn-primary" routerLink="/orders">Vedi ordini</button>
+    <table>
+        <tr>
+            <td align="right" width="150px">
+                <button mat-raised-button routerLink="/tables" style="width: 100%">Vedi tavoli</button>
+            </td>
+            <td width="150px">
+                <button mat-raised-button routerLink="/orders" style="width: 100%">Vedi ordini</button>
+            </td>
+        </tr>
+    </table>
 </div>
 
 <div class="container" *ngIf="role === 2 || role === 3">
-    <button class="btn btn-primary" routerLink="/orders">Vedi ordini</button>
+    <button mat-raised-button class="btn btn-primary" routerLink="/orders">Vedi ordini</button>
 </div>
 
 <div class="container" *ngIf="role === 4">
-    <button class="btn btn-primary" routerLink="/tables">Vedi tavoli</button>
-    <button class="btn btn-primary" routerLink="/orders">Vedi ordini</button>
+    <table>
+        <tr>
+            <td align="right" width="150px">
+                <button mat-raised-button routerLink="/tables" style="width: 100%">Vedi tavoli</button>
+            </td>
+            <td width="150px">
+                <button mat-raised-button routerLink="/orders" style="width: 100%">Vedi ordini</button>
+            </td>
+        </tr>
+    </table>
 </div>
 

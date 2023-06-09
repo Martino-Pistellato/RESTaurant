@@ -1,52 +1,84 @@
-<p>--ORDINI--</p>
+<p>-- ORDINI --</p>
 
 <div class="container" *ngIf="role === 0 || role === 1">
     <p> ADMIN o CASHIER </p>
 </div>
 
 <div class="container" *ngIf="role === 2 || role === 3">
-    <p>Ordini arrivati</p>
-    <ul *ngFor="let order of arrivedOrders" (click)="showFood(order)"> 
-        <p>Tavoli: <span *ngFor="let table of order.tables">{{table.number}} </span></p>
-        <ng-container *ngIf="showFoods.includes(order)">
-            <li *ngFor="let food of ((role === 3) ? order.foods_ordered : order.beverages_ordered)">
-                <span>{{food.name}}</span>
-            </li>
-        </ng-container>
-        <button (click)="updateOrder(order)"> Prendi in carico </button>
-    </ul>
+    
+    <mat-accordion *ngIf="arrivedOrders.length > 0">
+        <p>Ordini arrivati</p>
+        <mat-expansion-panel *ngFor="let order of arrivedOrders" hideToggle>
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    Tavoli: 
+                </mat-panel-title>
+                <mat-panel-description>
+                    <span *ngFor="let table of order.tables">
+                        {{table.number}} &nbsp;  
+                    </span>
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+            <p *ngFor="let food of ((role === 3) ? order.foods_ordered : order.beverages_ordered)">
+                {{food.name}}
+            </p>
+            <button mat-raised-button (click)="updateOrder(order)"> Prendi in carico </button>
+        </mat-expansion-panel>
+    </mat-accordion>
 
-    <p>Ordini in preparazione</p>
-    <ul *ngFor="let order of preparingOrders" (click)="showFood(order)"> 
-        <p>Tavoli: <span *ngFor="let table of order.tables">{{table.number}} </span></p>
-        <ng-container *ngIf="showFoods.includes(order)">
-            <li *ngFor="let food of ((role === 3) ? order.foods_ordered : order.beverages_ordered)">
-                <span>{{food.name}}</span>
-            </li>
-        </ng-container>
-        <button (click)="updateOrder(order)"> Termina </button>
-    </ul>
+    <mat-accordion *ngIf="preparingOrders.length > 0">
+        <p>Ordini in preparazione</p>
+        <mat-expansion-panel *ngFor="let order of preparingOrders" hideToggle>
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    Tavoli: 
+                </mat-panel-title>
+                <mat-panel-description>
+                    <span *ngFor="let table of order.tables">
+                        {{table.number}} &nbsp;  
+                    </span>
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+            <p *ngFor="let food of ((role === 3) ? order.foods_ordered : order.beverages_ordered)">
+                {{food.name}}
+            </p>
+            <button mat-raised-button (click)="updateOrder(order)"> Termina </button>
+        </mat-expansion-panel>
+    </mat-accordion>
 </div>
 
 <div class="container" *ngIf="role === 4">
     <p>Tavoli selezionati: {{shownSelectedTables}}</p>
-    <ul> Tavoli che hanno già ordinato
+
+    <ul *ngIf="shownOrders.length > 0" > Tavoli che hanno già ordinato
+        <br>
+        <br>
         <ng-container *ngFor="let order of shownOrders">
             <li *ngFor="let table of order.tables">
-                <button (click)="selectTable(table, order)"> tavolo: {{table.number}} </button>
+                <button mat-raised-button (click)="selectTable(table, order)"> tavolo: {{table.number}} </button>
+                <br>
+                <br>
             </li>
         </ng-container>
     </ul>
 
-    <ul> Tavoli che devono ancora ordinare
+    <ul *ngIf="tablesWithoutOrders.length > 0"> Tavoli che devono ancora ordinare
+        <br>
+        <br>
         <li *ngFor="let table of tablesWithoutOrders">
-            <button (click)="selectTable(table, null)">tavolo: {{table.number}}
+            <button mat-raised-button (click)="selectTable(table, null)">tavolo: {{table.number}}
             </button>
+            <br>
+            <br>
         </li>
     </ul>
-    <button (click)="getOrderId()"> Avanti </button>
+
+    <mat-divider></mat-divider>
+    <br>
+
+    <button mat-raised-button (click)="getOrderId()"> Avanti </button>
 </div>
 
+<br>
 
-
-<a routerLink="/home"><button > Home </button></a>
+<a routerLink="/home"><button mat-raised-button> Home </button></a>

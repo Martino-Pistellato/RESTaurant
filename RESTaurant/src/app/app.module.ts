@@ -10,6 +10,10 @@ import { MatDialogModule } from "@angular/material/dialog";
 import { MatInputModule } from "@angular/material/input";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatButtonModule } from "@angular/material/button";
+import { MatCardModule } from "@angular/material/card";
+import { MatExpansionModule } from "@angular/material/expansion";
+import { MatToolbarModule } from "@angular/material/toolbar";
+import { MatDividerModule } from "@angular/material/divider"
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './components/login-component/login.component';
@@ -42,7 +46,11 @@ import { TableOccupancyDialogComponent } from './components/table-occupancy-dial
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule
+    MatButtonModule,
+    MatExpansionModule,
+    MatCardModule,
+    MatToolbarModule,
+    MatDividerModule
   ],
   providers: [],
   bootstrap: [AppComponent]

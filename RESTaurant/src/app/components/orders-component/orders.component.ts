@@ -25,7 +25,6 @@ export class OrdersComponent {
   //FOR COOKS AND BARMEN
   public arrivedOrders: Order[] = [];
   public preparingOrders: Order[] = [];
-  public showFoods: Order[] = [];
 
   constructor(private tablesService: TablesService, 
               private ordersService: OrdersService,
@@ -72,7 +71,6 @@ export class OrdersComponent {
   dispatchOrders(): void {
     this.preparingOrders = [];
     this.arrivedOrders = [];
-    this.showFoods = [];
 
     this.ordersService.getOrders().subscribe(
       (orders) => { 
@@ -94,13 +92,6 @@ export class OrdersComponent {
           });
       }
     );
-  }
-
-  showFood(order: Order): void {
-    if(this.showFoods.includes(order))
-      this.showFoods.splice(this.showFoods.indexOf(order),1);
-    else
-      this.showFoods.push(order);
   }
 
   selectTable(table: Table, order: Order | null): void {

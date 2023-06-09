@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { UsersService, RoleTypes } from '../../services/users-services/users.service';
 import { Router } from '@angular/router';
+import { FormControl, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-login',
@@ -10,8 +11,27 @@ import { Router } from '@angular/router';
 export class LoginComponent {
   public errmessage: string | undefined = undefined;
   public role: RoleTypes | null = null;
+  protected email:string = '';
+  protected password: string = '';
+  public emailControl: FormControl;
+  public passwordControl: FormControl;
 
-  constructor( private us: UsersService, private router: Router  ) { }
+  getEmailErrorMessage() {
+    return  this.emailControl.hasError('required') ? 'Email must be provided' : 
+            this.emailControl.hasError('email') ? 'An email shoud have one @' : 
+            'Unknown error';
+  }
+
+  getPasswordErrorMessage() {
+    return  this.passwordControl.hasError('required') ? 'Password must be provided' : 
+            this.passwordControl.hasError('minlength') ? 'Password must be at least 6 characters long' : 
+            'Unknown error';
+  }
+
+  constructor( private us: UsersService, private router: Router  ) { 
+    this.emailControl = new FormControl('', [Validators.required, Validators.email]);
+    this.passwordControl = new FormControl('', [Validators.required, Validators.minLength(6)]);
+  }
 
   ngOnInit() {
     this.role = this.us.role;

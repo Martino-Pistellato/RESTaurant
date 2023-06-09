@@ -1,7 +1,20 @@
-<p>prova {{errmessage}}</p>
-<form>
-    <input #email type = "text" placeholder="Email">
-    <input #password type = "password" placeholder="Password">
-    <button type="button" (click)="login(email.value, password.value)">Login</button>
-</form>
-<!-- redirect to home -->
+<p *ngIf="errmessage">Errore: {{errmessage}}</p>
+<div style="padding: 16px;">
+    <mat-card style="padding: 16px; align-items: center; width: fit-content;">
+        <mat-form-field style="width:fit-content">
+            <mat-label>Email</mat-label>
+            <input matInput type="email" placeholder="example@RESTaurant" [formControl]="emailControl" [(ngModel)]="email" required>
+            <mat-error *ngIf="emailControl.invalid">{{getEmailErrorMessage()}}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field style="width:fit-content">
+            <mat-label>Password</mat-label>
+            <input matInput type="password" [formControl]="passwordControl" [(ngModel)]="password" required>
+            <mat-error *ngIf="passwordControl.invalid">{{getPasswordErrorMessage()}}</mat-error>
+        </mat-form-field>
+
+        <mat-card-actions style="width:fit-content">
+            <button mat-button type="button" [disabled]="emailControl.invalid || passwordControl.invalid" (click)="login(email, password)">Login</button>
+        </mat-card-actions>
+    </mat-card>
+</div>
