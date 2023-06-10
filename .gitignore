@@ -12,6 +12,12 @@ RESTaurant/node_modules
 npm-debug.log
 yarn-error.log
 
+#for debug
+Backend/*.js
+Backend/Database/*.js
+Backend/Routing/*.js
+Backend/package-lock.json
+
 # IDEs and editors
 .idea/
 .project

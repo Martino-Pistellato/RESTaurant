@@ -11,10 +11,11 @@ export enum roleTypes{
 }
 
 export interface User extends mongoose.Document {
-    name: string;
-    email: string; //make it primary key
-    role: roleTypes;
-    password: string;
+    name: string,
+    email: string, //make it primary key
+    role: roleTypes,
+    password: string,
+    totalWorks: string[]
     
     setPassword: (pwd:string)=>void,
     validatePassword: (pwd:string)=>boolean
@@ -37,6 +38,11 @@ const userSchema = new mongoose.Schema<User>({
     password:{
         type: mongoose.SchemaTypes.String,
         required: false
+    },
+    totalWorks:{
+        type: [mongoose.SchemaTypes.String],
+        required: false,
+        default: []
     }
 });
 

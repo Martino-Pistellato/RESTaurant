@@ -21,7 +21,8 @@ export interface Food extends mongoose.Document {
 const foodSchema = new mongoose.Schema<Food>({
     name:{
         type: mongoose.SchemaTypes.String,
-        required: true
+        required: true,
+        unique: true
     },
     price:{
         type: mongoose.SchemaTypes.Number,

@@ -13,4 +13,6 @@ cibo: get, post (solo cuoco)
 
 TODO: notifiche, cassieri
 
-modifiche agli ordini, rimuovere cibi se non ancora preparati
+component statistiche cashier
+test senza stati sugli ordini
+modo per distinguere chi ha preso in carico cosa

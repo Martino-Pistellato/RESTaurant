@@ -27,7 +27,8 @@ export interface User{
   role:       RoleTypes,
   email:      string,
   _id:        string,
-  password:   string
+  password:   string,
+  totalWorks: string[]
 };
 
 @Injectable({

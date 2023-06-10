@@ -11,6 +11,9 @@ export interface Order extends mongoose.Document{
     foods_ordered:          string[], 
     beverages_ordered:      string[],
 
+    foods_preparing:          string[], 
+    beverages_preparing:      string[],
+
     foods_prepared:         string[],
     beverages_prepared:     string[],
 
@@ -25,7 +28,8 @@ export interface Order extends mongoose.Document{
     insertionDate:          Date,
     total_queue_time:       number
     
-    payed:                 boolean
+    payed:                  boolean,
+    covers:                 number,
 }
 
 const orderSchema = new mongoose.Schema<Order>({
@@ -36,6 +40,18 @@ const orderSchema = new mongoose.Schema<Order>({
         ref : 'Food'
     },
     beverages_ordered:{
+        type: [mongoose.SchemaTypes.String], 
+        required: false,
+        default: [],
+        ref : 'Food'
+    },
+    foods_preparing:{
+        type: [mongoose.SchemaTypes.String], 
+        required: false,
+        default: [],
+        ref : 'Food'
+    },
+    beverages_preparing:{
         type: [mongoose.SchemaTypes.String], 
         required: false,
         default: [],
@@ -84,6 +100,10 @@ const orderSchema = new mongoose.Schema<Order>({
         type: mongoose.SchemaTypes.Boolean,
         required: false,
         default: false
+    },
+    covers:{
+        type: mongoose.SchemaTypes.Number,
+        required: true
     }
 });
 

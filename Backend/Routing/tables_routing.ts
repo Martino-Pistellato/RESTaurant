@@ -18,12 +18,12 @@ router.get('/', my_authorize([roleTypes.WAITER]), (req, res, next) => { //client
 })
 
 //Used to change status of a table form occupied to free and viceversa
-router.put('/', my_authorize([roleTypes.WAITER, roleTypes.ADMIN]), (req, res, next) => { //ne occupa/libera uno alla volta
+router.put('/', my_authorize([roleTypes.WAITER, roleTypes.ADMIN, roleTypes.CASHIER]), (req, res, next) => { //ne occupa/libera uno alla volta
     table.tableModel.findOne({number: req.body.tableNumber}).then((table) => { 
         try {
             order.orderModel.find().then((orders)=>{
-                if (orders.every((order)=>!order.tables.includes(table._id))){
-                    table.changeStatus(req.auth.id, req.body.occupancy);
+                if (orders.every((order)=>!(order.tables.includes(table._id) && !order.payed))){
+                    table.changeStatus((req.auth.role === roleTypes.WAITER) ? req.auth.id : null, req.body.occupancy);
                     table.save().then((table) => { res.send(table); });
                 }
                 else

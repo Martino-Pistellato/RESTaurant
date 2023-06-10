@@ -5,6 +5,7 @@ import { Table } from '../tables-services/tables.service';
 import { RoleTypes, UsersService } from '../users-services/users.service';
 import { handleError, createOptions } from 'src/app/utils';
 import { Food } from '../foods-services/foods.service';
+import { User } from '../users-services/users.service';
 
 export enum OrderStatus {
   RECEIVED,
@@ -30,7 +31,10 @@ export interface Order{
 
   insertionDate:          Date,
   total_queue_time:       number,
-  payed:                  boolean
+  payed:                  boolean,
+
+  cookID:                 User,
+  barmanID:               User
 }
 
 export interface Receipt {
@@ -45,6 +49,11 @@ export interface Receipt {
       name: string,
       price: number
   }[],
+  covers: number,
+  total: number
+}
+
+export interface Profit{
   total: number
 }
 
@@ -80,7 +89,7 @@ export class OrdersService {
     );
   }
 
-  createOrder(tables: string[]): Observable<Order>{
+  createOrder(tables: Table[]): Observable<Order>{
     return this.http.post<Order>('https://localhost:3000/orders', {tables: tables}, createOptions({},this.usersService.token)).pipe(
       catchError(handleError)
     );
@@ -88,6 +97,12 @@ export class OrdersService {
 
   pay(order: Order): Observable<Receipt>{
     return this.http.put<Receipt>('https://localhost:3000/orders/'+order._id, {}, createOptions({},this.usersService.token)).pipe(
+      catchError(handleError)
+    );
+  }
+
+  getTotalProfit(): Observable<Profit>{
+    return this.http.get<Profit>('https://localhost:3000/orders/totalprofit',  createOptions({},this.usersService.token)).pipe(
       catchError(handleError)
     );
   }

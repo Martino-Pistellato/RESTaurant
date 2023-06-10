@@ -139,7 +139,7 @@ export class OrdersComponent {
     if (this.selectedTables.length === 0) return;
 
     if (this.shownOrders.length === 0)
-      this.ordersService.createOrder([...this.selectedTables.map((table) => { return ''+table._id })])
+      this.ordersService.createOrder(this.selectedTables)
       .subscribe((order) => { 
         this.ordersService.selectedOrder = order._id;
         this.changePage('foods'); 
@@ -177,6 +177,9 @@ export class OrdersComponent {
   }
 
   pay(order: Order): void{
-    this.ordersService.pay(order).subscribe((receipt)=>{ this.openDialog(receipt) });
+    this.ordersService.pay(order).subscribe((receipt)=>{ 
+      order.tables.forEach(table => this.tablesService.changeStatus(table.number,0));
+      this.openDialog(receipt) 
+    });
   }
 }

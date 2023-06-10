@@ -77,7 +77,7 @@ app.get('/login', passport.authenticate('basic', { session: false }),(req, res) 
         id : req.user._id
     };
     let token_signed = jsonwebtoken.sign(tokendata, process.env.JWT_SECRET, { expiresIn: '10m' } );
-    res.cookie('token', token_signed, {httpOnly: true, secure: true, sameSite: 'none'});//TODO: we can eliminate it
+    //res.cookie('token', token_signed, {httpOnly: true, secure: true, sameSite: 'none'});//TODO: we can eliminate it
 
     //app.redirect('/home');
     res.send({token: token_signed});

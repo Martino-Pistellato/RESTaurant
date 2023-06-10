@@ -1,5 +1,6 @@
 import { roleTypes } from '../Database/User'
 import * as order from '../Database/Order'
+import * as user from '../Database/User'
 import { Router } from 'express';
 import { tableModel } from '../Database/Table';
 import { my_authorize } from '../utils';
@@ -18,7 +19,9 @@ router.get('/', my_authorize([]), (req, res) => {
             .then((orders) => {
                 let orders_to_return = [...orders];
                 orders.forEach((my_order) => {
-                    if (my_order.foods_ordered.length === 0 || (new Date(my_order.insertionDate as Date).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0)))
+                    if (my_order.foods_ordered.length === 0 || 
+                        my_order.payed || 
+                        (new Date(my_order.insertionDate as Date).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0)))
                         orders_to_return.splice(orders_to_return.indexOf(my_order), 1);
                     else {
                         let total_queue_time = 0;
@@ -38,7 +41,9 @@ router.get('/', my_authorize([]), (req, res) => {
             .then((orders) => {
                 let orders_to_return = [...orders];
                 orders.forEach((my_order) => {
-                    if (my_order.beverages_ordered.length === 0 || ((new Date(my_order.insertionDate as Date).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0))))
+                    if (my_order.beverages_ordered.length === 0 || 
+                        my_order.payed || 
+                        (new Date(my_order.insertionDate as Date).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0)))
                         orders_to_return.splice(orders_to_return.indexOf(my_order), 1);
                     else {
                         let total_queue_time = 0;
@@ -59,7 +64,9 @@ router.get('/', my_authorize([]), (req, res) => {
                 let my_orders = [];
 
                 orders.forEach((my_order) => {
-                    if (my_order.tables.length > 0 && (new Date(my_order.insertionDate as Date).setHours(0, 0, 0, 0) >= new Date().setHours(0, 0, 0, 0)))
+                    if (my_order.tables.length > 0 && 
+                        !my_order.payed && 
+                        (new Date(my_order.insertionDate as Date).setHours(0, 0, 0, 0) >= new Date().setHours(0, 0, 0, 0)))
                         my_orders.push(my_order);
                 });
 
@@ -76,7 +83,7 @@ router.get('/', my_authorize([]), (req, res) => {
             .then((orders) => {
                 let orders_to_return = [...orders];
                 orders.forEach((my_order) => {
-                    if (new Date(my_order.insertionDate as Date).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0))
+                    if (my_order.payed || new Date(my_order.insertionDate as Date).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0))
                         orders_to_return.splice(orders_to_return.indexOf(my_order), 1);
                     else {
                         let total_queue_time = 0;
@@ -104,12 +111,16 @@ router.get('/totalprofit', my_authorize([roleTypes.CASHIER]), (req, res) => {
         let todayEnd = new Date(today.setHours(23, 59, 59, 59))
 
         orders.forEach((order) => {
-            //check if payed
-            if (todayStart <= order.insertionDate && todayEnd >= order.insertionDate) {
+            if (order.payed && todayStart <= order.insertionDate && todayEnd >= order.insertionDate) {
                 order.foods_prepared.forEach((food) => { total += food['price']; });
+                console.log("after food",total)
                 order.beverages_prepared.forEach((beverage) => { total += beverage['price']; });
+                total += 2*order.covers;
+                console.log("after covers",total)
+
             }
         });
+        console.log("after all",total)
 
         res.send({ total: total });
     })
@@ -120,8 +131,20 @@ router.post('/', my_authorize([roleTypes.ADMIN, roleTypes.WAITER]), (req, res) =
     if (req.body.tables.length === 0)
         return res.status(400).json({ error: true, errormessage: "No tables selected" });
     else {
-        let my_order = order.newOrder({ tables: req.body.tables });
-        my_order.save().then((order) => { res.send(order); });
+        let my_covers = 0;
+        let my_tables: string[] = [];
+        req.body.tables.forEach(table => {
+            my_covers += table.occupancy;
+            my_tables.push(table._id);
+        }); 
+
+        let my_order = order.newOrder({ tables: my_tables, covers: my_covers });
+        my_order.save().then((order) => { 
+            user.userModel.findOne({_id:req.auth.id}).then((user) => {
+                user.totalWorks.push(order._id);
+                user.save().then(data=>res.send(order));
+            })
+        });
     }
 })
 
@@ -140,7 +163,12 @@ router.put('/:orderID', my_authorize([roleTypes.COOK, roleTypes.BARMAN, roleType
                 my_order.status.foods = orderStatus.TERMINATED;
                 my_order.total_queue_time = 0;
                 my_order.markModified('status');
-                my_order.save().then((order_saved) => { res.send(order_saved); }); //maybe add a notification for the waiter
+                my_order.save().then((order_saved) => { 
+                    user.userModel.findOne({_id:req.auth.id}).then((user) => {
+                        user.totalWorks.push(...my_order.foods_prepared);
+                        user.save().then(data=>res.send(order_saved));
+                    })
+                }); //maybe add a notification for the waiter
             }
         });
     else if (req.auth.role === roleTypes.BARMAN)
@@ -156,7 +184,12 @@ router.put('/:orderID', my_authorize([roleTypes.COOK, roleTypes.BARMAN, roleType
                 my_order.status.beverages = orderStatus.TERMINATED;
                 my_order.total_queue_time = 0;
                 my_order.markModified('status');
-                my_order.save().then((order_saved) => { res.send(order_saved); }); //maybe add a notification for the waiter
+                my_order.save().then((order_saved) => { 
+                    user.userModel.findOne({_id:req.auth.id}).then((user) => {
+                        user.totalWorks.push(...my_order.beverages_prepared);
+                        user.save().then(data=>res.send(order_saved));
+                    })
+                });
             }
         });
     else if (req.auth.role === roleTypes.WAITER)
@@ -201,12 +234,16 @@ router.put('/:orderID', my_authorize([roleTypes.COOK, roleTypes.BARMAN, roleType
                 tables: [...order.tables.map((table) => { return table['number']; })],
                 foods: [...order.foods_prepared.map((food) => {return {name: food['name'], price: food['price']};})],
                 beverages: [...order.beverages_prepared.map((drink) => {return {name: drink['name'], price: drink['price']};})],
-                total: total
+                covers: order.covers,
+                total: total + 2*(order.covers)
             }
 
             order['payed'] = true;
             order.save().then((saved_order) => {
-                res.send(receipe);
+                user.userModel.findOne({_id:req.auth.id}).then((user)=>{
+                    user.totalWorks.push(saved_order._id);
+                    user.save().then(data => res.send(receipe))
+                })
             })
         });
 })
