@@ -1,171 +1,155 @@
 <p>-- ORDINI --</p>
 
 <div class="container" *ngIf="role === 0 || role === 1">
-    <mat-accordion *ngIf="myOrders.length > 0">
-        <div *ngIf="arrivedOrders.length > 0">
-            <p>Ordini arrivati</p>
-            <mat-expansion-panel *ngFor="let order of arrivedOrders" hideToggle>
-                <mat-expansion-panel-header>
-                    <mat-panel-title>
-                        Tavoli: &nbsp;<span *ngFor="let table of order.tables">{{table.number}} &nbsp;</span>
-                    </mat-panel-title>
-                    <mat-panel-description>
-                        <span> Tempo di preparazione: {{order.total_queue_time}}'</span>
-                    </mat-panel-description>
-                </mat-expansion-panel-header>
-    
-                <ul *ngIf="order.foods_ordered.length > 0"> 
-                    Stato pietanze: 
-                    <span *ngIf="order.status.foods === 0"> Ricevute </span>
-                    <span *ngIf="order.status.foods === 1"> In preparazione </span>
-                    <li *ngFor="let food of order.foods_ordered">
-                        {{food.name}} ({{food.prepareTime}}')
-                    </li>
-                </ul>
-    
-                <mat-divider *ngIf="order.beverages_ordered.length > 0"></mat-divider>
-    
-                <ul *ngIf="order.beverages_ordered.length > 0"> 
-                    Stato bevande: 
-                    <span *ngIf="order.status.beverages === 0"> Ricevute </span>
-                    <span *ngIf="order.status.beverages === 1"> In preparazione </span>
-                    <li *ngFor="let food of order.beverages_ordered">
-                        {{food.name}} ({{food.prepareTime}}')
-                    </li>
-                </ul>
-            </mat-expansion-panel>
-        </div>
+    <mat-accordion *ngIf="receivedGroups.length > 0">
+        <p>Received orders</p>
+        <mat-expansion-panel *ngFor="let group of receivedGroups" hideToggle>
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    Tables: &nbsp;<span *ngFor="let table_number of group.table_numbers">{{table_number}} &nbsp;</span>
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <mat-accordion>
+                <mat-expansion-panel *ngFor="let order of group.orders" hideToggle>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            Prepare time: {{order.queue_time}}'
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <p *ngFor="let food of order.foods">
+                        {{food.name}} ({{food.prepare_time}}')
+                    </p>
+                </mat-expansion-panel>
+            </mat-accordion>
+            
+        </mat-expansion-panel>
+    </mat-accordion>
 
-        <br>
+    <br>
 
-        <div *ngIf="preparingOrders.length > 0">
-            <p>Ordini in preparazione</p>
-            <mat-expansion-panel *ngFor="let order of preparingOrders" hideToggle>
-                <mat-expansion-panel-header>
-                    <mat-panel-title>
-                        Tavoli: &nbsp;<span *ngFor="let table of order.tables">{{table.number}} &nbsp;</span>
-                    </mat-panel-title>
-                    <mat-panel-description>
-                        <span> Tempo di preparazione: {{order.total_queue_time}}'</span>
-                    </mat-panel-description>
-                </mat-expansion-panel-header>
-
-                <ul *ngIf="order.foods_ordered.length > 0"> 
-                    Stato pietanze: 
-                    <span *ngIf="order.status.foods === 0"> Ricevute </span>
-                    <span *ngIf="order.status.foods === 1"> In preparazione </span>
-                    <li *ngFor="let food of order.foods_ordered">
-                        {{food.name}} ({{food.prepareTime}}')
-                    </li>
-                </ul>
-
-                <mat-divider *ngIf="order.beverages_ordered.length > 0"></mat-divider>
-
-                <ul *ngIf="order.beverages_ordered.length > 0"> 
-                    Stato bevande: 
-                    <span *ngIf="order.status.beverages === 0"> Ricevute </span>
-                    <span *ngIf="order.status.beverages === 1"> In preparazione </span>
-                    <li *ngFor="let food of order.beverages_ordered">
-                        {{food.name}} ({{food.prepareTime}}')
-                    </li>
-                </ul>
-            </mat-expansion-panel>
-        </div>
+    <mat-accordion *ngIf="preparingGroups.length > 0">
+        <p>Preparing orders</p>
+        <mat-expansion-panel *ngFor="let group of preparingGroups" hideToggle>
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    Tables: &nbsp;<span *ngFor="let table_number of group.table_numbers">{{table_number}} &nbsp;</span>
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <mat-accordion>
+                <mat-expansion-panel *ngFor="let order of group.orders" hideToggle>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            Prepare time: {{order.queue_time}}'
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <p *ngFor="let food of order.foods">
+                        {{food.name}} ({{food.prepare_time}}')
+                    </p>
+                </mat-expansion-panel>
+            </mat-accordion>
+        </mat-expansion-panel>
+    </mat-accordion>
         
-        <br>
+    <br>
 
-        <div *ngIf="terminatedOrders.length > 0">
-            <p>Ordini terminati</p>
-            <mat-expansion-panel *ngFor="let order of terminatedOrders" hideToggle>
-                <mat-expansion-panel-header>
-                    <mat-panel-title>
-                        Tavoli: &nbsp;<span *ngFor="let table of order.tables">{{table.number}} &nbsp;</span>
-                    </mat-panel-title>
-                    <mat-panel-description>
-                        <span> Tempo di preparazione: {{order.total_queue_time}}'</span>
-                    </mat-panel-description>
-                </mat-expansion-panel-header>
-    
-                <ul *ngIf="order.foods_prepared.length > 0"> Cibi:
-                    <li *ngFor="let food of order.foods_prepared">
-                        {{food.name}} ({{food.prepareTime}}')
-                    </li>
-                </ul>
-    
-                <mat-divider *ngIf="order.beverages_prepared.length > 0"></mat-divider>
-    
-                <ul *ngIf="order.beverages_prepared.length > 0"> Bevande:
-                    <li *ngFor="let food of order.beverages_prepared">
-                        {{food.name}} ({{food.prepareTime}}')
-                    </li>
-                </ul>
-    
-                <button mat-raised-button (click)="pay(order)">Procedi al pagamento</button>
-            </mat-expansion-panel>
-        </div>
-        
+    <mat-accordion *ngIf="terminatedGroups.length > 0">
+        <p>Terminated orders</p>
+        <mat-expansion-panel *ngFor="let group of terminatedGroups" hideToggle>
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    Tables: &nbsp;<span *ngFor="let table_number of group.table_numbers">{{table_number}} &nbsp;</span>
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <mat-accordion>
+                <mat-expansion-panel *ngFor="let order of group.orders" hideToggle>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            Ordered foods:
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <p *ngFor="let food of order.foods">
+                        {{food.name}} ({{food.price}} euros)
+                    </p>
+                    <button mat-raised-button (click)="getReceipt(group.main_table)"> GET RECEIPT </button>
+                </mat-expansion-panel>
+            </mat-accordion>
+        </mat-expansion-panel>
     </mat-accordion>
 </div>
 
 <div class="container" *ngIf="role === 2 || role === 3">
-    <mat-accordion *ngIf="arrivedOrders.length > 0">
-        <p>Ordini arrivati</p>
-        <mat-expansion-panel *ngFor="let order of arrivedOrders" hideToggle>
+    <mat-accordion *ngIf="receivedGroups.length > 0">
+        <p>Received orders</p>
+        <mat-expansion-panel *ngFor="let group of receivedGroups" hideToggle>
             <mat-expansion-panel-header>
                 <mat-panel-title>
-                    Tavoli: &nbsp;<span *ngFor="let table of order.tables">{{table.number}} &nbsp;</span>
+                    Tables: &nbsp;<span *ngFor="let table_number of group.table_numbers">{{table_number}} &nbsp;</span>
                 </mat-panel-title>
-                <mat-panel-description>
-                    <span> Tempo di preparazione: {{order.total_queue_time}}'</span>
-                </mat-panel-description>
             </mat-expansion-panel-header>
-            <p *ngFor="let food of ((role === 3) ? order.foods_ordered : order.beverages_ordered)">
-                {{food.name}} ({{food.prepareTime}}')
-            </p>
-            <button mat-raised-button (click)="updateOrder(order)"> Prendi in carico </button>
+            <mat-accordion>
+                <mat-expansion-panel *ngFor="let order of group.orders" hideToggle>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            Prepare time: {{order.queue_time}}'
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <p *ngFor="let food of order.foods">
+                        {{food.name}} ({{food.prepare_time}}')
+                    </p>
+                    <button mat-raised-button (click)="updateOrder(order)"> START PREPARING </button>
+                </mat-expansion-panel>
+            </mat-accordion>
+            
         </mat-expansion-panel>
     </mat-accordion>
 
-    <mat-accordion *ngIf="preparingOrders.length > 0">
-        <p>Ordini in preparazione</p>
-        <mat-expansion-panel *ngFor="let order of preparingOrders" hideToggle>
+    <br>
+
+    <mat-accordion *ngIf="preparingGroups.length > 0">
+        <p>Preparing orders</p>
+        <mat-expansion-panel *ngFor="let group of preparingGroups" hideToggle>
             <mat-expansion-panel-header>
                 <mat-panel-title>
-                    Tavoli: &nbsp;<span *ngFor="let table of order.tables">{{table.number}} &nbsp;</span>
+                    Tables: &nbsp;<span *ngFor="let table_number of group.table_numbers">{{table_number}} &nbsp;</span>
                 </mat-panel-title>
-                <mat-panel-description>
-                    <span> Tempo di preparazione: {{order.total_queue_time}}'</span>
-                </mat-panel-description>
             </mat-expansion-panel-header>
-            <p *ngFor="let food of ((role === 3) ? order.foods_ordered : order.beverages_ordered)">
-                {{food.name}} ({{food.prepareTime}}')
-            </p>
-            <button mat-raised-button (click)="updateOrder(order)"> Termina </button>
+            <mat-accordion>
+                <mat-expansion-panel *ngFor="let order of group.orders" hideToggle>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            Prepare time: {{order.queue_time}}'
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <p *ngFor="let food of order.foods">
+                        {{food.name}} ({{food.prepare_time}}')
+                    </p>
+                    <button mat-raised-button (click)="updateOrder(order)"> READY TO SERVE </button>
+                </mat-expansion-panel>
+            </mat-accordion>
         </mat-expansion-panel>
     </mat-accordion>
 </div>
 
 <div class="container" *ngIf="role === 4">
-    <p>Tavoli selezionati: {{shownSelectedTables}}</p>
+    <p>Selected tables: {{show_selected_tables}}</p>
 
-    <ul *ngIf="shownOrders.length > 0" > Tavoli che hanno già ordinato
+    <ul *ngIf="tablesWithOrders.length > 0" > Tables with order
         <br>
         <br>
-        <ng-container *ngFor="let order of shownOrders">
-            <li *ngFor="let table of order.tables">
-                <button mat-raised-button (click)="selectTable(table, order)"> tavolo: {{table.number}} </button>
-                <br>
-                <br>
-            </li>
+        <ng-container *ngFor="let tables_list of tablesWithOrders">
+            <button mat-raised-button (click)="selectTable(tables_list[0])"> 
+                TABLES:&nbsp; 
+                <span *ngFor="let table of tables_list">{{table.number}}&nbsp;</span>
+            </button>
         </ng-container>
     </ul>
 
-    <ul *ngIf="tablesWithoutOrders.length > 0"> Tavoli che devono ancora ordinare
+    <ul *ngIf="tablesWithoutOrders.length > 0"> Tables without order
         <br>
         <br>
         <li *ngFor="let table of tablesWithoutOrders">
-            <button mat-raised-button (click)="selectTable(table, null)">
-                tavolo: {{table.number}}
+            <button mat-raised-button (click)="selectTable(table)">
+                TABLES: {{table.number}}
             </button>
             <br>
             <br>
@@ -175,7 +159,7 @@
     <mat-divider></mat-divider>
     <br>
 
-    <button mat-raised-button (click)="getOrderId()"> Avanti </button>
+    <button mat-raised-button (click)="createOrder()"> CREATE ORDER </button>
 </div>
 
 <br>

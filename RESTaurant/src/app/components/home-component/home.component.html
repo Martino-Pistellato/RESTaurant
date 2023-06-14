@@ -2,7 +2,7 @@
 
 <div>
     <button mat-raised-button routerLink="/login">Logout</button>
-    <span *ngIf="role === 0">  You are an: Admin</span>
+    <span *ngIf="role === 0">  You are an Admin</span>
     <span *ngIf="role === 1">  You are a Cashier</span>
     <span *ngIf="role === 2">  You are a Barman</span>
     <span *ngIf="role === 3">  You are a Cook</span>
@@ -41,6 +41,11 @@
             </td>
             <td width="150px">
                 <button mat-raised-button routerLink="/orders" style="width: 100%">Vedi ordini</button>
+            </td>
+        </tr>
+        <tr>
+            <td align="right">
+                <button mat-raised-button routerLink="/stats" style="width: 100%">STATISTICS</button>
             </td>
         </tr>
     </table>

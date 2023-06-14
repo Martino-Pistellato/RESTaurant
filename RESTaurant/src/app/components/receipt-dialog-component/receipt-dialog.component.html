@@ -1,0 +1,20 @@
+<p mat-dialog-title>RECEIPT</p>
+
+<mat-dialog-content>
+    <p>Date: {{data.receipt.date}}</p>
+    <p>Tables: {{data.receipt.tables}}</p>
+    <p>Order: {{data.receipt.order}}</p>
+    <ul *ngFor="let food of data.receipt.foods">
+        <p>{{food.name}}   {{food.price}}</p>
+    </ul>
+    <ul *ngFor="let drink of data.receipt.drinks">
+        <p>{{drink.name}}   {{drink.price}}</p>
+    </ul>
+    <p>Covers: {{data.receipt.covers}} * 2</p>
+    <p>Total: {{data.receipt.total}}</p>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+    <button mat-button (click)="close()">CLOSE</button>
+    <button mat-button (click)="pay(data.receipt.order)">PAY</button>
+</mat-dialog-actions>

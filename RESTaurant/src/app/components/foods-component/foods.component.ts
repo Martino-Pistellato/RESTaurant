@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { FoodsService, Food, FoodTypes } from '../../services/foods-services/foods.service';
+
+import { FoodsService, Food } from '../../services/foods-services/foods.service';
 import { OrdersService } from 'src/app/services/orders-services/orders.service';
 import { UsersService, RoleTypes } from 'src/app/services/users-services/users.service';
+import { SocketService } from 'src/app/services/socket-services/socket.service';
 
 @Component({
   selector: 'app-foods',
@@ -12,12 +14,12 @@ import { UsersService, RoleTypes } from 'src/app/services/users-services/users.s
 export class FoodsComponent {
   public foods: Food[] = [];
   public selectedFoods: Food[] = [];
-  public selectedBeverages: Food[] = [];
-  public role: RoleTypes | null;
+  public role: RoleTypes;
 
   constructor(private _foodService: FoodsService,
               private _orderService: OrdersService,
               private _userService: UsersService,
+              private _socketService: SocketService,
               private _router: Router) { 
     this.role = this._userService.role;
   }
@@ -25,29 +27,25 @@ export class FoodsComponent {
   ngOnInit(): void {
     if (this._orderService.selectedOrder === '' && this._userService.role !== RoleTypes.ADMIN) 
       this._router.navigate(['home']);
+    console.log("try to fill order: ",this._orderService.selectedOrder)
     this._foodService.getFoods().subscribe((foods: Food[]) => this.foods = foods);
   }
 
   addFood(food: Food): void{
-    if (food.type === FoodTypes.DRINK)
-      this.selectedBeverages.push(food);
-    else
-      this.selectedFoods.push(food);
+    this.selectedFoods.push(food);
   }
 
   removeFood(food: Food): void{
-    if (food.type === FoodTypes.DRINK){
-      if (!this.selectedBeverages.includes(food)) return;
-      this.selectedBeverages.splice(this.selectedBeverages.indexOf(food),1);
-    }
-    else{
-      if (!this.selectedFoods.includes(food)) return;
-      this.selectedFoods.splice(this.selectedFoods.indexOf(food),1);
-    }
+    if (!this.selectedFoods.includes(food)) return;
+    else this.selectedFoods.splice(this.selectedFoods.indexOf(food),1);
   }
 
   updateOrder(){
-    this._orderService.updateOrder(this.selectedFoods, this.selectedBeverages)
-    .subscribe((order)=>{this._router.navigate(['home']);});
+    this._orderService.updateOrder(this.selectedFoods)
+    .subscribe((order)=>{
+      //this._socketService.emitToServer('update_orders_list');
+      //this._socketService.emitToServer('update_tables_list');
+      this._router.navigate(['home']);
+    });
   }
 }

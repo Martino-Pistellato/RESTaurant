@@ -1,11 +1,10 @@
-//here we close all connections to the db. Maybe we could keep a connection open (singleton like) and use it through the whole application
+import { MongoClient } from 'mongodb';
+import * as mongoose from 'mongoose';
 
-const {MongoClient} = require('mongodb');
 import * as user from './User';
 import * as food from './Food';
 import * as table from './Table';
 import * as order from './Order';
-import * as mongoose from 'mongoose';
 
 //first, we connect to the cluster
 //Use MongoClient because mongoose gave problem getting the list of databases in the cluster. even if it's possible to use it for this purpose
@@ -19,11 +18,11 @@ client.connect()
 })
 
 //we collect the databases present in the cluster and search for RESTaurant_db. If is not present, we create it and its collections
-function searchDB(client){
+function searchDB(client: any){
     client.db().admin().listDatabases()
-    .then((list) => {
+    .then((list: any) => {
         let isDBPresent = false;
-        list.databases.forEach(db => {
+        list.databases.forEach((db: any) => {
             if(db.name === 'RESTaurant_db')
                 isDBPresent = true;
         });
@@ -119,12 +118,19 @@ function populateUsers() : Promise<void>{
         });
         my_bartender2.setPassword('123456');
 
-        let my_cashier = user.newUser({
+        let my_cashier1 = user.newUser({
             email: 'laura@cash.RESTaurant.it',
             name: 'Laura Frimi',
             role: user.roleTypes.CASHIER
         });
-        my_cashier.setPassword('123456');
+        my_cashier1.setPassword('123456');
+
+        let my_cashier2 = user.newUser({
+            email: 'cosimo@cash.RESTaurant.it',
+            name: 'Cosimo Berni',
+            role: user.roleTypes.CASHIER
+        });
+        my_cashier2.setPassword('123456');
 
         my_admin.save()
         .then(() => {
@@ -140,10 +146,13 @@ function populateUsers() : Promise<void>{
                             .then(() => {
                                 my_bartender2.save()
                                 .then(() => {
-                                    my_cashier.save().
+                                    my_cashier1.save().
                                     then(() => {
-                                        console.log("Users populated")
-                                        return resolve();
+                                        my_cashier2.save().
+                                        then(() => {
+                                            console.log("Users populated")
+                                            return resolve();
+                                        });
                                     });
                                 });
                             });
@@ -212,91 +221,91 @@ function populateFoods() : Promise<void>{
             price: 3,
             type: food.foodTypes.APPETIZER,
             ingredients: ["olives", "meat", "bread", "cheese", "eggs"],
-            prepareTime: 7
+            prepare_time: 7
         });
         let my_food2 = food.newFood({
             name: "Bruschette",
             price: 3,
             type: food.foodTypes.APPETIZER,
             ingredients: ["olives", "tomatoes", "bread", "olive oil"],
-            prepareTime: 5
+            prepare_time: 5
         });
         let my_food3 = food.newFood({
             name: "Pizza Margherita",
             price: 5,
             type: food.foodTypes.FIRST_COURSE,
             ingredients: ["tomato sauce", "mozzarella"],
-            prepareTime: 10
+            prepare_time: 10
         });
         let my_food4 = food.newFood({
             name: "Pasta with Pesto",
             price: 5,
             type: food.foodTypes.FIRST_COURSE,
             ingredients: ["pasta", "pesto"],
-            prepareTime: 10
+            prepare_time: 10
         });
         let my_food5 = food.newFood({
             name: "Cotoletta alla Milanese",
             price: 8,
             type: food.foodTypes.SECOND_COURSE,
             ingredients: ["eggs", "chicken", "flour", "breadcrumbs", "lemon"],
-            prepareTime: 10
+            prepare_time: 10
         });
         let my_food6 = food.newFood({
             name: "Parmigiana",
             price: 7,
             type: food.foodTypes.SECOND_COURSE,
             ingredients: ["eggplants", "mozzarella", "tomato sauce", "olive oil", "basil", "parmisan cheese"],
-            prepareTime: 10
+            prepare_time: 10
         });
         let my_food7 = food.newFood({
             name: "French Fries",
             price: 4,
             type: food.foodTypes.SIDE_DISH,
             ingredients: ["potatoes"],
-            prepareTime: 5
+            prepare_time: 5
         });
         let my_food8 = food.newFood({
             name: "Salad",
             price: 4,
             type: food.foodTypes.SIDE_DISH,
             ingredients: ["salad", "tomatoes", "carrots"],
-            prepareTime: 5
+            prepare_time: 5
         });
         let my_food9 = food.newFood({
             name: "Crème Brûlée",
             price: 5,
             type: food.foodTypes.DESSERT,
             ingredients: ["fresh cream", "milk", "sugar", "eggs", "vanilla"],
-            prepareTime: 6
+            prepare_time: 6
         });
         let my_food10 = food.newFood({
             name: "Tiramisù",
             price: 5,
             type: food.foodTypes.DESSERT,
             ingredients: ["mascarpone", "coffee", "eggs", "biscuits"],
-            prepareTime: 5
+            prepare_time: 5
         });
         let my_food11 = food.newFood({
             name: "Beer 1lt",
             price: 5,
             type: food.foodTypes.DRINK,
             ingredients: ["hops", "wheat"],
-            prepareTime: 0
+            prepare_time: 0
         });
         let my_food12 = food.newFood({
             name: "Water 1lt",
             price: 3,
             type: food.foodTypes.DRINK,
             ingredients: ["water"],
-            prepareTime: 0
+            prepare_time: 0
         });
         let my_food13 = food.newFood({
             name: "Americano",
             price: 5,
             type: food.foodTypes.DRINK,
             ingredients: ["campari", "vermouth", "seltz", "orange"],
-            prepareTime: 5
+            prepare_time: 5
         });
     
         my_food1.save()

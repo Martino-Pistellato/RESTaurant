@@ -1,5 +1,5 @@
 import mongoose = require('mongoose');
-import Ajv, {JSONSchemaType} from "ajv";
+import Ajv from 'ajv';
 
 export enum foodTypes{
     APPETIZER,
@@ -13,7 +13,7 @@ export enum foodTypes{
 export interface Food extends mongoose.Document {
     name:           string;
     price:          number;
-    prepareTime:    number; //in minutes
+    prepare_time:    number; //in minutes
     ingredients:    string[]; 
     type:           foodTypes;
 }
@@ -28,7 +28,7 @@ const foodSchema = new mongoose.Schema<Food>({
         type: mongoose.SchemaTypes.Number,
         required: true
     },
-    prepareTime:{
+    prepare_time:{
         type: mongoose.SchemaTypes.Number,
         required: true
     },
@@ -53,7 +53,7 @@ export function validateFood(food: Food): boolean {
     return validator.validate(foodSchema, food) as boolean;
 };
 
-export function newFood( data ): Food {
+export function newFood( data: any ): Food {
     let food = new foodModel( data );
     return food;
 }

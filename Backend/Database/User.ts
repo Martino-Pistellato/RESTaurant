@@ -65,7 +65,7 @@ export function validateUser(user: User): boolean {
     return validator.validate(userSchema, user) as boolean;
 };
 
-export function newUser( data ): User {
+export function newUser( data: any ): User {
     let user = new userModel( data );
     return user;
 }

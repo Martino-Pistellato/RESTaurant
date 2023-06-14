@@ -1,6 +1,6 @@
-import {Component, Inject} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {FormControl, Validators} from '@angular/forms';
+import { Component, Inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { FormControl, Validators } from '@angular/forms';
 
 import { Table } from 'src/app/services/tables-services/tables.service';
 
@@ -10,8 +10,6 @@ import { Table } from 'src/app/services/tables-services/tables.service';
   styleUrls: ['./table-occupancy-dialog.component.css']
 })
 export class TableOccupancyDialogComponent{
-    table: Table;
-    occupancy: number;
     occupancyControl: FormControl;
 
     getErrorMessage() {
@@ -20,10 +18,8 @@ export class TableOccupancyDialogComponent{
 
     constructor(
         private dialogRef: MatDialogRef<TableOccupancyDialogComponent>,
-        @Inject(MAT_DIALOG_DATA) public data: {table: Table, occupancy: number}) {
-        this.table = data.table;
-        this.occupancy = data.occupancy;
-        this.occupancyControl = new FormControl('', [Validators.max(this.table.capacity), Validators.min(1)]);
+        @Inject(MAT_DIALOG_DATA) protected data: {table: Table, occupancy: number}) {
+        this.occupancyControl = new FormControl('', [Validators.max(data.table.capacity), Validators.min(1)]);
     }
 
     close() {

@@ -17,7 +17,7 @@ export interface Food{
   _id:             string;
   name:           string;
   price:          number;
-  prepareTime:    number; //in minutes
+  prepare_time:    number; //in minutes
   ingredients:    string[]; 
   type:           FoodTypes;
 }
@@ -28,7 +28,7 @@ export interface Food{
 })
 export class FoodsService {
 
-  constructor(private http:HttpClient, private usersService: UsersService) { }
+  constructor(private http: HttpClient, private usersService: UsersService) { }
 
   getFoods(): Observable<Food[]>{
     return this.http.get<Food[]>('https://localhost:3000/foods', createOptions({},this.usersService.token)).pipe(

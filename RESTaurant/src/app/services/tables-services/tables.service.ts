@@ -5,52 +5,55 @@ import { handleError, createOptions } from 'src/app/utils';
 import { UsersService, User } from '../users-services/users.service';
 
 export interface Table{
-  _id:        string,
-  number:     number,
-  capacity:   number,
-  isFree:     boolean,
-  waiterId:   string | null | User,
-  occupancy:  number
+  _id:            string,
+  number:         number,
+  capacity:       number,
+  is_free:        boolean,
+  waiter_id:      string | null | User,
+  occupancy:      number,
+  linked_tables:  Table[]
 }
-
-
 
 @Injectable({
   providedIn: 'root'
 })
 export class TablesService {
+
   constructor(private http: HttpClient, private usersService: UsersService) { }
 
-  getMyTables(): Observable<Table[]>{
-    return this.http.get<Table[]>('https://localhost:3000/tables',  createOptions({},this.usersService.token)).pipe(
+  getTables(): Observable<Table[]>{
+    return this.http.get<Table[]>('https://localhost:3000/tables', createOptions({},this.usersService.token)).pipe(
       catchError(handleError)
     );
   }
 
-  getAllTables(): Observable<Table[]>{
-    return this.http.get<Table[]>('https://localhost:3000/tables/all',  createOptions({},this.usersService.token)).pipe(
+  getTable(table_id: string): Observable<Table>{
+    return this.http.get<Table>('https://localhost:3000/tables/'+table_id, createOptions({table_id: table_id},this.usersService.token)).pipe(
       catchError(handleError)
     );
   }
 
-  changeStatus(tableNumber: Number, occupancy: Number): Observable<Table>{
+  getServingTables(): Observable<Table[]>{
+    return this.http.get<Table[]>('https://localhost:3000/tables/serving', createOptions({},this.usersService.token)).pipe(
+      catchError(handleError)
+    );
+  }
+
+  changeStatus(table_id: string, id: string | null, occupancy: number): Observable<Table>{
     return this.http.put<Table>('https://localhost:3000/tables',{
-      tableNumber: tableNumber,
+      table_id: table_id,
+      id: id,
       occupancy: occupancy
-    }, createOptions({},this.usersService.token))
-    .pipe( catchError(handleError) );
+    },createOptions({},this.usersService.token)).pipe(
+      catchError(handleError)
+    );
   }
 
-  createTable(capacity: Number, number: Number): Observable<Table>{
-    return this.http.post<Table>('https://localhost:3000/tables', {
-      capacity: capacity,
-      number: number
-    }, createOptions({},this.usersService.token))
-    .pipe( catchError(handleError) );
-  }
-
-  deleteTable(tableNumber: Number): Observable<Table>{
-    return this.http.delete<Table>('https://localhost:3000/tables/' + tableNumber, createOptions({},this.usersService.token))
-    .pipe( catchError(handleError) );
+  linkTables(tables: Table[]){
+    return this.http.put<Table>('https://localhost:3000/tables/link',{
+      tables: tables
+    },createOptions({},this.usersService.token)).pipe(
+      catchError(handleError)
+    );
   }
 }

@@ -14,49 +14,40 @@ export enum OrderStatus {
 }
 
 export interface Order{
-  _id:                    string,
-  foods_ordered:          Food[], 
-  beverages_ordered:      Food[],
+  _id:            string,
+  foods:          Food[],
+  cook_id:        User,
 
-  foods_prepared:         Food[],
-  beverages_prepared:     Food[],
+  table:          Table,
+  notes:          string,
 
-  tables:                 Table[],
-  notes:                  string,
+  status:         OrderStatus,
+  is_payed:       boolean,
+  covers:         number,
 
-  status: {
-      foods:              OrderStatus,
-      beverages:          OrderStatus
-  },
-
-  insertionDate:          Date,
-  total_queue_time:       number,
-  payed:                  boolean,
-
-  cookID:                 User,
-  barmanID:               User
+  insertion_date: Date,
+  queue_time:     number
 }
 
 export interface Receipt {
-  date: Date,
-  order: string,
-  tables: number[],
+  date:       Date,
+  order:      string,
+  tables:     number[],
   foods: {
-      name: string,
-      price: number
+      name:   string,
+      price:  number
   }[],
-  beverages: {
-      name: string,
-      price: number
+  drinks: {
+      name:   string,
+      price:  number
   }[],
-  covers: number,
-  total: number
+  covers:     number,
+  total:      number
 }
 
 export interface Profit{
   total: number
 }
-
 
 @Injectable({
   providedIn: 'root'
@@ -66,21 +57,26 @@ export class OrdersService {
 
   constructor(private http: HttpClient, private usersService: UsersService) { }
 
-  updateOrder(foods: Food[], beverages: Food[]): Observable<Order>;
-  updateOrder(order: Order): Observable<Order>;
-
-  updateOrder(firstItem: Food[] | Order, secondItem?: Food[]): Observable<Order>{
+  updateOrder(firstItem: Food[] | Order | string): Observable<Order>{
     if (this.usersService.role === RoleTypes.WAITER)
-      return this.http.put<Order>('https://localhost:3000/orders/'+this.selectedOrder, {
+      return this.http.put<Order>('https://localhost:3000/orders', {
+        order_id: this.selectedOrder,
         foods: firstItem as Food[],
-        beverages: secondItem as Food[],
       }, createOptions({}, this.usersService.token)).pipe(
         catchError(handleError)
       );
-    else
-      return this.http.put<Order>('https://localhost:3000/orders/'+(firstItem as Order)._id, {}, createOptions({},this.usersService.token)).pipe(
+    else if (this.usersService.role === RoleTypes.COOK || this.usersService.role === RoleTypes.BARMAN){
+      return this.http.put<Order>('https://localhost:3000/orders', {
+        order_id: (firstItem as Order)._id
+      }, createOptions({},this.usersService.token)).pipe(
         catchError(handleError)
-      );
+      );}
+    else{
+      return this.http.put<Order>('https://localhost:3000/orders', {
+        order_id: (firstItem as string)
+      }, createOptions({},this.usersService.token)).pipe(
+        catchError(handleError)
+      );}
   }
 
   getOrders(): Observable<Order[]>{
@@ -89,14 +85,24 @@ export class OrdersService {
     );
   }
 
-  createOrder(tables: Table[]): Observable<Order>{
-    return this.http.post<Order>('https://localhost:3000/orders', {tables: tables}, createOptions({},this.usersService.token)).pipe(
+  getAllOrders(): Observable<Order[]>{
+    return this.http.get<Order[]>('https://localhost:3000/orders/all',  createOptions({},this.usersService.token)).pipe(
       catchError(handleError)
     );
   }
 
-  pay(order: Order): Observable<Receipt>{
-    return this.http.put<Receipt>('https://localhost:3000/orders/'+order._id, {}, createOptions({},this.usersService.token)).pipe(
+  createOrder(table: Table): Observable<Order>{
+    console.log("inside order creation service")
+    console.log("service passed table: ", table)
+    return this.http.post<Order>('https://localhost:3000/orders', {table: table}, createOptions({},this.usersService.token)).pipe(
+      catchError(handleError)
+    );
+  }
+
+  getReceipt(table: Table): Observable<Receipt>{
+    return this.http.get<Receipt>('https://localhost:3000/orders/receipt/'+table._id, createOptions({
+      table_id: table._id
+    },this.usersService.token)).pipe(
       catchError(handleError)
     );
   }

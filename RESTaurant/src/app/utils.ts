@@ -1,5 +1,5 @@
 import { HttpHeaders, HttpParams, HttpErrorResponse } from '@angular/common/http';
-import { throwError} from 'rxjs';
+import { throwError } from 'rxjs';
 
 export function handleError(error: HttpErrorResponse) {
     if (error.error instanceof ErrorEvent) {
@@ -14,7 +14,7 @@ export function handleError(error: HttpErrorResponse) {
     }
   }
 
-export function createOptions( passed_params = {}, token:string ) { //alfredo@waiter.RESTaurant.it
+export function createOptions( passed_params = {}, token:string ) { 
     return  {
         headers: new HttpHeaders({
             authorization: 'Bearer ' + token,
@@ -23,4 +23,12 @@ export function createOptions( passed_params = {}, token:string ) { //alfredo@wa
         }),
         params: new HttpParams().appendAll( passed_params )
     };
+}
+
+export const Events = {
+  UPDATE_TABLES_LIST:     'update_tables_list',
+  UPDATE_ORDERS_LIST:     'update_orders_list',
+  UPDATE_TOTAL_PROFIT:    'update_total_profit'
+
+  //add notifications for waiters/cooks
 }

@@ -19,3 +19,7 @@ ul {
     width: 300px;
     margin-bottom: 8px;
 }
+
+mat-sidenav {
+    width: 200px;
+}

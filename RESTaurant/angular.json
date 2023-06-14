@@ -61,8 +61,8 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
             "browserTarget": "RESTaurant:build",
-            "sslKey": "./ssl/key.pem",
-            "sslCert": "./ssl/cert.pem",
+            "sslKey": "./keys/key.pem",
+            "sslCert": "./keys/cert.pem",
             "ssl": true
           },
           "configurations": {
@@ -102,8 +102,5 @@
         }
       }
     }
-  },
-  "cli": {
-    "analytics": false
   }
 }

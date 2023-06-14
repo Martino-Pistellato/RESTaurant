@@ -1,15 +1,14 @@
-import {roleTypes} from '../Database/User'
-import * as food from '../Database/Food'
-import jsonwebtoken = require('jsonwebtoken');  // JWT generation
 import { Router } from 'express';
+
+import { roleTypes } from '../Database/User'
+import * as food from '../Database/Food'
 import { my_authorize } from '../utils';
 
 const router = Router();
 
 //Get all foods and drinks in the menu route
-router.get('/', my_authorize([roleTypes.ADMIN, roleTypes.WAITER]), (req, res) => {
-    food.foodModel.find().then((foods) => { res.send(foods); }); 
-    //redirect order in PUT
+router.get('/', my_authorize([roleTypes.ADMIN, roleTypes.WAITER, roleTypes.CASHIER]), (req, res) => {
+    food.foodModel.find().then((foods) => { res.send(foods); });
 })
 
 //Create new food/drink route

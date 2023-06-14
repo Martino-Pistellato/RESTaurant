@@ -1,15 +1,16 @@
 import mongoose = require('mongoose');
-import Ajv from "ajv";
+import Ajv from 'ajv';
 
 export interface Table extends mongoose.Document{
-    number: number,
-    capacity: number,
-    isFree: boolean,
-    waiterId: string | null,
-    occupancy: number
+    number:         number,
+    capacity:       number,
+    is_free:         boolean,
+    waiter_id:       string,
+    occupancy:      number,
+    linked_tables:  string[]
     //isReserved: boolean;
 
-    changeStatus: (waiterID: string, occupancy: number) => void
+    changeStatus: (waiter_id: string | null, occupancy: number) => void
 }
 
 const tableSchema = new mongoose.Schema<Table>({
@@ -22,12 +23,12 @@ const tableSchema = new mongoose.Schema<Table>({
         type: mongoose.SchemaTypes.Number,
         required: true
     },
-    isFree:{
+    is_free:{
         type: mongoose.SchemaTypes.Boolean,
         required: false,
         default: true
     },
-    waiterId:{
+    waiter_id:{
         type: mongoose.SchemaTypes.String,
         required: false,
         default: null,
@@ -37,29 +38,34 @@ const tableSchema = new mongoose.Schema<Table>({
         type: mongoose.SchemaTypes.Number,
         required: false,
         default: 0
+    },
+    linked_tables:{
+        type: [mongoose.SchemaTypes.String],
+        required: false,
+        default: [],
+        ref: 'Table'
     }
 });
 
 //handle case of cashier freeing table --> what about admin?
-tableSchema.methods.changeStatus = function(waiterID: string, occupancy: number) { 
+tableSchema.methods.changeStatus = function(waiter_id: string | null, occupancy: number) { 
     if (occupancy > this.capacity) throw new Error("Occupancy cannot be greater than capacity");
-    
-    if(!this.isFree){
-        if(this.waiterId == waiterID || waiterID == null){
-            this.isFree = true
-            this.waiterId = null;
+    if(!this.is_free){
+        if(this.waiter_id === waiter_id || waiter_id === null){
+            this.is_free = true
+            this.waiter_id = null;
             this.occupancy = 0;
         }
-        else{
-            throw new Error("You cannot free a table you're not serving!");
+        else throw new Error("You cannot free a table you're not serving!");
+    }
+    else {
+        if(waiter_id !== null){
+            this.is_free = false
+            this.waiter_id = waiter_id;
+            this.occupancy = occupancy;
         }
+        else throw new Error("Only waiter can occupy tables");
     }
-    else{
-        this.isFree = false
-        this.waiterId = waiterID;
-        this.occupancy = occupancy;
-    }
-
 }
 
 export function getSchema() {
@@ -73,7 +79,7 @@ export function validateTable(table: Table): boolean {
     return validator.validate(tableSchema, table) as boolean;
 };
 
-export function newTable( data ): Table {
+export function newTable( data: any ): Table {
     let table = new tableModel( data );
     return table;
 }

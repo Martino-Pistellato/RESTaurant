@@ -1,10 +1,19 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
-import { ReceiptDialogComponent } from '../receipt-dialog/receipt-dialog.component';
+
+import { ReceiptDialogComponent } from '../receipt-dialog-component/receipt-dialog.component';
 import { TablesService, Table } from 'src/app/services/tables-services/tables.service';
 import { OrdersService, Order, OrderStatus, Receipt } from 'src/app/services/orders-services/orders.service';
 import { UsersService, RoleTypes } from 'src/app/services/users-services/users.service';
+import { SocketService } from 'src/app/services/socket-services/socket.service';
+import { Events } from 'src/app/utils';
+
+interface Group{
+  orders: Order[],
+  table_numbers: number[],
+  main_table: Table
+}
 
 @Component({
   selector: 'app-orders',
@@ -13,173 +22,224 @@ import { UsersService, RoleTypes } from 'src/app/services/users-services/users.s
 })
 export class OrdersComponent {
   private myTables: Table[] = [];
-  protected myOrders: Order[] = [];
-  
+  private myOrders: Order[] = [];
   protected role: RoleTypes;
 
-  //USED FOR WAITERS  
-  private tablesWithOrders: Table[] = [];
+  protected tablesWithOrders: Table[][] = [];
   protected tablesWithoutOrders: Table[] = [];
   protected selectedTables: Table[] = [];
-  protected shownSelectedTables: string = '';
-  protected shownOrders: Order[] = [];
+  protected show_selected_tables: string = '';
 
-  //FOR COOKS AND BARMEN
-  protected arrivedOrders: Order[] = [];
-  protected preparingOrders: Order[] = [];
+  private receivedOrders: Order[] = [];
+  private preparingOrders: Order[] = [];
+  private terminatedOrders: Order[] = [];
 
-  //FOR CASHIER
-  protected terminatedOrders: Order[] = [];
+  protected receivedGroups: Group[] = [];
+  protected preparingGroups: Group[] = [];
+  protected terminatedGroups: Group[] = [];
 
   constructor(private tablesService: TablesService, 
               private ordersService: OrdersService,
               private usersService: UsersService, 
+              private socketService: SocketService,
               private router: Router,
               private dialog: MatDialog) {
-    this.role = (this.usersService.role as RoleTypes);
+    this.role = this.usersService.role;
   }
 
   ngOnInit(): void {
-    this.ordersService.getOrders().subscribe(
-      (orders) => { 
-        this.myOrders = orders;
+    if (this.role === RoleTypes.WAITER){
+      this.updateServingTablesList(); //it also updates orders
+      this.socketService.listenToServer(Events.UPDATE_TABLES_LIST, () => this.updateServingTablesList());
+    }
+    else {
+      this.updateOrdersList()
+      this.socketService.listenToServer(Events.UPDATE_ORDERS_LIST, () => this.updateOrdersList());
+    }
+  }
 
-        if (this.role === RoleTypes.WAITER) 
-          this.tablesService.getMyTables().subscribe(
-            (tables) => { 
-              this.myTables = tables; 
-              this.dispatchTables(); 
-            }
-          );
-        else this.dispatchOrders();       
-      }
-    );
+  updateServingTablesList(){
+    this.tablesService.getServingTables().subscribe(tables => {
+      this.myTables = tables;
+      this.ordersService.getOrders().subscribe(orders => {
+        this.myOrders = orders;
+        this.dispatchTables();
+      })
+    })
+  }
+
+  updateOrdersList(){
+    this.ordersService.getOrders().subscribe(orders => {
+      this.myOrders = orders;
+      this.dispatchOrders();
+    })
   }
 
   dispatchTables(): void{
     this.tablesWithOrders = [];
     this.tablesWithoutOrders = [...this.myTables];
-    this.shownOrders = [...this.myOrders];
+    this.show_selected_tables = '';
 
-    this.myOrders.forEach((order) => {
-      this.tablesWithOrders.push(...order.tables);
-    });
-
-    this.myTables.forEach((table) => {
-      this.tablesWithOrders.every((table_with_order) => { //every it's just more efficient than forEach
-        if(table_with_order._id === table._id) 
-          return this.tablesWithoutOrders.splice(this.tablesWithoutOrders.indexOf(table),1) === null;
-        return true;
-      });
+    this.myOrders.forEach(order => {
+      this.tablesService.getTable(order.table._id).subscribe(main_table => {
+        let index = this.tablesWithOrders.findIndex(table_list => (table_list.findIndex(table => table.number === main_table.number)) >= 0);
+        if (!(index >= 0))
+          this.tablesWithOrders.push([main_table].concat(main_table.linked_tables));
+        index = this.tablesWithoutOrders.findIndex(table => table.number === main_table.number);
+        if (index >= 0){
+          this.tablesWithoutOrders.splice(index,1);
+          main_table.linked_tables.forEach(table => {
+            index = this.tablesWithoutOrders.findIndex(table_to_delete => table_to_delete.number === table.number);
+            if (index >= 0)
+              this.tablesWithoutOrders.splice(index,1);
+          });
+        }
+      })
     });
   }
 
   dispatchOrders(): void {
+    this.receivedOrders = [];
     this.preparingOrders = [];
-    this.arrivedOrders = [];
     this.terminatedOrders = [];
 
-    this.ordersService.getOrders().subscribe(
-      (orders) => { 
-        this.myOrders = orders;
+    this.myOrders.forEach((order) => {
+      if (order.status === OrderStatus.RECEIVED)
+        this.receivedOrders.push(order);
+      else if (order.status === OrderStatus.PREPARING)
+        this.preparingOrders.push(order);
+      else if (order.status === OrderStatus.TERMINATED)
+        this.terminatedOrders.push(order);
+    });
 
-        if (this.role === RoleTypes.BARMAN)
-          this.myOrders.forEach((order)=>{
-            if(order.status.beverages === OrderStatus.PREPARING)
-              this.preparingOrders.push(order);
-            else if(order.status.beverages === OrderStatus.RECEIVED)
-              this.arrivedOrders.push(order);
-          });
-        else if (this.role === RoleTypes.COOK)
-          this.myOrders.forEach((order)=>{
-            if(order.status.foods === OrderStatus.PREPARING)
-              this.preparingOrders.push(order);
-            else if(order.status.foods === OrderStatus.RECEIVED)
-              this.arrivedOrders.push(order);
-          });
-        else {
-          this.myOrders.forEach((order)=>{
-            if(order.status.foods === OrderStatus.RECEIVED || order.status.beverages === OrderStatus.RECEIVED)
-              this.arrivedOrders.push(order);
-            else if(order.status.foods === OrderStatus.PREPARING || order.status.beverages === OrderStatus.PREPARING)
-              this.preparingOrders.push(order);
-            else if (!order.payed)
-              this.terminatedOrders.push(order);
-          });
-        }
-      }
-    );
+    this.groupOrders();
   }
 
-  selectTable(table: Table, order: Order | null): void {
-    if (this.selectedTables.includes(table)) 
-      this.selectedTables.splice(this.selectedTables.indexOf(table), 1);
-    else
-      this.selectedTables.push(table);
+  groupOrders(){
+    let filteredGroups = [];
+    this.receivedGroups = [];
+    this.preparingGroups = [];
+    this.terminatedGroups = [];
 
-    this.shownSelectedTables = '';
-    this.selectedTables.forEach((table)=>{ this.shownSelectedTables+=table.number+' '; });
-
-    if (this.selectedTables.length === 0){ //there aren't selected tables so we have to reset what is shown
-      this.dispatchTables();
-      return;
-    }
-    else if (this.selectedTables.length === 1){ //the first element is selected and we change what is selectable
-      if (order !== null){
-        this.tablesWithoutOrders = [];
-        this.shownOrders = [order];
+    this.receivedOrders.forEach(order => {
+      filteredGroups = this.receivedGroups.filter(group => group.table_numbers.includes(order.table.number));
+      if (filteredGroups.length > 0){
+        let index = this.receivedGroups.findIndex(group => group.table_numbers.includes(order.table.number));
+        this.receivedGroups.at(index)?.orders.push(order);
       }
+      else 
+        this.tablesService.getTable(order.table._id).subscribe(main_table=>
+            this.receivedGroups.push({
+            orders: [order],
+            table_numbers: [...[main_table.number].concat(main_table.linked_tables.map((table => table.number)))],
+            main_table: order.table
+          })
+        );
+    });
+
+    this.preparingOrders.forEach(order => {
+      filteredGroups = this.preparingGroups.filter(group => group.table_numbers.includes(order.table.number));
+      if (filteredGroups.length > 0){
+        let index = this.preparingGroups.findIndex(group => group.table_numbers.includes(order.table.number));
+        this.preparingGroups.at(index)?.orders.push(order);
+      }
+      else 
+        this.tablesService.getTable(order.table._id).subscribe(main_table=>
+          this.preparingGroups.push({
+          orders: [order],
+          table_numbers: [...[main_table.number].concat(main_table.linked_tables.map((table => table.number)))],
+          main_table: order.table
+        })
+      );
+    });
+
+    this.terminatedOrders.forEach(order => {
+      filteredGroups = this.terminatedGroups.filter(group => group.table_numbers.includes(order.table.number));
+      if (filteredGroups.length > 0){
+        let index = this.terminatedGroups.findIndex(group => group.table_numbers.includes(order.table.number));
+        this.terminatedGroups.at(index)?.orders.push(order);
+      }
+      else 
+        this.tablesService.getTable(order.table._id).subscribe(main_table=>
+          this.terminatedGroups.push({
+          orders: [order],
+          table_numbers: [...[main_table.number].concat(main_table.linked_tables.map((table => table.number)))],
+          main_table: order.table
+        })
+      );
+    });
+  }
+
+  selectTable(selected_table: Table): void {
+    let index = this.tablesWithoutOrders.findIndex(table => table.number === selected_table.number);
+    if (index >= 0){
+      index = this.selectedTables.findIndex(table => table.number === selected_table.number);
+      if (index >= 0)
+        this.selectedTables.splice(index,1);
       else
-        this.shownOrders = [];
+        this.selectedTables.push(selected_table);
+
+      if(this.selectedTables.length === 0)
+        this.dispatchTables();
+      else if (this.selectedTables.length === 1)
+        this.tablesWithOrders = [];
     }
-    else return; //we don't have to change what is shown
+    else {
+      if (this.selectedTables.length === 0){
+        this.selectedTables = [selected_table];
+        this.tablesWithoutOrders = [];
+        this.tablesWithOrders = [[selected_table].concat(selected_table.linked_tables)];
+      }
+      else {
+        this.selectedTables = [];
+        this.dispatchTables();
+      }
+    }
+    
+    this.show_selected_tables = '';
+    this.selectedTables.forEach(table => {
+      this.show_selected_tables+=' '+table.number
+      table.linked_tables.forEach(linked_table => { this.show_selected_tables+=' '+linked_table.number });
+    });
   }
 
-  getOrderId(): void { //alfredo@waiter.RESTaurant.it
-    if (this.selectedTables.length === 0) return;
-
-    if (this.shownOrders.length === 0)
-      this.ordersService.createOrder(this.selectedTables)
-      .subscribe((order) => { 
+  createOrder(): void{
+    if (this.selectedTables.length === 1)
+      this.ordersService.createOrder((this.selectedTables.at(0) as Table)).subscribe(order => {
         this.ordersService.selectedOrder = order._id;
-        this.changePage('foods'); 
+        this.router.navigate(['foods']);
       });
-    else{ 
-      this.ordersService.selectedOrder = (this.shownOrders.at(0) as Order)._id;
-      this.changePage('foods');
+    else {
+      this.tablesService.linkTables(this.selectedTables).subscribe(main_table =>{
+        this.ordersService.createOrder(main_table).subscribe(order => {
+          this.ordersService.selectedOrder = order._id;
+          this.router.navigate(['foods']);
+        })}
+      );
     }
   }
 
   updateOrder(order: Order): void{
-    this.ordersService.updateOrder(order).subscribe((updated_order: Order) => this.dispatchOrders());
-  }
-
-  changePage(route: string): void {
-    this.selectedTables = [];
-    this.dispatchTables();
-    this.router.navigate([route]);
+    this.ordersService.updateOrder(order).subscribe({ });
   }
 
   openDialog(receipt: Receipt) {
     const dialogConfig = new MatDialogConfig();
-    dialogConfig.disableClose = true;
+    dialogConfig.disableClose = false;
     dialogConfig.autoFocus = true;
 
     dialogConfig.data = {
-        receipt: receipt
+      receipt: receipt
     };
 
     const dialogRef = this.dialog.open(ReceiptDialogComponent, dialogConfig);
 
     dialogRef.afterClosed().subscribe(
-        data => this.dispatchOrders()
+      data => { if(data) this.updateOrder(data); }
     ); 
   }
 
-  pay(order: Order): void{
-    this.ordersService.pay(order).subscribe((receipt)=>{ 
-      order.tables.forEach(table => this.tablesService.changeStatus(table.number,0));
-      this.openDialog(receipt) 
-    });
+  getReceipt(table: Table){
+    this.ordersService.getReceipt(table).subscribe((receipt)=>this.openDialog(receipt));
   }
 }

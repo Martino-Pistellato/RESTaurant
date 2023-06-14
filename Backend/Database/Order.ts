@@ -8,69 +8,35 @@ export enum orderStatus {
 }
 
 export interface Order extends mongoose.Document{
-    foods_ordered:          string[], 
-    beverages_ordered:      string[],
+    foods:                  string[],
+    cook_id:                string,
 
-    foods_preparing:          string[], 
-    beverages_preparing:      string[],
-
-    foods_prepared:         string[],
-    beverages_prepared:     string[],
-
-    tables:                 string[],
+    table:                  string,
     notes:                  string,
 
-    status: {
-        foods:              orderStatus,
-        beverages:          orderStatus
-    },
-
-    insertionDate:          Date,
-    total_queue_time:       number
-    
-    payed:                  boolean,
+    status:                 orderStatus,
+    is_payed:               boolean,
     covers:                 number,
+
+    insertion_date:         Date,
+    queue_time:             number
 }
 
 const orderSchema = new mongoose.Schema<Order>({
-    foods_ordered:{
+    foods:{
         type: [mongoose.SchemaTypes.String], 
         required: false,
         default: [],
         ref : 'Food'
     },
-    beverages_ordered:{
-        type: [mongoose.SchemaTypes.String], 
+    cook_id:{
+        type: mongoose.SchemaTypes.String, 
         required: false,
-        default: [],
-        ref : 'Food'
+        default: null,
+        ref : 'User'
     },
-    foods_preparing:{
-        type: [mongoose.SchemaTypes.String], 
-        required: false,
-        default: [],
-        ref : 'Food'
-    },
-    beverages_preparing:{
-        type: [mongoose.SchemaTypes.String], 
-        required: false,
-        default: [],
-        ref : 'Food'
-    },
-    foods_prepared:{
-        type: [mongoose.SchemaTypes.String], 
-        required: false,
-        default: [],
-        ref : 'Food'
-    },
-    beverages_prepared:{
-        type: [mongoose.SchemaTypes.String], 
-        required: false,
-        default: [],
-        ref : 'Food'
-    },
-    tables:{
-        type: [mongoose.SchemaTypes.String], 
+    table:{
+        type: mongoose.SchemaTypes.String, 
         required: true,
         ref: 'Table'
     },
@@ -81,22 +47,19 @@ const orderSchema = new mongoose.Schema<Order>({
     status:{
         type: mongoose.SchemaTypes.Mixed,
         required: false,
-        default: {
-            foods: orderStatus.TERMINATED,
-            beverages: orderStatus.TERMINATED
-        }
+        default: orderStatus.TERMINATED
     },
-    insertionDate:{
+    insertion_date:{
         type: mongoose.SchemaTypes.Date,
         required: false,
         default: new Date()
     },
-    total_queue_time:{
+    queue_time:{
         type: mongoose.SchemaTypes.Number,
         required: false,
         default: 0
     },
-    payed:{
+    is_payed:{
         type: mongoose.SchemaTypes.Boolean,
         required: false,
         default: false
@@ -118,7 +81,7 @@ export function validateOrder(order: Order): boolean {
     return validator.validate(orderSchema, order) as boolean;
 };
 
-export function newOrder( data ): Order {
+export function newOrder( data: any ): Order {
     let order = new orderModel( data );
     return order;
 }

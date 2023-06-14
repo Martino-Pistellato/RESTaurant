@@ -8,15 +8,15 @@ import { Receipt } from 'src/app/services/orders-services/orders.service';
   styleUrls: ['./receipt-dialog.component.css']
 })
 export class ReceiptDialogComponent {
-  protected receipt: Receipt;
-  
   constructor(
     private dialogRef: MatDialogRef<ReceiptDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) private data: {receipt: Receipt}) {
-      this.receipt = data.receipt;
-  }
+    @Inject(MAT_DIALOG_DATA) protected data: {receipt: Receipt}) { }
 
   close() {
     this.dialogRef.close(null);
+  }
+
+  pay(order_id: string) {
+    this.dialogRef.close(order_id);
   }
 }

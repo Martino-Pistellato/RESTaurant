@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, tap, throwError, catchError  } from 'rxjs';
 import jwt_decode from "jwt-decode";
+import { createOptions, handleError } from 'src/app/utils';
 
 export enum RoleTypes{
   ADMIN,
@@ -23,10 +24,10 @@ export interface TokenData{
 };
 
 export interface User{
+  _id:        string,
   name:       string,  
   role:       RoleTypes,
   email:      string,
-  _id:        string,
   password:   string,
   totalWorks: string[]
 };
@@ -75,11 +76,8 @@ export class UsersService {
     );
   }
 
-  get role(): RoleTypes | null{
-    if(this._user_data)
-      return this._user_data.role;
-    else
-      return null;
+  get role(): RoleTypes{
+    return (this._user_data as TokenData).role;
   }
 
   get token() : string{
@@ -88,6 +86,16 @@ export class UsersService {
 
   get user_data() : TokenData | null{
     return this._user_data;
+  }
+
+  get id() : string{
+    return (this._user_data as TokenData).id;
+  }
+
+  getUsers(): Observable<User[]>{
+    return this.http.get<User[]>('https://localhost:3000/users', createOptions({}, this.token)).pipe(
+      catchError(handleError)
+    );
   }
   //todo: add a logout function
 }

@@ -9,9 +9,26 @@
   }
 </style>
 
-<mat-toolbar class="toolbar">
-  <span>My Application</span>
+<mat-toolbar class="toolbar" color="primary">
+  <button (click)="sidenav.toggle()" mat-icon-button class="example-icon" aria-label="Example icon-button with menu icon">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <span>{{title}}</span>
 </mat-toolbar>
 
+<mat-sidenav-container class="example-container" style="height: 100%;">
+  <mat-sidenav #sidenav mode="over" [(opened)]="opened" style="padding-top: 15px;">
+    <div style="margin-bottom: 15px; display: flex; justify-content: center; align-items: center;">
+      <button mat-raised-button color="primary" style="width: 120px;"><mat-icon>home</mat-icon> HOME</button>
+    </div>
+    <div style="display: flex; justify-content: center; align-items: center;">
+      <button mat-raised-button color="primary" style="width: 120px;"><mat-icon>logout</mat-icon> LOGOUT</button>
+    </div>
+  </mat-sidenav>
 
-<router-outlet></router-outlet>
+  <mat-sidenav-content style="padding-left: 15px; padding-bottom: 15px;">
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>
+
+

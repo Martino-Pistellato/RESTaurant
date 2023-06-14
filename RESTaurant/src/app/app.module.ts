@@ -14,28 +14,30 @@ import { MatCardModule } from "@angular/material/card";
 import { MatExpansionModule } from "@angular/material/expansion";
 import { MatToolbarModule } from "@angular/material/toolbar";
 import { MatDividerModule } from "@angular/material/divider"
+import { MatIconModule } from "@angular/material/icon"
+import {MatSidenavModule} from '@angular/material/sidenav';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './components/login-component/login.component';
 import { HomeComponent } from './components/home-component/home.component';
-import { CreateUserComponent } from './components/create-user-component/create-user.component';
 import { TablesComponent } from './components/tables-component/tables.component';
 import { OrdersComponent } from './components/orders-component/orders.component';
 import { FoodsComponent } from './components/foods-component/foods.component';
-import { TableOccupancyDialogComponent } from './components/table-occupancy-dialog/table-occupancy-dialog.component';
-import { ReceiptDialogComponent } from './components/receipt-dialog/receipt-dialog.component';
+import { TableOccupancyDialogComponent } from './components/table-occupancy-dialog-component/table-occupancy-dialog.component';
+import { ReceiptDialogComponent } from './components/receipt-dialog-component/receipt-dialog.component';
+import { StatsComponent } from './components/stats-component/stats.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     HomeComponent,
-    CreateUserComponent,
     TablesComponent,
     OrdersComponent,
     FoodsComponent,
     TableOccupancyDialogComponent,
     ReceiptDialogComponent,
+    StatsComponent
   ],
   imports: [
     BrowserModule,
@@ -52,7 +54,9 @@ import { ReceiptDialogComponent } from './components/receipt-dialog/receipt-dial
     MatExpansionModule,
     MatCardModule,
     MatToolbarModule,
-    MatDividerModule
+    MatDividerModule,
+    MatIconModule, 
+    MatSidenavModule
   ],
   providers: [],
   bootstrap: [AppComponent]

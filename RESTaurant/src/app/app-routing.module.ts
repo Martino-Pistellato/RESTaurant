@@ -5,7 +5,7 @@ import { OrdersComponent } from './components/orders-component/orders.component'
 import { TablesComponent } from './components/tables-component/tables.component';
 import { FoodsComponent } from './components/foods-component/foods.component';
 import { HomeComponent } from './components/home-component/home.component';
-import { CreateUserComponent } from './components/create-user-component/create-user.component';
+import { StatsComponent } from './components/stats-component/stats.component';
 
 const routes: Routes = [
   { path: 'home', component:  HomeComponent },
@@ -14,7 +14,7 @@ const routes: Routes = [
   { path: 'orders', component:  OrdersComponent },
   { path: 'tables', component:  TablesComponent },
   { path: 'foods', component:  FoodsComponent },
-  { path: 'users', component:  CreateUserComponent }
+  { path: 'stats', component:  StatsComponent }
 ];
 
 @NgModule({
