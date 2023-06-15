@@ -28,7 +28,8 @@ export function createOptions( passed_params = {}, token:string ) {
 export const Events = {
   UPDATE_TABLES_LIST:     'update_tables_list',
   UPDATE_ORDERS_LIST:     'update_orders_list',
-  UPDATE_TOTAL_PROFIT:    'update_total_profit'
+  UPDATE_TOTAL_PROFIT:    'update_total_profit',
 
-  //add notifications for waiters/cooks
+  NEW_ORDER_RECEIVED:     'new_order_received',
+  NEW_ORDER_PREPARED:     'new_order_prepared'
 }

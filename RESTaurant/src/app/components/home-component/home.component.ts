@@ -3,12 +3,11 @@ import { Component } from '@angular/core';
 import { UsersService, RoleTypes } from '../../services/users-services/users.service';
 import { OrdersService } from 'src/app/services/orders-services/orders.service';
 import { SocketService } from 'src/app/services/socket-services/socket.service';
-import {  } from 'src/app/app.component';
-export interface Tile {
-  color: string;
-  cols: number;
-  rows: number;
-  text: string;
+import { Events } from 'src/app/utils';
+
+export const Notifications = {
+  NEW_ORDER_RECEIVED: 'A new order has arrived',
+  NEW_ORDER_PREPARED: 'A new order has been prepared for table: '
 }
 
 @Component({
@@ -19,14 +18,8 @@ export interface Tile {
 export class HomeComponent {
   protected role: RoleTypes | null = null;
   protected profit: number = 0;
-  protected name: string | undefined = ''
-
-  tiles: Tile[] = [
-    {text: 'NAME', cols: 3, rows: 1, color: 'lightblue'},
-    {text: 'ROLE', cols: 1, rows: 1, color: 'lightgreen'},
-    {text: 'ACTIONS', cols: 3, rows: 2, color: 'lightgreen'},
-    {text: 'NOTIFICATIONS', cols: 1, rows: 2, color: 'lightpink'},
-  ];
+  protected name: string | undefined = '';
+  protected notifications: string[] = [];
 
   constructor( private userService: UsersService, 
                private orderService: OrdersService,
@@ -35,10 +28,21 @@ export class HomeComponent {
   ngOnInit() {
     this.role = this.userService.role;
     this.name = this.userService.user_data?.name
+
     if (this.role === RoleTypes.CASHIER){
       this.updateTotalProfit();
-      this.socketService.listenToServer('update_total_profit', (data: any) => this.updateTotalProfit());
+      this.socketService.listenToServer(Events.UPDATE_TOTAL_PROFIT, (data: any) => this.updateTotalProfit());
     }
+    else if (this.role === RoleTypes.COOK || this.role === RoleTypes.BARMAN)
+      this.socketService.listenToServer(Events.NEW_ORDER_RECEIVED, (role: RoleTypes) => {
+        if (role === this.role)
+          this.notifications.unshift(Notifications.NEW_ORDER_RECEIVED);
+      });
+    else if (this.role === RoleTypes.WAITER)
+      this.socketService.listenToServer(Events.NEW_ORDER_PREPARED, (waiter_id: string, table_number: number) => {
+        if (this.userService.id === waiter_id)
+          this.notifications.unshift(Notifications.NEW_ORDER_PREPARED+table_number);
+      });
   }
 
   updateTotalProfit(){

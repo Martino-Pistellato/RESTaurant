@@ -114,7 +114,8 @@ router.get('/receipt/:table_id', my_authorize([roleTypes.CASHIER]), async (req, 
                     covers: my_covers,
                     total: total + 2*(my_covers)
                 }
-        
+
+                get_socket().emit(Events.UPDATE_ORDERS_LIST); 
                 res.send(receipt);
             });
         });
@@ -161,7 +162,7 @@ router.post('/', my_authorize([roleTypes.WAITER]), (req, res) => {
 })
 
 router.put('/', my_authorize([roleTypes.COOK, roleTypes.BARMAN, roleTypes.CASHIER, roleTypes.WAITER]), (req, res) => {
-    order.orderModel.findById(req.body.order_id).then((selected_order) => {
+    order.orderModel.findById(req.body.order_id).populate('table').then((selected_order) => {
         let my_order = selected_order as order.Order;
         if (req.auth.role === roleTypes.COOK || req.auth.role === roleTypes.BARMAN){
             if (my_order.status === orderStatus.RECEIVED) {
@@ -178,7 +179,8 @@ router.put('/', my_authorize([roleTypes.COOK, roleTypes.BARMAN, roleTypes.CASHIE
                     my_order.status = orderStatus.TERMINATED;
                     user.save().then(data => my_order.save().then(order_saved => {
                         get_socket().emit(Events.UPDATE_ORDERS_LIST); 
-                        res.send(order_saved)
+                        get_socket().emit(Events.NEW_ORDER_PREPARED, my_order.table['waiter_id'],  my_order.table['number']);
+                        res.send(order_saved);
                     }));
                 }); //maybe add a notification for the waiter
             }
@@ -190,14 +192,21 @@ router.put('/', my_authorize([roleTypes.COOK, roleTypes.BARMAN, roleTypes.CASHIE
                 my_order.foods.push(...req.body.foods);
                 my_order.status = orderStatus.RECEIVED;
                 my_order.save().then((order) => { 
-                    get_socket().emit(Events.UPDATE_ORDERS_LIST); 
+                    get_socket().emit(Events.UPDATE_ORDERS_LIST);
+                    let has_food = false, has_drink = false;
+                    has_food = order.foods.some(food => food['type'] !== foodTypes.DRINK);
+                    has_drink = order.foods.some(food => food['type'] === foodTypes.DRINK);
+                    if (has_food)
+                        get_socket().emit(Events.NEW_ORDER_RECEIVED, roleTypes.COOK);
+                    if (has_drink)
+                        get_socket().emit(Events.NEW_ORDER_RECEIVED, roleTypes.BARMAN);
                     res.send(order); 
                 });
             }
         }
         else{
             my_order.is_payed = true;
-            tableModel.findById(my_order.table).then(my_table => {
+            tableModel.findById(my_order.table['_id']).then(my_table => {
                 if (my_table.linked_tables.length > 0)
                     my_table.linked_tables.forEach(linked_table => {
                         tableModel.findById(linked_table).then(table_to_free => {

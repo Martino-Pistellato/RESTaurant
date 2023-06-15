@@ -10,7 +10,7 @@ import { FormControl, Validators } from '@angular/forms';
 })
 export class LoginComponent {
   public errmessage: string | undefined = undefined;
-  public role: RoleTypes | null = null;
+  //public role: RoleTypes | null = null;
   protected email:string = '';
   protected password: string = '';
   public emailControl: FormControl;
@@ -34,7 +34,7 @@ export class LoginComponent {
   }
 
   ngOnInit() {
-    this.role = this.us.role;
+    //this.role = this.us.role;
   }
 
   login(mail: string, password: string) {

@@ -1,6 +1,14 @@
 import { Component } from '@angular/core';
-import { UsersService } from './services/users-services/users.service';
 import { Router } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { UsersService, RoleTypes } from './services/users-services/users.service';
+import { SocketService } from './services/socket-services/socket.service';
+import { Events } from './utils';
+
+export const Notifications = {
+  NEW_ORDER_RECEIVED: 'A new order has arrived',
+  NEW_ORDER_PREPARED: 'A new order has been prepared for table: '
+}
 
 @Component({
   selector: 'app-root',
@@ -10,20 +18,27 @@ import { Router } from '@angular/router';
 export class AppComponent {
   title = 'RESTaurant';
   opened = false;
-  constructor(protected usersService: UsersService, private router: Router){}
+  role;
+  constructor(protected usersService: UsersService, 
+              private socketService: SocketService, 
+              private router: Router, 
+              private snackBar: MatSnackBar){
+    this.role = this.usersService.role;
+    if (this.role === RoleTypes.COOK || this.role === RoleTypes.BARMAN)
+      this.socketService.listenToServer(Events.NEW_ORDER_RECEIVED, (role: RoleTypes) => {
+        if (role === this.role)
+          this.openSnackBar(Notifications.NEW_ORDER_RECEIVED, 'CLOSE');
+      });
+    else if (this.role === RoleTypes.WAITER)
+      this.socketService.listenToServer(Events.NEW_ORDER_PREPARED, (waiter_id: string, table_number: number) => {
+        if (this.usersService.id === waiter_id)
+          this.openSnackBar(Notifications.NEW_ORDER_PREPARED + table_number, 'CLOSE');
+      });
+  }
 
-  navigate(route: string){
-    let name;
-    switch (route){
-      case 'home': name = ' - Home'; break;
-      case 'login': name = ''; break;
-      case 'tables': name = ' - Tables'; break;
-      case 'orders': name = ' - Orders'; break;
-      case 'users': name = ' - Users'; break;
-      case 'foods': name = ' - Foods'; break;
-      case 'stats': name = ' - Statistics'; break;
-    }
-    this.title = 'RESTaurant' + name;
-    this.router.navigate([route]);
+  openSnackBar(message: string, action: string) {
+    this.snackBar.open(message, action,{
+      verticalPosition:'top'
+    });
   }
 }

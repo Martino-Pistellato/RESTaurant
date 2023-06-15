@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Observable, tap, throwError, catchError  } from 'rxjs';
 import jwt_decode from "jwt-decode";
 import { createOptions, handleError } from 'src/app/utils';
+import { SocketService } from '../socket-services/socket.service';
 
 export enum RoleTypes{
   ADMIN,
@@ -40,7 +41,7 @@ export class UsersService {
   private _token: string;
   private _user_data: TokenData | null;
 
-  constructor(private http: HttpClient, private router: Router) { 
+  constructor(private http: HttpClient, private router: Router, private socketService: SocketService) { 
     const loadedtoken = localStorage.getItem('user_token');
 
     if ( !loadedtoken || loadedtoken.length < 1 ) {
@@ -101,6 +102,7 @@ export class UsersService {
     this._token = "";
     this._user_data = null;
     localStorage.setItem('user_token', this._token);
+    this.socketService.disconnect();
     this.router.navigate(['login']);
   }
 
@@ -109,5 +111,4 @@ export class UsersService {
       catchError(handleError)
     );
   }
-  //todo: add a logout function
 }

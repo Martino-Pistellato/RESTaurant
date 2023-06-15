@@ -11,6 +11,10 @@ export class SocketService {
   }
 
   listenToServer(connection: string, cb: Function): void{
-    this.socket.on(connection, data => cb(data));
+    this.socket.on(connection, (...args: any[]) => {console.log("inside socket"); cb(...args)});
+  }
+
+  disconnect(){
+    this.socket.disconnect();
   }
 }

@@ -72,7 +72,12 @@
         </mat-grid-tile>
         <mat-grid-tile [colspan]="1" [rowspan]="4">
             <mat-card style="width: 100%; height: 95%" class="top-parent">
-                <mat-card-content>NOTIFICATIONS</mat-card-content>
+                <mat-card-content>
+                    NOTIFICATIONS
+                    <mat-card *ngFor="let not of notifications">
+                        <mat-card-content>{{not}}</mat-card-content>
+                    </mat-card>
+                </mat-card-content>
             </mat-card>
         </mat-grid-tile>
     </mat-grid-list>
