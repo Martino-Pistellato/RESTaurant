@@ -1,0 +1,42 @@
+<mat-accordion class="example-headers-align"    >
+    <mat-expansion-panel *ngFor="let user of users" hideToggle>
+        <mat-expansion-panel-header>
+            <mat-panel-title>{{user.name}}</mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <mat-form-field  style="width:fit-content">
+            <mat-label>Name</mat-label>
+            <input matInput [(ngModel)]="name" placeholder="user.name">
+        </mat-form-field>
+
+        <mat-form-field  style="width:fit-content">
+            <mat-label>Email</mat-label>
+            <input [(ngModel)]="email" matInput placeholder="user.email" type=""email>
+        </mat-form-field>
+
+        <mat-form-field>
+            <mat-label>Role</mat-label>
+            <mat-select matNativeControl>
+              <mat-option value="" selected></mat-option>
+              <mat-option value="0">Admin</mat-option>
+              <mat-option value="1">Cashier</mat-option>
+              <mat-option value="2">Barman</mat-option>
+              <mat-option value="3">Cook</mat-option>
+              <mat-option value="4">Waiter</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+        <mat-form-field  style="width:fit-content">
+            <mat-label>Password</mat-label>
+            <input [(ngModel)]="password" matInput [type]="hide ? 'password' : 'text'">
+            <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
+                <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
+        </mat-form-field>
+
+        <mat-action-row>
+            <button mat-button color="warn" (click)="deleteUser(user._id)">DELETE</button>
+            <button mat-button color="primary" (click)="updateUser(user._id, name, email, role, password)">UPDATE</button>
+        </mat-action-row>
+    </mat-expansion-panel>
+</mat-accordion>

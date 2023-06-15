@@ -111,4 +111,21 @@ export class UsersService {
       catchError(handleError)
     );
   }
+
+  deleteUser(user_id: string){
+    return this.http.delete('https://localhost:3000/users/'+user_id, createOptions({}, this.token)).pipe(
+      catchError(handleError)
+    );
+  }
+
+  updateUser(user_id: string, name: string | null, email: string | null, role: number | null, password: string | null): Observable<User>{
+    return this.http.put<User>('https://localhost:3000/users/'+user_id,{
+      name: name,
+      email: email,
+      role: role,
+      password: password
+    },createOptions({}, this.token)).pipe(
+      catchError(handleError)
+    );
+  }
 }

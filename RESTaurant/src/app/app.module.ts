@@ -18,6 +18,7 @@ import { MatIconModule } from "@angular/material/icon"
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSelectModule } from '@angular/material/select';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './components/login-component/login.component';
@@ -28,6 +29,7 @@ import { FoodsComponent } from './components/foods-component/foods.component';
 import { TableOccupancyDialogComponent } from './components/table-occupancy-dialog-component/table-occupancy-dialog.component';
 import { ReceiptDialogComponent } from './components/receipt-dialog-component/receipt-dialog.component';
 import { StatsComponent } from './components/stats-component/stats.component';
+import { UsersComponent } from './components/users-component/users.component';
 
 @NgModule({
   declarations: [
@@ -39,7 +41,8 @@ import { StatsComponent } from './components/stats-component/stats.component';
     FoodsComponent,
     TableOccupancyDialogComponent,
     ReceiptDialogComponent,
-    StatsComponent
+    StatsComponent,
+    UsersComponent
   ],
   imports: [
     BrowserModule,
@@ -60,7 +63,8 @@ import { StatsComponent } from './components/stats-component/stats.component';
     MatIconModule, 
     MatSidenavModule,
     MatGridListModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatSelectModule
   ],
   providers: [],
   bootstrap: [AppComponent]
