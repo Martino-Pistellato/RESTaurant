@@ -1,6 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 
 html, body { 
+    background-color: #FFC107;
     height: 100%; 
 }
 
@@ -22,4 +23,16 @@ ul {
 
 mat-sidenav {
     width: 200px;
+}
+
+.center-parent{
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+}
+
+.top-parent{
+    display: flex; 
+    justify-content: top; 
+    align-items: center;
 }

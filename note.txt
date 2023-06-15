@@ -11,8 +11,5 @@ ordini: get, post
 tavoli: get --> /tables/free oppure /tables/occupied oppure /tables/all in GET  , post --> /tables/id in POST 
 cibo: get, post (solo cuoco)
 
-TODO: notifiche, cassieri
+TODO: notifiche, admin
 
-component statistiche cashier
-test senza stati sugli ordini
-modo per distinguere chi ha preso in carico cosa

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { Observable, tap, throwError, catchError  } from 'rxjs';
 import jwt_decode from "jwt-decode";
 import { createOptions, handleError } from 'src/app/utils';
@@ -39,7 +40,7 @@ export class UsersService {
   private _token: string;
   private _user_data: TokenData | null;
 
-  constructor(private http: HttpClient) { 
+  constructor(private http: HttpClient, private router: Router) { 
     const loadedtoken = localStorage.getItem('user_token');
 
     if ( !loadedtoken || loadedtoken.length < 1 ) {
@@ -80,16 +81,27 @@ export class UsersService {
     return (this._user_data as TokenData).role;
   }
 
-  get token() : string{
+  get token(): string{
     return this._token;
   }
 
-  get user_data() : TokenData | null{
+  get user_data(): TokenData | null{
     return this._user_data;
   }
 
-  get id() : string{
+  get id(): string{
     return (this._user_data as TokenData).id;
+  }
+
+  isLogged(): boolean{
+    return this._token !== "";
+  }
+
+  logout(): void{
+    this._token = "";
+    this._user_data = null;
+    localStorage.setItem('user_token', this._token);
+    this.router.navigate(['login']);
   }
 
   getUsers(): Observable<User[]>{

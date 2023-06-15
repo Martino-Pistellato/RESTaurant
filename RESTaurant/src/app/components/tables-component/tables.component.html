@@ -1,31 +1,25 @@
-<p>-- TAVOLI --</p>
-
 <div class="container">
     <mat-accordion style="display: flex; flex-direction: row; flex-wrap: wrap; padding: 10px;">
         <mat-card   *ngFor="let table of tables" hideToggle 
                     style="width:300px; margin: 10px;" 
-                    [style.background]="table.is_free ? 'rgb(150, 236, 110)':'rgb(245, 84, 84)'">
+                    [style.background]="table.is_free ? 'white':'#FF5252'">
             <mat-card-header>
                 <mat-card-title>
-                    Tavolo {{table.number}} 
+                    Table {{table.number}} 
                 </mat-card-title>
-                <mat-card-subtitle *ngIf="!table.is_free">Cameriere: {{getWaiterName(table)}}</mat-card-subtitle>
-                <mat-card-subtitle *ngIf="table.is_free">Libero</mat-card-subtitle>
+                <mat-card-subtitle *ngIf="!table.is_free">Waiter: {{getWaiterName(table)}}</mat-card-subtitle>
+                <mat-card-subtitle *ngIf="table.is_free">Free</mat-card-subtitle>
             </mat-card-header>
 
             <mat-card-content>
-                <p>Posti occupati: {{table.occupancy}}</p>
-                <p>Posti totali: {{table.capacity}}</p>
-            </mat-card-content>
+                <p>Occupied seats: {{table.occupancy}}</p>
+                <p>Total seats: {{table.capacity}}</p>
+            </mat-card-content> 
             
             <mat-card-actions *ngIf="role===4">
-                <button  *ngIf="table.is_free" mat-raised-button (click)="openDialog(table)"> Occupa tavolo </button>
-                <button  *ngIf="!table.is_free" mat-raised-button (click)="openDialog(table)"> Libera tavolo </button>
+                <button  *ngIf="table.is_free" style="background-color: #673AB7; color: white;" mat-raised-button (click)="openDialog(table)"> OCCUPY </button>
+                <button  *ngIf="!table.is_free" style="background-color: #673AB7; color: white;" mat-raised-button (click)="openDialog(table)"> FREE </button>
             </mat-card-actions>
         </mat-card>
     </mat-accordion>
 </div>
-
-<br>
-
-<a routerLink="/home"><button mat-raised-button> HOME </button></a>

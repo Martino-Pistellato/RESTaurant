@@ -1,70 +1,82 @@
-<br>
 
 <div>
-    <button mat-raised-button routerLink="/login">Logout</button>
-    <span *ngIf="role === 0">  You are an Admin</span>
-    <span *ngIf="role === 1">  You are a Cashier</span>
-    <span *ngIf="role === 2">  You are a Barman</span>
-    <span *ngIf="role === 3">  You are a Cook</span>
-    <span *ngIf="role === 4">  You are a Waiter</span>
+    <mat-grid-list cols="4" rowHeight="100px">
+        <mat-grid-tile [colspan]="3" [rowspan]="1">
+            <mat-card style="width: 100%; margin-right: 2%;">
+                <mat-card-content>Welcome {{name}}</mat-card-content>
+            </mat-card>
+        </mat-grid-tile>
+        <mat-grid-tile [colspan]="1" [rowspan]="1">
+            <mat-card style="width: 100%;" class="center-parent">
+                <mat-card-content>
+                    <span *ngIf="role === 0">ADMIN</span>
+                    <span *ngIf="role === 1">CASHIER</span>
+                    <span *ngIf="role === 2">BARMAN</span>
+                    <span *ngIf="role === 3">COOK</span>
+                    <span *ngIf="role === 4">WAITER</span>
+                </mat-card-content>
+            </mat-card>
+        </mat-grid-tile>
+        <mat-grid-tile [colspan]="3" [rowspan]="1">
+            <mat-card style="width: 100%; height: 80%;  margin-right: 2%;">
+                <mat-card-content style="height: 100%; display: flex; justify-content: center; align-items: center;">
+                    <div *ngIf="role === 0">
+                        <button mat-raised-button routerLink="/foods" style="width:100px;margin-right:5px;">
+                            MENU
+                        </button>
+                        <button mat-raised-button routerLink="/users" style="width:100px;margin-right:5px;">
+                            USERS
+                        </button>
+                        <button mat-raised-button routerLink="/tables" style="width:100px; margin-right:5px;">
+                            TABLES
+                        </button>
+                        <button mat-raised-button routerLink="/orders" style="width:100px">
+                            ORDERS
+                        </button>
+                    </div>
+
+                    <div *ngIf="role === 1">
+                        <button mat-raised-button routerLink="/foods" style="width:100px;margin-right:5px;">
+                            MENU
+                        </button>
+                        <button mat-raised-button routerLink="/stats" style="width:100px;margin-right:5px;">
+                            STATS
+                        </button>
+                        <button mat-raised-button routerLink="/tables" style="width:100px; margin-right:5px;">
+                            TABLES
+                        </button>
+                        <button mat-raised-button routerLink="/orders" style="width:100px">
+                            ORDERS
+                        </button>
+                    </div>
+
+                    <div *ngIf="role === 2 || role === 3">
+                        <button mat-raised-button routerLink="/orders" style="width:100px">
+                            ORDERS
+                        </button>
+                    </div>
+                    
+                    <div *ngIf="role === 4">
+                        <button mat-raised-button routerLink="/foods" style="width:100px;margin-right:5px;">
+                            MENU
+                        </button>
+                        <button mat-raised-button routerLink="/tables" style="width:100px; margin-right:5px;">
+                            TABLES
+                        </button>
+                        <button mat-raised-button routerLink="/orders" style="width:100px">
+                            ORDERS
+                        </button>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+        </mat-grid-tile>
+        <mat-grid-tile [colspan]="1" [rowspan]="4">
+            <mat-card style="width: 100%; height: 95%" class="top-parent">
+                <mat-card-content>NOTIFICATIONS</mat-card-content>
+            </mat-card>
+        </mat-grid-tile>
+    </mat-grid-list>
 </div>
 
-<br>
 
-<div class="container" *ngIf="role === 0">
-    <table>
-        <tr>
-            <td align="right" width="150px">
-                <button mat-raised-button routerLink="/foods" style="width: 100%">Menu</button>
-            </td>
-            <td>
-                <button mat-raised-button routerLink="/users" style="width: 100%">Gestisci utenti</button>
-            </td>
-        </tr>
-        <tr>
-            <td align="right">
-                <button mat-raised-button routerLink="/tables" style="width: 100%">Vedi tavoli</button>
-            </td>
-            <td width="150px">
-                <button mat-raised-button routerLink="/orders" style="width: 100%">Vedi ordini</button>
-            </td>
-        </tr>
-    </table>    
-</div>
-
-<div class="container" *ngIf="role === 1">
-    <p>Profit of the day: {{profit}}</p>
-    <table>
-        <tr>
-            <td align="right" width="150px">
-                <button mat-raised-button routerLink="/tables" style="width: 100%">Vedi tavoli</button>
-            </td>
-            <td width="150px">
-                <button mat-raised-button routerLink="/orders" style="width: 100%">Vedi ordini</button>
-            </td>
-        </tr>
-        <tr>
-            <td align="right">
-                <button mat-raised-button routerLink="/stats" style="width: 100%">STATISTICS</button>
-            </td>
-        </tr>
-    </table>
-</div>
-
-<div class="container" *ngIf="role === 2 || role === 3">
-    <button mat-raised-button class="btn btn-primary" routerLink="/orders">Vedi ordini</button>
-</div>
-
-<div class="container" *ngIf="role === 4">
-    <table>
-        <tr>
-            <td align="right" width="150px">
-                <button mat-raised-button routerLink="/tables" style="width: 100%">Vedi tavoli</button>
-            </td>
-            <td width="150px">
-                <button mat-raised-button routerLink="/orders" style="width: 100%">Vedi ordini</button>
-            </td>
-        </tr>
-    </table>
-</div>
 

@@ -1,6 +1,6 @@
 <p *ngIf="errmessage">Errore: {{errmessage}}</p>
-<div style="padding: 16px;">
-    <mat-card style="padding: 16px; align-items: center; width: fit-content;">
+<div style="padding: 15px;" class="center-parent">
+    <mat-card style="padding: 15px; align-items: center; width: fit-content;">
         <mat-form-field style="width:fit-content">
             <mat-label>Email</mat-label>
             <input matInput type="email" placeholder="example@RESTaurant" [formControl]="emailControl" [(ngModel)]="email" required>
