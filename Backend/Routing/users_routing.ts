@@ -35,7 +35,9 @@ router.put('/:user_id', my_authorize([roleTypes.ADMIN]), (req, res) => {
             user_to_update?.setPassword(req.body.password);
             
         user_to_update?.save().then(saved_user => {
-            get_socket().emit(Events.UPDATE_USERS_LIST)
+            get_socket().emit(Events.UPDATE_USERS_LIST);
+            if(req.body.password && req.body.password.length >= 6)
+                get_socket().emit(Events.FORCE_LOGOUT, req.params.user_id);
             res.send(saved_user)
         });
     })
@@ -43,8 +45,9 @@ router.put('/:user_id', my_authorize([roleTypes.ADMIN]), (req, res) => {
 
 router.delete('/:user_id', my_authorize([roleTypes.ADMIN]), async (req, res) => {
     await user.userModel.findByIdAndDelete(req.params.user_id);
-    get_socket().emit(Events.UPDATE_USERS_LIST)
-    res.send("User deleted")
+    get_socket().emit(Events.UPDATE_USERS_LIST);
+    get_socket().emit(Events.FORCE_LOGOUT, req.params.user_id);
+    res.send("User deleted");
 })
 
 export default router;

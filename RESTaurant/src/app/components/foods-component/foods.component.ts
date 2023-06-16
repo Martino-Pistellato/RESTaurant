@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { FoodsService, Food } from '../../services/foods-services/foods.service';
@@ -15,6 +15,8 @@ export class FoodsComponent {
   public foods: Food[] = [];
   public selectedFoods: Food[] = [];
   public role: RoleTypes;
+  @Input() order_id: string = '';
+  @Output() changeModuleEvent = new EventEmitter<string>();
 
   constructor(private _foodService: FoodsService,
               private _orderService: OrdersService,
@@ -42,10 +44,10 @@ export class FoodsComponent {
 
   updateOrder(){
     this._orderService.updateOrder(this.selectedFoods)
-    .subscribe((order)=>{
-      //this._socketService.emitToServer('update_orders_list');
-      //this._socketService.emitToServer('update_tables_list');
-      this._router.navigate(['home']);
-    });
+    .subscribe(()=> this.addNewOrder() );
+  }
+
+  addNewOrder() {
+    this.changeModuleEvent.emit('orders');
   }
 }

@@ -37,5 +37,7 @@ export const Events = {
     UPDATE_TOTAL_PROFIT:    'update_total_profit',
 
     NEW_ORDER_RECEIVED:     'new_order_received',
-    NEW_ORDER_PREPARED:     'new_order_prepared'
+    NEW_ORDER_PREPARED:     'new_order_prepared',
+
+    FORCE_LOGOUT:           'force_logout'
 }

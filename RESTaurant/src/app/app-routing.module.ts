@@ -10,13 +10,13 @@ import { UsersComponent } from './components/users-component/users.component';
 
 const routes: Routes = [
   { path: 'home', component:  HomeComponent },
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'login', component:  LoginComponent },
-  { path: 'orders', component:  OrdersComponent },
-  { path: 'tables', component:  TablesComponent },
-  { path: 'foods', component:  FoodsComponent },
-  { path: 'stats', component:  StatsComponent },
-  { path: 'users', component:  UsersComponent }
+  // { path: 'home/orders', component:  OrdersComponent },
+  // { path: 'home/tables', component:  TablesComponent },
+  // { path: 'home/foods', component:  FoodsComponent },
+  // { path: 'home/stats', component:  StatsComponent },
+  // { path: 'home/users', component:  UsersComponent }
 ];
 
 @NgModule({

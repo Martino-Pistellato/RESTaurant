@@ -16,6 +16,8 @@ import { Events } from 'src/app/utils';
 export class TablesComponent {
   protected tables: Table[] = [];
   protected role: RoleTypes;
+  protected table_number: number | null = null;
+  protected table_capacity: number | null = null;
 
   constructor(private tablesService: TablesService, private usersService: UsersService, 
               private socketService: SocketService, private router: Router,
@@ -27,7 +29,7 @@ export class TablesComponent {
 
   ngOnInit(): void {
     this.getTables();
-    this.socketService.listenToServer(Events.UPDATE_TABLES_LIST, (data: any) => this.getTables());
+    this.socketService.listenToServer(Events.UPDATE_TABLES_LIST).subscribe((data: any) => this.getTables());
   }
 
   getWaiterName(table: Table): string{
@@ -64,36 +66,23 @@ export class TablesComponent {
   }
   
   changeStatus(table_id: string, occupancy: number): void {
-    this.tablesService.changeStatus(table_id, (this.role === RoleTypes.WAITER)? this.usersService.id : null, occupancy).subscribe({
-      next: (table) => {
-        //this.socketService.emitToServer(Events.UPDATE_TABLES_LIST);
-      },
-      error: (err) => {
-        console.log('Error: ' + JSON.stringify(err));
-      }
-    });
+    this.tablesService.changeStatus(table_id, (this.role === RoleTypes.WAITER)? this.usersService.id : null, occupancy).subscribe();
   }
 
-  // createTable(capacity: Number, number: Number): void {
-  //   this.tablesService.createTable(capacity, number).subscribe({
-  //     next: (table) => {
-  //       this.socketService.emitToServer('update_tables_list');
-  //     },
-  //     error: (err) => {
-  //       console.log('Error: ' + JSON.stringify(err));
-  //     }
-  //   });
-  // }
+  createTable(table_capacity: number | null, table_number: number | null): void {
+    this.tablesService.createTable(table_capacity, table_number).subscribe(() => this.resetField());
+  }
 
-  // deleteTable(tableNumber: Number): void {
-  //   this.tablesService.deleteTable(tableNumber).subscribe({
-  //     next: (table) => {
-  //       this.socketService.emitToServer('update_tables_list');
-  //     },
-  //     error: (err) => {
-  //       console.log('Error: ' + JSON.stringify(err));
-  //     }
-  //   });
-  // }
+  updateTable(table_id: string, table_capacity: number | null, table_number: number | null): void {
+    this.tablesService.updateTable(table_id, table_capacity, table_number).subscribe(() => this.resetField());
+  }
 
+  deleteTable(table_id: string): void {
+    this.tablesService.deleteTable(table_id).subscribe();
+  }
+
+  resetField(){
+    this.table_capacity = null;
+    this.table_number = null;
+  }
 }

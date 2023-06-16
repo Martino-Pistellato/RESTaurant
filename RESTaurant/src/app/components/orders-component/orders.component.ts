@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter  } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 
@@ -38,6 +38,8 @@ export class OrdersComponent {
   protected preparingGroups: Group[] = [];
   protected terminatedGroups: Group[] = [];
 
+  @Output() newOrderEvent = new EventEmitter<string>();
+  
   constructor(private tablesService: TablesService, 
               private ordersService: OrdersService,
               private usersService: UsersService, 
@@ -50,11 +52,11 @@ export class OrdersComponent {
   ngOnInit(): void {
     if (this.role === RoleTypes.WAITER){
       this.updateServingTablesList(); //it also updates orders
-      this.socketService.listenToServer(Events.UPDATE_TABLES_LIST, () => this.updateServingTablesList());
+      this.socketService.listenToServer(Events.UPDATE_TABLES_LIST).subscribe(() => this.updateServingTablesList());
     }
     else {
       this.updateOrdersList()
-      this.socketService.listenToServer(Events.UPDATE_ORDERS_LIST, () => this.updateOrdersList());
+      this.socketService.listenToServer(Events.UPDATE_ORDERS_LIST).subscribe(() => this.updateOrdersList());
     }
   }
 
@@ -108,7 +110,7 @@ export class OrdersComponent {
         this.receivedOrders.push(order);
       else if (order.status === OrderStatus.PREPARING)
         this.preparingOrders.push(order);
-      else if (order.status === OrderStatus.TERMINATED)
+      else if (order.status === OrderStatus.TERMINATED)   
         this.terminatedOrders.push(order);
     });
 
@@ -121,53 +123,53 @@ export class OrdersComponent {
     this.preparingGroups = [];
     this.terminatedGroups = [];
 
-    this.receivedOrders.forEach(order => {
-      filteredGroups = this.receivedGroups.filter(group => group.table_numbers.includes(order.table.number));
-      if (filteredGroups.length > 0){
-        let index = this.receivedGroups.findIndex(group => group.table_numbers.includes(order.table.number));
-        this.receivedGroups.at(index)?.orders.push(order);
-      }
-      else 
-        this.tablesService.getTable(order.table._id).subscribe(main_table=>
-            this.receivedGroups.push({
+    this.receivedOrders.forEach( order => 
+      this.tablesService.getTable(order.table._id).subscribe(main_table => {
+        filteredGroups = this.receivedGroups.filter(group => group.table_numbers.includes(order.table.number));
+        if (filteredGroups.length > 0){
+          let index = this.receivedGroups.findIndex(group => group.table_numbers.includes(order.table.number));
+          this.receivedGroups.at(index)?.orders.push(order);
+        }
+        else 
+          this.receivedGroups.push({
             orders: [order],
             table_numbers: [...[main_table.number].concat(main_table.linked_tables.map((table => table.number)))],
             main_table: order.table
           })
-        );
-    });
+      })
+    );
 
-    this.preparingOrders.forEach(order => {
-      filteredGroups = this.preparingGroups.filter(group => group.table_numbers.includes(order.table.number));
-      if (filteredGroups.length > 0){
-        let index = this.preparingGroups.findIndex(group => group.table_numbers.includes(order.table.number));
-        this.preparingGroups.at(index)?.orders.push(order);
-      }
-      else 
-        this.tablesService.getTable(order.table._id).subscribe(main_table=>
+    this.preparingOrders.forEach( order => 
+      this.tablesService.getTable(order.table._id).subscribe(main_table => {
+        filteredGroups = this.preparingGroups.filter(group => group.table_numbers.includes(order.table.number));
+        if (filteredGroups.length > 0){
+          let index = this.preparingGroups.findIndex(group => group.table_numbers.includes(order.table.number));
+          this.preparingGroups.at(index)?.orders.push(order);
+        }
+        else 
           this.preparingGroups.push({
-          orders: [order],
-          table_numbers: [...[main_table.number].concat(main_table.linked_tables.map((table => table.number)))],
-          main_table: order.table
-        })
-      );
-    });
+            orders: [order],
+            table_numbers: [...[main_table.number].concat(main_table.linked_tables.map((table => table.number)))],
+            main_table: order.table
+          })
+      })
+    );
 
-    this.terminatedOrders.forEach(order => {
-      filteredGroups = this.terminatedGroups.filter(group => group.table_numbers.includes(order.table.number));
-      if (filteredGroups.length > 0){
-        let index = this.terminatedGroups.findIndex(group => group.table_numbers.includes(order.table.number));
-        this.terminatedGroups.at(index)?.orders.push(order);
-      }
-      else 
-        this.tablesService.getTable(order.table._id).subscribe(main_table=>
+    this.terminatedOrders.forEach( order => 
+      this.tablesService.getTable(order.table._id).subscribe(main_table => {
+        filteredGroups = this.terminatedGroups.filter(group => group.table_numbers.includes(order.table.number));
+        if (filteredGroups.length > 0){
+          let index = this.terminatedGroups.findIndex(group => group.table_numbers.includes(order.table.number));
+          this.terminatedGroups.at(index)?.orders.push(order);
+        }
+        else 
           this.terminatedGroups.push({
-          orders: [order],
-          table_numbers: [...[main_table.number].concat(main_table.linked_tables.map((table => table.number)))],
-          main_table: order.table
-        })
-      );
-    });
+            orders: [order],
+            table_numbers: [...[main_table.number].concat(main_table.linked_tables.map((table => table.number)))],
+            main_table: order.table
+          })
+      })
+    );
   }
 
   selectTable(selected_table: Table): void {
@@ -207,13 +209,13 @@ export class OrdersComponent {
     if (this.selectedTables.length === 1)
       this.ordersService.createOrder((this.selectedTables.at(0) as Table)).subscribe(order => {
         this.ordersService.selectedOrder = order._id;
-        this.router.navigate(['foods']);
+        this.addNewOrder(order._id);
       });
     else {
       this.tablesService.linkTables(this.selectedTables).subscribe(main_table =>{
         this.ordersService.createOrder(main_table).subscribe(order => {
           this.ordersService.selectedOrder = order._id;
-          this.router.navigate(['foods']);
+          this.addNewOrder(order._id);
         })}
       );
     }
@@ -221,6 +223,10 @@ export class OrdersComponent {
 
   updateOrder(order: Order): void{
     this.ordersService.updateOrder(order).subscribe({ });
+  }
+
+  addNewOrder(value: string) {
+    this.newOrderEvent.emit(value);
   }
 
   openDialog(receipt: Receipt) {

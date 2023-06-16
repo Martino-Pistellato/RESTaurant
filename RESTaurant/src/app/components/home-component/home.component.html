@@ -1,87 +1,76 @@
-
-<div>
-    <mat-grid-list cols="4" rowHeight="100px">
-        <mat-grid-tile [colspan]="3" [rowspan]="1">
-            <mat-card style="width: 100%; margin-right: 2%;">
-                <mat-card-content>Welcome {{name}}</mat-card-content>
-            </mat-card>
-        </mat-grid-tile>
-        <mat-grid-tile [colspan]="1" [rowspan]="1">
-            <mat-card style="width: 100%;" class="center-parent">
-                <mat-card-content>
-                    <span *ngIf="role === 0">ADMIN</span>
-                    <span *ngIf="role === 1">CASHIER</span>
-                    <span *ngIf="role === 2">BARMAN</span>
-                    <span *ngIf="role === 3">COOK</span>
-                    <span *ngIf="role === 4">WAITER</span>
-                </mat-card-content>
-            </mat-card>
-        </mat-grid-tile>
-        <mat-grid-tile [colspan]="3" [rowspan]="1">
-            <mat-card style="width: 100%; height: 80%;  margin-right: 2%;">
-                <mat-card-content style="height: 100%; display: flex; justify-content: center; align-items: center;">
-                    <div *ngIf="role === 0">
-                        <button mat-raised-button routerLink="/foods" style="width:100px;margin-right:5px;">
-                            MENU
-                        </button>
-                        <button mat-raised-button routerLink="/users" style="width:100px;margin-right:5px;">
-                            USERS
-                        </button>
-                        <button mat-raised-button routerLink="/tables" style="width:100px; margin-right:5px;">
-                            TABLES
-                        </button>
-                        <button mat-raised-button routerLink="/orders" style="width:100px">
-                            ORDERS
-                        </button>
-                    </div>
-
-                    <div *ngIf="role === 1">
-                        <button mat-raised-button routerLink="/foods" style="width:100px;margin-right:5px;">
-                            MENU
-                        </button>
-                        <button mat-raised-button routerLink="/stats" style="width:100px;margin-right:5px;">
-                            STATS
-                        </button>
-                        <button mat-raised-button routerLink="/tables" style="width:100px; margin-right:5px;">
-                            TABLES
-                        </button>
-                        <button mat-raised-button routerLink="/orders" style="width:100px">
-                            ORDERS
-                        </button>
-                    </div>
-
-                    <div *ngIf="role === 2 || role === 3">
-                        <button mat-raised-button routerLink="/orders" style="width:100px">
-                            ORDERS
-                        </button>
-                    </div>
-                    
-                    <div *ngIf="role === 4">
-                        <button mat-raised-button routerLink="/foods" style="width:100px;margin-right:5px;">
-                            MENU
-                        </button>
-                        <button mat-raised-button routerLink="/tables" style="width:100px; margin-right:5px;">
-                            TABLES
-                        </button>
-                        <button mat-raised-button routerLink="/orders" style="width:100px">
-                            ORDERS
-                        </button>
-                    </div>
-                </mat-card-content>
-            </mat-card>
-        </mat-grid-tile>
-        <mat-grid-tile [colspan]="1" [rowspan]="4">
-            <mat-card style="width: 100%; height: 95%" class="top-parent">
-                <mat-card-content>
-                    NOTIFICATIONS
-                    <mat-card *ngFor="let not of notifications">
-                        <mat-card-content>{{not}}</mat-card-content>
+<table style="width: 100%;">
+    <tr>
+        <td style="width: 75%;">
+            <table style="width: 100%;">
+                <tr>
+                    <mat-card style="display:flex; justify-content:center; align-items:center;">
+                        <mat-card-header>
+                            <mat-card-title>
+                                Welcome {{name}}
+                            </mat-card-title>
+                        </mat-card-header>
+                        <mat-card-content>
+                        </mat-card-content>
                     </mat-card>
-                </mat-card-content>
-            </mat-card>
-        </mat-grid-tile>
-    </mat-grid-list>
-</div>
-
-
-
+                </tr>
+                <tr class="center-parent">
+                    <mat-button-toggle-group [(ngModel)]="loadedModule">
+                        <mat-button-toggle *ngIf="role !== 2 && role !== 3" value="tables">TABLES</mat-button-toggle>
+                        <mat-button-toggle value="orders">ORDERS</mat-button-toggle>
+                        <!-- <mat-button-toggle *ngIf="role !== 1" value="foods">MENU</mat-button-toggle> -->
+                        <mat-button-toggle *ngIf="role === 0" value="users">USERS</mat-button-toggle>
+                        <mat-button-toggle *ngIf="role === 0 || role === 1" value="stats">STATS</mat-button-toggle>
+                    </mat-button-toggle-group>
+                </tr>
+                <tr>
+                    <mat-card>
+                        <mat-card-content>
+                            <app-orders (newOrderEvent)="addOrder($event)" *ngIf="loadedModule === 'orders'"></app-orders>
+                            <app-tables *ngIf="loadedModule === 'tables'" ></app-tables>
+                            <app-foods (changeModuleEvent)="changeModuleEvent($event)" [order_id] = "order_id" *ngIf="loadedModule === 'foods'"></app-foods>
+                            <app-users *ngIf="loadedModule === 'users'"></app-users>
+                            <app-stats *ngIf="loadedModule === 'stats'"></app-stats>
+                        </mat-card-content>
+                    </mat-card>
+                </tr>
+            </table>
+        </td>
+        <td style="width: 25%;">
+            <table style="width: 100%;">
+                <tr>
+                    <td>
+                        <mat-card style="display:flex; justify-content:center; align-items:center;">
+                            <mat-card-content>
+                                <!-- <span *ngIf="role === 0">ADMIN</span>
+                                <span *ngIf="role === 1">CASHIER</span>
+                                <span *ngIf="role === 2">BARMAN</span>
+                                <span *ngIf="role === 3">COOK</span>
+                                <span *ngIf="role === 4">WAITER</span> -->
+                                <button mat-raised-button color="primary" style="width: 120px;" 
+                                    (click)="userService.logout()">
+                                    <mat-icon>logout</mat-icon> LOGOUT
+                                </button>
+                            </mat-card-content>
+                        </mat-card>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <mat-card style="display:flex; justify-content:center; align-items:center;">
+                            <mat-card-header>
+                                <mat-card-subtitle>NOTIFICATIONS</mat-card-subtitle>
+                            </mat-card-header>
+                            <mat-card-content style="padding-top: 2%;">
+                                <mat-accordion>
+                                    <mat-card *ngFor="let not of notifications" style="margin-bottom: 2%;" (click)="focusOrder()">
+                                        <mat-card-content style="background-color: #FFC107;">{{not}}</mat-card-content>
+                                    </mat-card>
+                                </mat-accordion>
+                            </mat-card-content>
+                        </mat-card>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>

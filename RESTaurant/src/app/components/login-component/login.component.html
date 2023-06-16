@@ -1,20 +1,24 @@
 <p *ngIf="errmessage">Errore: {{errmessage}}</p>
 <div style="padding: 15px;" class="center-parent">
     <mat-card style="padding: 15px; align-items: center; width: fit-content;">
-        <mat-form-field style="width:fit-content">
+        <mat-form-field style="width:30vw">
             <mat-label>Email</mat-label>
             <input matInput type="email" placeholder="example@RESTaurant" [formControl]="emailControl" [(ngModel)]="email" required>
             <mat-error *ngIf="emailControl.invalid">{{getEmailErrorMessage()}}</mat-error>
         </mat-form-field>
 
-        <mat-form-field style="width:fit-content">
+        <mat-form-field style="width:30vw">
             <mat-label>Password</mat-label>
-            <input matInput type="password" [formControl]="passwordControl" [(ngModel)]="password" required>
+            <input [(ngModel)]="password" matInput [type]="hide ? 'password' : 'text'"
+                   [formControl]="passwordControl" required>
+            <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
+                <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
             <mat-error *ngIf="passwordControl.invalid">{{getPasswordErrorMessage()}}</mat-error>
         </mat-form-field>
 
-        <mat-card-actions style="width:fit-content">
-            <button mat-button type="button" [disabled]="emailControl.invalid || passwordControl.invalid" (click)="login(email, password)">Login</button>
+        <mat-card-actions >
+            <button style="width:30vw" mat-raised-button color="primary" type="button" [disabled]="emailControl.invalid || passwordControl.invalid" (click)="login(email, password)">LOGIN</button>
         </mat-card-actions>
     </mat-card>
 </div>

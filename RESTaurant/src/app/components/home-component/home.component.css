@@ -1,0 +1,17 @@
+.mat-button-toggle{
+  width:100px;
+}
+.mat-button-toggle-checked{
+  background-color: #673AB7;
+  color: white !important;
+}
+.mat-button-toggle:hover{
+  background-color: #FFD740;
+  color: black !important;
+}
+table td, table td * {
+    vertical-align: top;
+    border-spacing: 10px 10px;
+}
+/* .mat-mdc-card.mdc-card:hover { background-color: #ffeeaf;   } */
+

@@ -1,163 +1,105 @@
-<p>-- ORDINI --</p>
+<mat-tab-group>
+    <mat-tab *ngIf="role !== 4" label="Received Orders">
+        <mat-accordion *ngIf="receivedGroups.length > 0" style="padding:0 2%">
+            <mat-expansion-panel *ngFor="let group of receivedGroups" hideToggle>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Tables: &nbsp;<span *ngFor="let table_number of group.table_numbers">{{table_number}} &nbsp;</span>
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <mat-accordion>
+                    <mat-expansion-panel *ngFor="let order of group.orders" hideToggle>
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
+                                Prepare time: {{order.queue_time}}'
+                            </mat-panel-title>
+                        </mat-expansion-panel-header>
+                        <p *ngFor="let food of order.foods">
+                            {{food.name}} ({{food.prepare_time}}')
+                        </p>
+                        <button *ngIf="role === 2 || role === 3" mat-raised-button color="primary" (click)="updateOrder(order)"> 
+                            START PREPARING 
+                        </button>
+                    </mat-expansion-panel>
+                </mat-accordion>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </mat-tab>
+    <mat-tab *ngIf="role !== 4" label="Preparing Orders">
+        <mat-accordion *ngIf="preparingGroups.length > 0"  style="padding:0 2%">
+            <mat-expansion-panel *ngFor="let group of preparingGroups" hideToggle>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Tables: &nbsp;<span *ngFor="let table_number of group.table_numbers">{{table_number}} &nbsp;</span>
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <mat-accordion>
+                    <mat-expansion-panel *ngFor="let order of group.orders" hideToggle>
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
+                                Prepare time: {{order.queue_time}}'
+                            </mat-panel-title>
+                        </mat-expansion-panel-header>
+                        <p *ngFor="let food of order.foods">
+                            {{food.name}} ({{food.prepare_time}}')
+                        </p>
+                        <button *ngIf="role === 2 || role === 3" mat-raised-button color="primary" (click)="updateOrder(order)"> 
+                            READY TO SERVE
+                        </button>
+                    </mat-expansion-panel>
+                </mat-accordion>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </mat-tab>
+    <mat-tab *ngIf="role === 0 || role === 1" label="Terminated Orders">
+        <mat-accordion *ngIf="terminatedGroups.length > 0"  style="padding:0 2%">
+            <mat-expansion-panel *ngFor="let group of terminatedGroups" hideToggle>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Tables: &nbsp;<span *ngFor="let table_number of group.table_numbers">{{table_number}} &nbsp;</span>
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <mat-accordion>
+                    <mat-expansion-panel *ngFor="let order of group.orders" hideToggle>
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
+                                Ordered foods:
+                            </mat-panel-title>
+                        </mat-expansion-panel-header>
+                        <p *ngFor="let food of order.foods">
+                            {{food.name}} ({{food.price}} euros)
+                        </p>
+                        <button *ngIf="role === 1" mat-raised-button color="primary" (click)="getReceipt(group.main_table)"> 
+                            GET RECEIPT 
+                        </button>
+                    </mat-expansion-panel>
+                </mat-accordion>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </mat-tab>
+    <mat-tab *ngIf="role === 4" label="Tables with Orders">
+        <ul *ngIf="tablesWithOrders.length > 0" style="padding-top:2%">
+            <li *ngFor="let tables_list of tablesWithOrders" style="margin-bottom:2%">
+                <button mat-stroked-button color="primary" (click)="selectTable(tables_list[0])"> 
+                    TABLES:&nbsp; 
+                    <span *ngFor="let table of tables_list">{{table.number}}&nbsp;</span>
+                </button>
+            </li>
+        </ul>
+    </mat-tab>
+    <mat-tab *ngIf="role === 4" label="Tables without Orders">
+        <ul *ngIf="tablesWithoutOrders.length > 0" style="padding-top:2%">
+            <li *ngFor="let table of tablesWithoutOrders" style="margin-bottom:2%">
+                <button color="primary" mat-stroked-button (click)="selectTable(table)">
+                    TABLES: {{table.number}}
+                </button>
+            </li>
+        </ul>
+    </mat-tab>
+</mat-tab-group>
 
-<div class="container" *ngIf="role === 0 || role === 1">
-    <mat-accordion *ngIf="receivedGroups.length > 0">
-        <p>Received orders</p>
-        <mat-expansion-panel *ngFor="let group of receivedGroups" hideToggle>
-            <mat-expansion-panel-header>
-                <mat-panel-title>
-                    Tables: &nbsp;<span *ngFor="let table_number of group.table_numbers">{{table_number}} &nbsp;</span>
-                </mat-panel-title>
-            </mat-expansion-panel-header>
-            <mat-accordion>
-                <mat-expansion-panel *ngFor="let order of group.orders" hideToggle>
-                    <mat-expansion-panel-header>
-                        <mat-panel-title>
-                            Prepare time: {{order.queue_time}}'
-                        </mat-panel-title>
-                    </mat-expansion-panel-header>
-                    <p *ngFor="let food of order.foods">
-                        {{food.name}} ({{food.prepare_time}}')
-                    </p>
-                </mat-expansion-panel>
-            </mat-accordion>
-            
-        </mat-expansion-panel>
-    </mat-accordion>
-
-    <br>
-
-    <mat-accordion *ngIf="preparingGroups.length > 0">
-        <p>Preparing orders</p>
-        <mat-expansion-panel *ngFor="let group of preparingGroups" hideToggle>
-            <mat-expansion-panel-header>
-                <mat-panel-title>
-                    Tables: &nbsp;<span *ngFor="let table_number of group.table_numbers">{{table_number}} &nbsp;</span>
-                </mat-panel-title>
-            </mat-expansion-panel-header>
-            <mat-accordion>
-                <mat-expansion-panel *ngFor="let order of group.orders" hideToggle>
-                    <mat-expansion-panel-header>
-                        <mat-panel-title>
-                            Prepare time: {{order.queue_time}}'
-                        </mat-panel-title>
-                    </mat-expansion-panel-header>
-                    <p *ngFor="let food of order.foods">
-                        {{food.name}} ({{food.prepare_time}}')
-                    </p>
-                </mat-expansion-panel>
-            </mat-accordion>
-        </mat-expansion-panel>
-    </mat-accordion>
-        
-    <br>
-
-    <mat-accordion *ngIf="terminatedGroups.length > 0">
-        <p>Terminated orders</p>
-        <mat-expansion-panel *ngFor="let group of terminatedGroups" hideToggle>
-            <mat-expansion-panel-header>
-                <mat-panel-title>
-                    Tables: &nbsp;<span *ngFor="let table_number of group.table_numbers">{{table_number}} &nbsp;</span>
-                </mat-panel-title>
-            </mat-expansion-panel-header>
-            <mat-accordion>
-                <mat-expansion-panel *ngFor="let order of group.orders" hideToggle>
-                    <mat-expansion-panel-header>
-                        <mat-panel-title>
-                            Ordered foods:
-                        </mat-panel-title>
-                    </mat-expansion-panel-header>
-                    <p *ngFor="let food of order.foods">
-                        {{food.name}} ({{food.price}} euros)
-                    </p>
-                    <button mat-raised-button (click)="getReceipt(group.main_table)"> GET RECEIPT </button>
-                </mat-expansion-panel>
-            </mat-accordion>
-        </mat-expansion-panel>
-    </mat-accordion>
-</div>
-
-<div class="container" *ngIf="role === 2 || role === 3">
-    <mat-accordion *ngIf="receivedGroups.length > 0">
-        <p>Received orders</p>
-        <mat-expansion-panel *ngFor="let group of receivedGroups" hideToggle>
-            <mat-expansion-panel-header>
-                <mat-panel-title>
-                    Tables: &nbsp;<span *ngFor="let table_number of group.table_numbers">{{table_number}} &nbsp;</span>
-                </mat-panel-title>
-            </mat-expansion-panel-header>
-            <mat-accordion>
-                <mat-expansion-panel *ngFor="let order of group.orders" hideToggle>
-                    <mat-expansion-panel-header>
-                        <mat-panel-title>
-                            Prepare time: {{order.queue_time}}'
-                        </mat-panel-title>
-                    </mat-expansion-panel-header>
-                    <p *ngFor="let food of order.foods">
-                        {{food.name}} ({{food.prepare_time}}')
-                    </p>
-                    <button mat-raised-button (click)="updateOrder(order)"> START PREPARING </button>
-                </mat-expansion-panel>
-            </mat-accordion>
-            
-        </mat-expansion-panel>
-    </mat-accordion>
-
-    <br>
-
-    <mat-accordion *ngIf="preparingGroups.length > 0">
-        <p>Preparing orders</p>
-        <mat-expansion-panel *ngFor="let group of preparingGroups" hideToggle>
-            <mat-expansion-panel-header>
-                <mat-panel-title>
-                    Tables: &nbsp;<span *ngFor="let table_number of group.table_numbers">{{table_number}} &nbsp;</span>
-                </mat-panel-title>
-            </mat-expansion-panel-header>
-            <mat-accordion>
-                <mat-expansion-panel *ngFor="let order of group.orders" hideToggle>
-                    <mat-expansion-panel-header>
-                        <mat-panel-title>
-                            Prepare time: {{order.queue_time}}'
-                        </mat-panel-title>
-                    </mat-expansion-panel-header>
-                    <p *ngFor="let food of order.foods">
-                        {{food.name}} ({{food.prepare_time}}')
-                    </p>
-                    <button mat-raised-button (click)="updateOrder(order)"> READY TO SERVE </button>
-                </mat-expansion-panel>
-            </mat-accordion>
-        </mat-expansion-panel>
-    </mat-accordion>
-</div>
 
 <div class="container" *ngIf="role === 4">
     <p>Selected tables: {{show_selected_tables}}</p>
-
-    <ul *ngIf="tablesWithOrders.length > 0" > Tables with order
-        <br>
-        <br>
-        <ng-container *ngFor="let tables_list of tablesWithOrders">
-            <button mat-raised-button (click)="selectTable(tables_list[0])"> 
-                TABLES:&nbsp; 
-                <span *ngFor="let table of tables_list">{{table.number}}&nbsp;</span>
-            </button>
-        </ng-container>
-    </ul>
-
-    <ul *ngIf="tablesWithoutOrders.length > 0"> Tables without order
-        <br>
-        <br>
-        <li *ngFor="let table of tablesWithoutOrders">
-            <button mat-raised-button (click)="selectTable(table)">
-                TABLES: {{table.number}}
-            </button>
-            <br>
-            <br>
-        </li>
-    </ul>
-
-    <mat-divider></mat-divider>
-    <br>
-
-    <button mat-raised-button (click)="createOrder()"> CREATE ORDER </button>
+    <button color="primary" mat-raised-button (click)="createOrder()" [disabled]="show_selected_tables === '' "> CREATE ORDER </button>
 </div>

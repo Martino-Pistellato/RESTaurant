@@ -1,25 +1,74 @@
-<div class="container">
-    <mat-accordion style="display: flex; flex-direction: row; flex-wrap: wrap; padding: 10px;">
-        <mat-card   *ngFor="let table of tables" hideToggle 
-                    style="width:300px; margin: 10px;" 
-                    [style.background]="table.is_free ? 'white':'#FF5252'">
-            <mat-card-header>
-                <mat-card-title>
-                    Table {{table.number}} 
-                </mat-card-title>
-                <mat-card-subtitle *ngIf="!table.is_free">Waiter: {{getWaiterName(table)}}</mat-card-subtitle>
-                <mat-card-subtitle *ngIf="table.is_free">Free</mat-card-subtitle>
-            </mat-card-header>
+<mat-accordion *ngIf="role !== 0" style="display: flex; flex-direction: row; flex-wrap: wrap; padding: 10px;">
+    <mat-card *ngFor="let table of tables" hideToggle 
+                style="width:300px; margin: 10px;" 
+                [style.background]="table.is_free ? 'white':'#FF5252'">
+        <mat-card-header>
+            <mat-card-title>
+                Table {{table.number}} 
+            </mat-card-title>
+            <mat-card-subtitle *ngIf="!table.is_free">Waiter: {{getWaiterName(table)}}</mat-card-subtitle>
+            <mat-card-subtitle *ngIf="table.is_free">Free</mat-card-subtitle>
+        </mat-card-header>
 
-            <mat-card-content>
-                <p>Occupied seats: {{table.occupancy}}</p>
-                <p>Total seats: {{table.capacity}}</p>
-            </mat-card-content> 
-            
-            <mat-card-actions *ngIf="role===4">
-                <button  *ngIf="table.is_free" style="background-color: #673AB7; color: white;" mat-raised-button (click)="openDialog(table)"> OCCUPY </button>
-                <button  *ngIf="!table.is_free" style="background-color: #673AB7; color: white;" mat-raised-button (click)="openDialog(table)"> FREE </button>
-            </mat-card-actions>
-        </mat-card>
-    </mat-accordion>
-</div>
+        <mat-card-content>
+            <p>Occupied seats: {{table.occupancy}}</p>
+            <p>Total seats: {{table.capacity}}</p>
+        </mat-card-content> 
+        
+        <mat-card-actions *ngIf="role===4">
+            <button  *ngIf="table.is_free" style="background-color: #673AB7; color: white;" mat-raised-button (click)="openDialog(table)"> OCCUPY </button>
+            <button  *ngIf="!table.is_free" style="background-color: #673AB7; color: white;" mat-raised-button (click)="openDialog(table)"> FREE </button>
+        </mat-card-actions>
+    </mat-card>
+</mat-accordion>
+
+<mat-accordion *ngIf="role === 0" class="example-headers-align">
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title>Create new table</mat-panel-title>
+        </mat-expansion-panel-header>
+        
+        <mat-form-field style="width:20vw; padding-left:10px;">
+            <mat-label>Number</mat-label>
+            <input matInput [(ngModel)]="table_number" placeholder="table.number" type="number" required min="1">
+        </mat-form-field>
+
+        <mat-form-field style="width:20vw">
+            <mat-label>Capacity</mat-label>
+            <input [(ngModel)]="table_capacity" matInput placeholder="table.capacity" type="number" required min="1">
+        </mat-form-field>
+
+        <mat-action-row>
+            <button mat-stroked-button color="primary" (click)="createTable(table_capacity, table_number)">
+                CREATE
+            </button>
+        </mat-action-row>
+    </mat-expansion-panel>
+    <mat-expansion-panel *ngFor="let table of tables"  [style.background]="table.is_free ? 'white':'#FF5252'">
+        <mat-expansion-panel-header>
+            <mat-panel-title>Table {{table.number}}</mat-panel-title>
+        </mat-expansion-panel-header>
+        
+        <mat-form-field style="width:20vw; padding-left:10px;">
+            <mat-label>Number</mat-label>
+            <input matInput [(ngModel)]="table_number" placeholder="table.number" type="number" min="1">
+        </mat-form-field>
+
+        <mat-form-field style="width:20vw">
+            <mat-label>Capacity</mat-label>
+            <input [(ngModel)]="table_capacity" matInput placeholder="table.capacity" type="number" min="1">
+        </mat-form-field>
+
+        <mat-action-row>
+            <button mat-stroked-button color="warn" (click)="deleteTable(table._id)">
+                DELETE
+            </button>
+            <button mat-stroked-button color="accent" [disabled]="table.is_free" (click)="changeStatus(table._id, 0)">
+                FREE
+            </button>
+            <button mat-stroked-button color="primary" (click)="updateTable(table._id, table_capacity, table_number)">
+                UPDATE
+            </button>
+        </mat-action-row>
+    </mat-expansion-panel>
+</mat-accordion>

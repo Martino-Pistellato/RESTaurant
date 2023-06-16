@@ -56,4 +56,28 @@ export class TablesService {
       catchError(handleError)
     );
   }
+
+  createTable(table_capacity: number | null, table_number: number | null): Observable<Table>{
+    return this.http.post<Table>('https://localhost:3000/tables',{
+      table_capacity: table_capacity,
+      table_number: table_number
+    },createOptions({},this.usersService.token)).pipe(
+      catchError(handleError)
+    );
+  }
+
+  updateTable(table_id: string, table_capacity: number | null, table_number: number | null): Observable<Table>{
+    return this.http.put<Table>('https://localhost:3000/tables/'+table_id,{
+      table_capacity: table_capacity,
+      table_number: table_number
+    },createOptions({},this.usersService.token)).pipe(
+      catchError(handleError)
+    );
+  }
+
+  deleteTable(table_id: string){
+    return this.http.delete('https://localhost:3000/tables/'+table_id,createOptions({},this.usersService.token)).pipe(
+      catchError(handleError)
+    );
+  }
 }

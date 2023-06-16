@@ -18,27 +18,13 @@ export const Notifications = {
 export class AppComponent {
   title = 'RESTaurant';
   opened = false;
-  role;
+  //role;
   constructor(protected usersService: UsersService, 
               private socketService: SocketService, 
               private router: Router, 
               private snackBar: MatSnackBar){
-    this.role = this.usersService.role;
-    if (this.role === RoleTypes.COOK || this.role === RoleTypes.BARMAN)
-      this.socketService.listenToServer(Events.NEW_ORDER_RECEIVED, (role: RoleTypes) => {
-        if (role === this.role)
-          this.openSnackBar(Notifications.NEW_ORDER_RECEIVED, 'CLOSE');
-      });
-    else if (this.role === RoleTypes.WAITER)
-      this.socketService.listenToServer(Events.NEW_ORDER_PREPARED, (waiter_id: string, table_number: number) => {
-        if (this.usersService.id === waiter_id)
-          this.openSnackBar(Notifications.NEW_ORDER_PREPARED + table_number, 'CLOSE');
-      });
+    
   }
 
-  openSnackBar(message: string, action: string) {
-    this.snackBar.open(message, action,{
-      verticalPosition:'top'
-    });
-  }
+  
 }

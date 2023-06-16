@@ -19,6 +19,8 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSelectModule } from '@angular/material/select';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatTabsModule } from '@angular/material/tabs';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './components/login-component/login.component';
@@ -64,7 +66,9 @@ import { UsersComponent } from './components/users-component/users.component';
     MatSidenavModule,
     MatGridListModule,
     MatSnackBarModule,
-    MatSelectModule
+    MatSelectModule,
+    MatButtonToggleModule,
+    MatTabsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

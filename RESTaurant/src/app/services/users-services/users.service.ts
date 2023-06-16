@@ -128,4 +128,15 @@ export class UsersService {
       catchError(handleError)
     );
   }
+
+  createUser(name: string | null, email: string | null, role: RoleTypes | null, password: string | null): Observable<User>{
+    return this.http.post<User>('https://localhost:3000/users',{
+      name: name,
+      email: email,
+      role: role,
+      password: password
+    },createOptions({}, this.token)).pipe(
+      catchError(handleError)
+    );
+  }
 }

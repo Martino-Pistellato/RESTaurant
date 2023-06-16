@@ -48,8 +48,7 @@ router.get('/', my_authorize([]), (req, res) => {
             let my_orders: order.Order[] = [];
 
             orders.forEach((my_order) => {
-                if (!my_order.is_payed && 
-                    (new Date(my_order.insertion_date as Date).setHours(0, 0, 0, 0) >= new Date().setHours(0, 0, 0, 0)))
+                if (!my_order.is_payed)// && (new Date(my_order.insertion_date as Date).setHours(0, 0, 0, 0) >= new Date().setHours(0, 0, 0, 0)))
                     my_orders.push(my_order);
             });
 
@@ -60,8 +59,8 @@ router.get('/', my_authorize([]), (req, res) => {
         order.orderModel.find().populate('table').populate('cook_id').populate('foods').then(orders => {
             let my_orders: order.Order[] = [];
 
-            orders.forEach(order => {
-                if (!order.is_payed && (new Date(order.insertion_date as Date).setHours(0, 0, 0, 0) >= new Date().setHours(0, 0, 0, 0))){
+            orders.forEach(order => { 
+                if (!order.is_payed){//&& (new Date(order.insertion_date as Date).setHours(0, 0, 0, 0) >= new Date().setHours(0, 0, 0, 0))
                     order.queue_time = 0;
                     order.foods.forEach(food => order.queue_time += food['prepare_time']);
                     my_orders.push(order);
@@ -179,7 +178,10 @@ router.put('/', my_authorize([roleTypes.COOK, roleTypes.BARMAN, roleTypes.CASHIE
                     my_order.status = orderStatus.TERMINATED;
                     user.save().then(data => my_order.save().then(order_saved => {
                         get_socket().emit(Events.UPDATE_ORDERS_LIST); 
-                        get_socket().emit(Events.NEW_ORDER_PREPARED, my_order.table['waiter_id'],  my_order.table['number']);
+                        get_socket().emit(Events.NEW_ORDER_PREPARED, {
+                            waiter_id: my_order.table['waiter_id'],  
+                            table_number: my_order.table['number']
+                        });
                         res.send(order_saved);
                     }));
                 }); //maybe add a notification for the waiter

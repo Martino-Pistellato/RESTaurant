@@ -15,6 +15,7 @@ export class LoginComponent {
   protected password: string = '';
   public emailControl: FormControl;
   public passwordControl: FormControl;
+  hide:boolean=true;
 
   getEmailErrorMessage() {
     return  this.emailControl.hasError('required') ? 'Email must be provided' : 
