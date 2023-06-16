@@ -1,12 +1,30 @@
-<div class="container" *ngIf="role === 4">
-    <p>Cibi selezionati: {{selectedFoods.length}}</p>
+<p>Selected foods: {{selectedFoods.length}}</p>
+<mat-accordion>
+    <mat-expansion-panel *ngFor="let food of foods" hideToggle
+    [style.background]="selectedFoods.includes(food) ? '#673AB7':'white'"
+    [style.color]="selectedFoods.includes(food) ? 'white':'black'">
+        <mat-expansion-panel-header>
+            <mat-panel-title [style.color]="selectedFoods.includes(food) ? 'white':'black'">
+                {{food.name}}
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+        Ingredients:
+        <span *ngFor="let ingredient of food.ingredients"> 
+            {{ingredient}}
+        </span>
+        <mat-action-row style="height: fit-content;">
+            <button (click)="removeFood(food)" mat-icon-button>
+                <mat-icon [style.color]="selectedFoods.includes(food) ? '#FFD740':'#673AB7'">remove_circle</mat-icon>
+            </button>
+            <button (click)="addFood(food)" mat-icon-button>
+                <mat-icon [style.color]="selectedFoods.includes(food) ? '#FFD740':'#673AB7'">add_circle</mat-icon>
+            </button>
+        </mat-action-row>
+    </mat-expansion-panel>
+</mat-accordion>
 
-    <ul>
-        <li *ngFor="let food of foods">
-            <button (click)="removeFood(food)">-</button>
-            <span> {{food.name}} </span>
-            <button (click)="addFood(food)">+</button>
-        </li>
-    </ul>
-    <button (click)="updateOrder()">Aggiungi all'ordine</button>
-</div>
+<mat-action-row>
+    <button [disabled]="selectedFoods.length <= 0" mat-raised-button color="primary" (click)="updateOrder()">
+        ADD TO ORDER
+    </button>
+</mat-action-row>

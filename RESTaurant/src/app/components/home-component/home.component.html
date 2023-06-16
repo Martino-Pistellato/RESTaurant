@@ -17,7 +17,7 @@
                     <mat-button-toggle-group [(ngModel)]="loadedModule">
                         <mat-button-toggle *ngIf="role !== 2 && role !== 3" value="tables">TABLES</mat-button-toggle>
                         <mat-button-toggle value="orders">ORDERS</mat-button-toggle>
-                        <!-- <mat-button-toggle *ngIf="role !== 1" value="foods">MENU</mat-button-toggle> -->
+                        <mat-button-toggle value="foods">MENU</mat-button-toggle> 
                         <mat-button-toggle *ngIf="role === 0" value="users">USERS</mat-button-toggle>
                         <mat-button-toggle *ngIf="role === 0 || role === 1" value="stats">STATS</mat-button-toggle>
                     </mat-button-toggle-group>
