@@ -1,5 +1,85 @@
-<p>Selected foods: {{selectedFoods.length}}</p>
+<p *ngIf="role === 4">Selected foods: {{selectedFoods.length}}</p>
 <mat-accordion>
+    <mat-expansion-panel *ngIf="role === 0">
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                Create new food
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+        <p>Name: {{name}}</p>
+        <p>Ingredients:
+            <span *ngFor="let ingredient of new_food_ingredients"> 
+                {{ingredient}},
+            </span>
+        </p>
+        <p>Preparation time: {{prepare_time}}'</p>
+        <p>Price: {{price}}€</p>
+
+        <div *ngIf="role === 0">
+            <div>
+                <mat-form-field style="width: 20vw; margin-right: 2%;">
+                    <mat-label>Ingredients</mat-label>
+                    <mat-select matNativeControl [(ngModel)]="remove_ingredient">
+                    <mat-option *ngFor="let ingredient of new_food_ingredients" value={{ingredient}} >
+                        {{ingredient}}
+                    </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <button mat-stroked-button color = "warn" style = "width: 20vw"
+                        [disabled]="remove_ingredient===''" 
+                        (click)="toggleIngredient(remove_ingredient, null)"> 
+                    REMOVE
+                </button>
+            </div>
+        
+            <div>
+                <mat-form-field style="width:20vw; margin-right: 2%;">
+                    <mat-label>New Ingredient</mat-label>
+                    <input [(ngModel)]="add_ingredient" matInput>
+                </mat-form-field>
+                <button mat-stroked-button color="primary" style="width: 20vw"
+                        [disabled]="add_ingredient===''" 
+                        (click)="toggleIngredient(add_ingredient, null)"> 
+                    ADD 
+                </button>
+            </div>
+
+            <mat-form-field style="width: 20vw; margin-right: 2%;">
+                <mat-label>Food type</mat-label>
+                <mat-select matNativeControl [(ngModel)]="food_type" required>
+                    <mat-option value=0>Appetizer</mat-option>
+                    <mat-option value=1>First course</mat-option>
+                    <mat-option value=2>Second course</mat-option>
+                    <mat-option value=3>Side dish</mat-option>
+                    <mat-option value=4>Dessert</mat-option>
+                    <mat-option value=5>Drink</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field style="width:20vw; margin-right: 2%;">
+                <mat-label>Name</mat-label>
+                <input [(ngModel)]="name" matInput type="text" required>
+            </mat-form-field>
+
+            <mat-form-field style="width:20vw; margin-right: 2%;">
+                <mat-label>Price</mat-label>
+                <input [(ngModel)]="price" matInput type="number" min="1" required>
+            </mat-form-field>
+
+            <mat-form-field style="width:20vw">
+                <mat-label>Prepare time in min</mat-label>
+                <input [(ngModel)]="prepare_time" matInput type="number" min="1" required>
+            </mat-form-field>
+        </div>
+            
+        <mat-action-row>
+            <button mat-stroked-button color="primary" (click)="createFood()" 
+                    [disabled]="new_food_ingredients.length===0 || price === 0 || prepare_time === 0 || name === ''"> 
+                CREATE
+            </button>
+        </mat-action-row>
+    </mat-expansion-panel>
+
     <mat-expansion-panel *ngFor="let food of foods" hideToggle
     [style.background]="selectedFoods.includes(food) ? '#673AB7':'white'"
     [style.color]="selectedFoods.includes(food) ? 'white':'black'">
@@ -8,23 +88,92 @@
                 {{food.name}}
             </mat-panel-title>
         </mat-expansion-panel-header>
-        Ingredients:
-        <span *ngFor="let ingredient of food.ingredients"> 
-            {{ingredient}}
-        </span>
-        <mat-action-row style="height: fit-content;">
-            <button (click)="removeFood(food)" mat-icon-button>
+        <p>Ingredients:
+            <span *ngFor="let ingredient of food.ingredients"> 
+                {{ingredient}},
+            </span>
+        </p>
+        <p>Preparation time: {{food.prepare_time}}'</p>
+        <p>Price: {{food.price}}€</p>
+
+        <div *ngIf="role === 0">
+            <div>
+                <mat-form-field style="width: 20vw; margin-right: 2%;">
+                    <mat-label>Ingredients</mat-label>
+                    <mat-select matNativeControl [(ngModel)]="remove_ingredient">
+                    <mat-option *ngFor="let ingredient of food.ingredients" value={{ingredient}} >
+                        {{ingredient}}
+                    </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <button mat-stroked-button color = "warn" style = "width: 20vw"
+                        [disabled]="remove_ingredient===''" 
+                        (click)="toggleIngredient(remove_ingredient, food._id)"> 
+                    REMOVE
+                </button>
+            </div>
+        
+            <div>
+                <mat-form-field style="width:20vw; margin-right: 2%;">
+                    <mat-label>New Ingredient</mat-label>
+                    <input [(ngModel)]="add_ingredient" matInput>
+                </mat-form-field>
+                <button mat-stroked-button color="primary" style="width: 20vw"
+                        [disabled]="add_ingredient===''" 
+                        (click)="toggleIngredient(add_ingredient, food._id)"> 
+                    ADD 
+                </button>
+            </div>
+
+            <mat-form-field style="width: 20vw; margin-right: 2%;">
+                <mat-label>Food type</mat-label>
+                <mat-select matNativeControl [(ngModel)]="food_type">
+                    <mat-option value=0>Appetizer</mat-option>
+                    <mat-option value=1>First course</mat-option>
+                    <mat-option value=2>Second course</mat-option>
+                    <mat-option value=3>Side dish</mat-option>
+                    <mat-option value=4>Dessert</mat-option>
+                    <mat-option value=5>Drink</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field style="width:20vw; margin-right: 2%;">
+                <mat-label>Name</mat-label>
+                <input [(ngModel)]="name" matInput placeholder={{food.name}} type="text">
+            </mat-form-field>
+
+            <mat-form-field style="width:20vw; margin-right: 2%;">
+                <mat-label>Price</mat-label>
+                <input [(ngModel)]="price" matInput placeholder={{food.price}} type="number" min="1">
+            </mat-form-field>
+
+            <mat-form-field style="width:20vw">
+                <mat-label>Prepare time in min</mat-label>
+                <input [(ngModel)]="prepare_time" matInput placeholder={{food.prepare_time}} type="number" min="1">
+            </mat-form-field>
+        </div>
+            
+        <mat-action-row>
+            <button (click)="removeFood(food)" mat-icon-button  *ngIf="role === 4">
                 <mat-icon [style.color]="selectedFoods.includes(food) ? '#FFD740':'#673AB7'">remove_circle</mat-icon>
             </button>
-            <button (click)="addFood(food)" mat-icon-button>
+            <button (click)="addFood(food)" mat-icon-button  *ngIf="role === 4">
                 <mat-icon [style.color]="selectedFoods.includes(food) ? '#FFD740':'#673AB7'">add_circle</mat-icon>
+            </button>
+            <button mat-stroked-button color="warn" (click)="deleteFood(food._id)" *ngIf="role === 0"
+                    [disabled]="food.ingredients.length===0 || price === 0 || prepare_time === 0 || name === ''">
+                DELETE 
+            </button>
+            <button mat-stroked-button color="primary" (click)="updateFood(food._id)" *ngIf="role === 0"
+                    [disabled]="food.ingredients.length===0 || price === 0 || prepare_time === 0 || name === ''"> 
+                UPDATE
             </button>
         </mat-action-row>
     </mat-expansion-panel>
 </mat-accordion>
 
 <mat-action-row>
-    <button [disabled]="selectedFoods.length <= 0" mat-raised-button color="primary" (click)="updateOrder()">
+    <button *ngIf="role === 4" [disabled]="selectedFoods.length <= 0" mat-raised-button color="primary" (click)="updateOrder()">
         ADD TO ORDER
     </button>
 </mat-action-row>

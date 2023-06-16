@@ -68,16 +68,19 @@ passport.use( new passportHTTP.BasicStrategy(
 //Login route
 app.get('/login', passport.authenticate('basic', { session: false }),(req, res) => {
     console.log("Login granted. Generating token" );
+    
+    userModel.findById(req.user._id).then((logged_user) => {
+        logged_user.totalWorks = [];
+        logged_user?.save().then((user) => {
+            let tokendata = {
+                name: req.user.name,  
+                role: req.user.role,
+                email: req.user.email,
+                id : req.user._id
+            };
 
-    let tokendata = {
-        name: req.user.name,  
-        role: req.user.role,
-        email: req.user.email,
-        id : req.user._id
-    };
-    let token_signed = jsonwebtoken.sign(tokendata, process.env.JWT_SECRET, { expiresIn: '1h' } );
-    res.send({token: token_signed});
+            let token_signed = jsonwebtoken.sign(tokendata, process.env.JWT_SECRET, { expiresIn: '9h' } );
+            res.send({token: token_signed});
+        })
+    })
 })
-
-//TODO: add @login_required (or something like that)
-//TODO: add logout

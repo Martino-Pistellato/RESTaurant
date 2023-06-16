@@ -1,6 +1,7 @@
+<p>{{innerWidth}}, mobile:{{mobile_screen}}</p>
 <table style="width: 100%;">
     <tr>
-        <td style="width: 75%;">
+        <td [style.width]="(mobile_screen)?'100%':'75%'">
             <table style="width: 100%;">
                 <tr>
                     <mat-card style="display:flex; justify-content:center; align-items:center;">
@@ -17,7 +18,7 @@
                     <mat-button-toggle-group [(ngModel)]="loadedModule">
                         <mat-button-toggle *ngIf="role !== 2 && role !== 3" value="tables">TABLES</mat-button-toggle>
                         <mat-button-toggle value="orders">ORDERS</mat-button-toggle>
-                        <mat-button-toggle value="foods">MENU</mat-button-toggle> 
+                        <mat-button-toggle *ngIf="role === 0" value="foods">MENU</mat-button-toggle> 
                         <mat-button-toggle *ngIf="role === 0" value="users">USERS</mat-button-toggle>
                         <mat-button-toggle *ngIf="role === 0 || role === 1" value="stats">STATS</mat-button-toggle>
                     </mat-button-toggle-group>
@@ -29,13 +30,13 @@
                             <app-tables *ngIf="loadedModule === 'tables'" ></app-tables>
                             <app-foods (changeModuleEvent)="changeModuleEvent($event)" [order_id] = "order_id" *ngIf="loadedModule === 'foods'"></app-foods>
                             <app-users *ngIf="loadedModule === 'users'"></app-users>
-                            <app-stats *ngIf="loadedModule === 'stats'"></app-stats>
+                            <app-stats [total_profit] = "profit" *ngIf="loadedModule === 'stats'"></app-stats>
                         </mat-card-content>
                     </mat-card>
                 </tr>
             </table>
         </td>
-        <td style="width: 25%;">
+        <td [style.width]="(mobile_screen)?'0%':'25%'" *ngIf="!mobile_screen">
             <table style="width: 100%;">
                 <tr>
                     <td>

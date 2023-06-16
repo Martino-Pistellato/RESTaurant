@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 
 import { UsersService, RoleTypes } from '../../services/users-services/users.service';
 import { OrdersService } from 'src/app/services/orders-services/orders.service';
@@ -25,13 +26,24 @@ export class HomeComponent {
   protected notifications: string[] = [];
   loadedModule?: string;
   order_id: string = '';
+  mobile_screen: boolean;
+  public innerWidth: any;
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event:any) {
+    this.innerWidth = event.target.innerWidth;
+    this.mobile_screen = this.innerWidth <= 780;
+  }
 
   constructor( protected userService: UsersService, 
                private orderService: OrdersService,
                private socketService: SocketService,
                private router: Router, 
-               private snackBar: MatSnackBar) {
+               private snackBar: MatSnackBar,
+               private breakpointObserver: BreakpointObserver) {
                 if (!this.userService.isLogged()) this.router.navigate(['login']);
+                this.innerWidth = window.innerWidth;
+                this.mobile_screen = this.innerWidth <= 780;
               }
 
   ngOnInit() {
@@ -39,7 +51,6 @@ export class HomeComponent {
     this.role = this.userService.role;
 
     this.socketService.listenToServer(Events.FORCE_LOGOUT).subscribe((user_id: string) => {
-      console.log("inside my listen for users")
       if (this.userService.id === user_id)
         this.openSnackBar('You have been logged out by an admin', 'CLOSE', true);
     });
@@ -58,7 +69,7 @@ export class HomeComponent {
           this.openSnackBar(Notifications.NEW_ORDER_PREPARED + response.table_number, 'CLOSE', false);
         }
       });
-    else if (this.role === RoleTypes.CASHIER){
+    else if (this.role === RoleTypes.CASHIER || this.role === RoleTypes.ADMIN){
       this.updateTotalProfit();
       this.socketService.listenToServer(Events.UPDATE_TOTAL_PROFIT).subscribe((data: any) => this.updateTotalProfit());
     }

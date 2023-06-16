@@ -14,7 +14,7 @@ router.post('/', my_authorize([roleTypes.ADMIN]), (req, res) => {
     let my_user = user.newUser({
         name: req.body.name,
         email: req.body.email,
-        role: req.body.role
+        role: Number(req.body.role)
     }); 
     my_user.setPassword(req.body.password);
     my_user.save().then((user) => {
@@ -30,7 +30,7 @@ router.put('/:user_id', my_authorize([roleTypes.ADMIN]), (req, res) => {
         if (req.body.email && req.body.email.length > 0)
             user_to_update.email = req.body.email;
         if (req.body.role && req.body.role >= user.roleTypes.ADMIN && req.body.role <= user.roleTypes.WAITER) 
-            user_to_update.role = req.body.role;
+            user_to_update.role = Number(req.body.role);
         if(req.body.password && req.body.password.length >= 6)
             user_to_update?.setPassword(req.body.password);
             

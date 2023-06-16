@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import * as chart from 'chart.js/auto'
 
 import { UsersService, User, RoleTypes } from 'src/app/services/users-services/users.service';
@@ -17,6 +17,7 @@ export class StatsComponent {
   protected tables: Table[] = [];
   protected foods: Food[] = [];
   protected orders: Order[] = [];
+  @Input() total_profit: number = 0;
 
   constructor(private usersService: UsersService, 
               private tablesService: TablesService,

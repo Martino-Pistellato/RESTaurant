@@ -36,14 +36,32 @@ export class FoodsService {
     );
   }
 
-  addFood(food: Food){
-    return this.http.post('https://localhost:3000/foods', food,  createOptions({},this.usersService.token)).pipe(
+  addFood(name:string|null, ingredients: string[], price: number|null, type:FoodTypes|null, prepare_time: number|null){
+    return this.http.post<Food>('https://localhost:3000/foods', {
+      name: name,
+      ingredients: ingredients,
+      price: price,
+      type: type,
+      prepare_time: prepare_time
+    },  createOptions({},this.usersService.token)).pipe(
       catchError(handleError)
     );
   }
 
-  deleteFood(foodID: string){
-    return this.http.delete('https://localhost:3000/foods/' + foodID,  createOptions({},this.usersService.token)).pipe(
+  deleteFood(food_id: string){
+    return this.http.delete('https://localhost:3000/foods/' + food_id,  createOptions({},this.usersService.token)).pipe(
+      catchError(handleError)
+    );
+  }
+
+  updateFood(food_id:string, name:string|null, ingredients: string[], price: number|null, type:FoodTypes|null, prepare_time: number|null){
+    return this.http.patch<Food>('https://localhost:3000/foods/'+food_id,{
+      name: name,
+      ingredients: ingredients,
+      price: price,
+      type: type,
+      prepare_time: prepare_time
+    },createOptions({},this.usersService.token)).pipe(
       catchError(handleError)
     );
   }
