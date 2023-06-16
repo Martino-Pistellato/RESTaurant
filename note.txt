@@ -11,5 +11,6 @@ ordini: get, post
 tavoli: get --> /tables/free oppure /tables/occupied oppure /tables/all in GET  , post --> /tables/id in POST 
 cibo: get, post (solo cuoco)
 
-TODO: notifiche, admin
+TODO:  admin, login required, svuotare i totalworks, note nel cibo
+
 

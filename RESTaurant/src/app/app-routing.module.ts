@@ -9,9 +9,10 @@ import { StatsComponent } from './components/stats-component/stats.component';
 import { UsersComponent } from './components/users-component/users.component';
 
 const routes: Routes = [
-  { path: 'home', component:  HomeComponent },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
+  { path: 'home', component:  HomeComponent },
   { path: 'login', component:  LoginComponent },
+  { path: '**', redirectTo: 'home', pathMatch: 'full' },
   // { path: 'home/orders', component:  OrdersComponent },
   // { path: 'home/tables', component:  TablesComponent },
   // { path: 'home/foods', component:  FoodsComponent },

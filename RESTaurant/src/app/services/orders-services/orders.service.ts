@@ -92,8 +92,6 @@ export class OrdersService {
   }
 
   createOrder(table: Table): Observable<Order>{
-    console.log("inside order creation service")
-    console.log("service passed table: ", table)
     return this.http.post<Order>('https://localhost:3000/orders', {table: table}, createOptions({},this.usersService.token)).pipe(
       catchError(handleError)
     );
@@ -109,6 +107,12 @@ export class OrdersService {
 
   getTotalProfit(): Observable<Profit>{
     return this.http.get<Profit>('https://localhost:3000/orders/totalprofit',  createOptions({},this.usersService.token)).pipe(
+      catchError(handleError)
+    );
+  }
+
+  deleteOrder(order_id: string){
+    return this.http.delete('https://localhost:3000/orders/'+order_id,  createOptions({},this.usersService.token)).pipe(
       catchError(handleError)
     );
   }

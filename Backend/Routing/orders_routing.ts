@@ -72,7 +72,7 @@ router.get('/', my_authorize([]), (req, res) => {
         });
 })
 
-router.get('/all', my_authorize([roleTypes.CASHIER]), (req, res) => {
+router.get('/all', my_authorize([roleTypes.CASHIER, roleTypes.ADMIN]), (req, res) => {
     order.orderModel.find().populate('foods').populate('table').then(orders => res.send(orders))
 })
 

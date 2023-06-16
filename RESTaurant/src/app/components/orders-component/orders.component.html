@@ -20,6 +20,9 @@
                         <button *ngIf="role === 2 || role === 3" mat-raised-button color="primary" (click)="updateOrder(order)"> 
                             START PREPARING 
                         </button>
+                        <button *ngIf="role === 0" mat-stroked-button color="warn" (click)="deleteOrder(order._id)"> 
+                            DELETE 
+                        </button>
                     </mat-expansion-panel>
                 </mat-accordion>
             </mat-expansion-panel>
@@ -45,6 +48,9 @@
                         </p>
                         <button *ngIf="role === 2 || role === 3" mat-raised-button color="primary" (click)="updateOrder(order)"> 
                             READY TO SERVE
+                        </button>
+                        <button *ngIf="role === 0" mat-stroked-button color="warn" (click)="deleteOrder(order._id)"> 
+                            DELETE 
                         </button>
                     </mat-expansion-panel>
                 </mat-accordion>
@@ -72,6 +78,9 @@
                         <button *ngIf="role === 1" mat-raised-button color="primary" (click)="getReceipt(group.main_table)"> 
                             GET RECEIPT 
                         </button>
+                        <button *ngIf="role === 0" mat-stroked-button color="warn" (click)="deleteOrder(order._id)"> 
+                            DELETE 
+                        </button>
                     </mat-expansion-panel>
                 </mat-accordion>
             </mat-expansion-panel>
@@ -97,7 +106,6 @@
         </ul>
     </mat-tab>
 </mat-tab-group>
-
 
 <div class="container" *ngIf="role === 4">
     <p>Selected tables: {{show_selected_tables}}</p>

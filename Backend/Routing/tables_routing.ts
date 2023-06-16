@@ -26,13 +26,24 @@ router.get('/serving', my_authorize([roleTypes.WAITER]), (req, res) => {
     .then(tables => res.send(tables));
 })
 
-router.get('/:table_id', my_authorize([roleTypes.WAITER, roleTypes.COOK, roleTypes.BARMAN, roleTypes.CASHIER]), (req, res) => {
+router.put('/link', my_authorize([roleTypes.WAITER, roleTypes.ADMIN, roleTypes.CASHIER]), (req, res, next) => {
+    let main_table: table.Table = req.body.tables.shift();
+
+    table.tableModel.findById(main_table._id).then(my_table => {
+        my_table?.linked_tables.push(...req.body.tables);
+        my_table?.save().then(saved_table => 
+            table.tableModel.findById(saved_table._id).populate('linked_tables').then(full_table=> res.send(full_table))
+        );        
+    })
+})
+
+router.get('/:table_id', my_authorize([]), (req, res) => {
     table.tableModel.findById(req.params.table_id)
     .populate('linked_tables')
     .then(table => res.send(table));
 })
 
-router.put('/:table_id', my_authorize([roleTypes.ADMIN]), (req, res, next) => { 
+router.patch('/:table_id', my_authorize([roleTypes.ADMIN]), (req, res, next) => { 
     table.tableModel.findById(req.params.table_id).then(my_table => {
         if(req.body.table_number)
             my_table.number = req.body.table_number;

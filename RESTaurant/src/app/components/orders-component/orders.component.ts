@@ -225,6 +225,10 @@ export class OrdersComponent {
     this.ordersService.updateOrder(order).subscribe({ });
   }
 
+  deleteOrder(order_id: string){
+    this.ordersService.deleteOrder(order_id).subscribe();
+  }
+
   addNewOrder(value: string) {
     this.newOrderEvent.emit(value);
   }
