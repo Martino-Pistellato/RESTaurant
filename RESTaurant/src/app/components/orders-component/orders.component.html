@@ -1,7 +1,7 @@
-<mat-tab-group>
-    <mat-tab *ngIf="role !== 4" label="Received Orders">
+<mat-tab-group  mat-stretch-tabs="false" mat-align-tabs="center" style="width:80vw;">
+    <mat-tab *ngIf="role !== 4" label="Received Orders" >
         <mat-accordion *ngIf="receivedGroups.length > 0" style="padding:0 2%">
-            <mat-expansion-panel *ngFor="let group of receivedGroups" hideToggle>
+            <mat-expansion-panel *ngFor="let group of receivedGroups">
                 <mat-expansion-panel-header>
                     <mat-panel-title>
                         Tables: &nbsp;<span *ngFor="let table_number of group.table_numbers">{{table_number}} &nbsp;</span>
@@ -58,7 +58,7 @@
         </mat-accordion>
     </mat-tab>
     <mat-tab *ngIf="role === 0 || role === 1" label="Terminated Orders">
-        <mat-accordion *ngIf="terminatedGroups.length > 0"  style="padding:0 2%">
+        <mat-accordion *ngIf="terminatedGroups.length > 0">
             <mat-expansion-panel *ngFor="let group of terminatedGroups" hideToggle>
                 <mat-expansion-panel-header>
                     <mat-panel-title>
@@ -97,7 +97,7 @@
         </ul>
     </mat-tab>
     <mat-tab *ngIf="role === 4" label="Tables without Orders">
-        <ul *ngIf="tablesWithoutOrders.length > 0" style="padding-top:2%">
+        <ul *ngIf="tablesWithoutOrders.length > 0">
             <li *ngFor="let table of tablesWithoutOrders" style="margin-bottom:2%">
                 <button color="primary" mat-stroked-button (click)="selectTable(table)">
                     TABLES: {{table.number}}

@@ -1,13 +1,13 @@
 <p *ngIf="errmessage">Errore: {{errmessage}}</p>
 <div style="padding: 15px;" class="center-parent">
     <mat-card style="padding: 15px; align-items: center; width: fit-content;">
-        <mat-form-field style="width:30vw">
+        <mat-form-field style="width:60vw">
             <mat-label>Email</mat-label>
             <input matInput type="email" placeholder="example@RESTaurant" [formControl]="emailControl" [(ngModel)]="email" required>
             <mat-error *ngIf="emailControl.invalid">{{getEmailErrorMessage()}}</mat-error>
         </mat-form-field>
 
-        <mat-form-field style="width:30vw">
+        <mat-form-field style="width:60vw">
             <mat-label>Password</mat-label>
             <input [(ngModel)]="password" matInput [type]="hide ? 'password' : 'text'"
                    [formControl]="passwordControl" required>
@@ -18,7 +18,7 @@
         </mat-form-field>
 
         <mat-card-actions >
-            <button style="width:30vw" mat-raised-button color="primary" type="button" [disabled]="emailControl.invalid || passwordControl.invalid" (click)="login(email, password)">LOGIN</button>
+            <button style="width:60vw" mat-raised-button color="primary" type="button" [disabled]="emailControl.invalid || passwordControl.invalid" (click)="login(email, password)">LOGIN</button>
         </mat-card-actions>
     </mat-card>
 </div>
