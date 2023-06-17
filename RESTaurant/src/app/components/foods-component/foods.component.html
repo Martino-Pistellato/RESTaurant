@@ -85,7 +85,8 @@
     [style.color]="selectedFoods.includes(food) ? 'white':'black'">
         <mat-expansion-panel-header>
             <mat-panel-title [style.color]="selectedFoods.includes(food) ? 'white':'black'">
-                {{food.name}}
+                {{food.name}} &nbsp;
+                <span *ngIf="getNumberOfFoods(food._id) > 0"> Selected: {{getNumberOfFoods(food._id)}}</span>
             </mat-panel-title>
         </mat-expansion-panel-header>
         <p>Ingredients:

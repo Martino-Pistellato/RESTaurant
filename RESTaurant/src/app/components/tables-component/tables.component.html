@@ -60,13 +60,13 @@
         </mat-form-field>
 
         <mat-action-row>
-            <button mat-stroked-button color="warn" (click)="deleteTable(table._id)">
+            <button mat-stroked-button color="warn" [disabled]="!table.is_free" (click)="deleteTable(table._id)">
                 DELETE
             </button>
             <button mat-stroked-button color="accent" [disabled]="table.is_free" (click)="changeStatus(table._id, 0)">
                 FREE
             </button>
-            <button mat-stroked-button color="primary" (click)="updateTable(table._id, table_capacity, table_number)">
+            <button mat-stroked-button color="primary" [disabled]="!table.is_free" (click)="updateTable(table._id, table_capacity, table_number)">
                 UPDATE
             </button>
         </mat-action-row>

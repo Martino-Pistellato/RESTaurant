@@ -69,11 +69,13 @@ export class HomeComponent {
           this.openSnackBar(Notifications.NEW_ORDER_PREPARED + response.table_number, 'CLOSE', false);
         }
       });
-    else if (this.role === RoleTypes.CASHIER || this.role === RoleTypes.ADMIN){
+    else if (this.role === RoleTypes.CASHIER){
       this.updateTotalProfit();
       this.socketService.listenToServer(Events.UPDATE_TOTAL_PROFIT).subscribe((data: any) => this.updateTotalProfit());
     }
     else if (this.role === RoleTypes.ADMIN){
+      this.updateTotalProfit();
+      this.socketService.listenToServer(Events.UPDATE_TOTAL_PROFIT).subscribe((data: any) => this.updateTotalProfit());
       this.socketService.listenToServer(Events.UPDATE_USERS_LIST).subscribe((data: any) => {
         this.notifications.unshift(Notifications.USER_LIST_UPDATED)
         this.openSnackBar(Notifications.USER_LIST_UPDATED, 'CLOSE', false);

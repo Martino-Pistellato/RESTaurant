@@ -95,4 +95,8 @@ export class FoodsComponent {
     this.food_type = null;
     this.prepare_time = null;
   }
+
+  getNumberOfFoods(food_id: string){
+    return this.selectedFoods.filter(food => food._id === food_id).length;
+  }
 }
