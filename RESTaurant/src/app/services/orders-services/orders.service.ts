@@ -57,26 +57,19 @@ export class OrdersService {
 
   constructor(private http: HttpClient, private usersService: UsersService) { }
 
-  updateOrder(firstItem: Food[] | Order | string): Observable<Order>{
-    if (this.usersService.role === RoleTypes.WAITER)
-      return this.http.put<Order>('https://localhost:3000/orders', {
-        order_id: this.selectedOrder,
-        foods: firstItem as Food[],
-      }, createOptions({}, this.usersService.token)).pipe(
-        catchError(handleError)
-      );
-    else if (this.usersService.role === RoleTypes.COOK || this.usersService.role === RoleTypes.BARMAN){
+  updateOrder(firstItem: Order | string): Observable<Order>{
+    if (this.usersService.role === RoleTypes.COOK || this.usersService.role === RoleTypes.BARMAN)
       return this.http.put<Order>('https://localhost:3000/orders', {
         order_id: (firstItem as Order)._id
       }, createOptions({},this.usersService.token)).pipe(
         catchError(handleError)
-      );}
-    else{
+      );
+    else
       return this.http.put<Order>('https://localhost:3000/orders', {
         order_id: (firstItem as string)
       }, createOptions({},this.usersService.token)).pipe(
         catchError(handleError)
-      );}
+      );
   }
 
   getOrders(): Observable<Order[]>{
@@ -91,8 +84,11 @@ export class OrdersService {
     );
   }
 
-  createOrder(table: Table): Observable<Order>{
-    return this.http.post<Order>('https://localhost:3000/orders', {table: table}, createOptions({},this.usersService.token)).pipe(
+  createOrder(table: Table, foods: Food[]): Observable<Order>{
+    return this.http.post<Order>('https://localhost:3000/orders', {
+      table: table,
+      foods: foods
+    }, createOptions({},this.usersService.token)).pipe(
       catchError(handleError)
     );
   }

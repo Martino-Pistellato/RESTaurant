@@ -1,12 +1,13 @@
 import { Component, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
+import { BreakpointObserver } from '@angular/cdk/layout';
 
 import { UsersService, RoleTypes } from '../../services/users-services/users.service';
 import { OrdersService } from 'src/app/services/orders-services/orders.service';
 import { SocketService } from 'src/app/services/socket-services/socket.service';
 import { Events } from 'src/app/utils';
+import { Table } from 'src/app/services/tables-services/tables.service';
 
 export const Notifications = {
   NEW_ORDER_RECEIVED: 'A new order has arrived',
@@ -26,6 +27,7 @@ export class HomeComponent {
   protected notifications: string[] = [];
   loadedModule?: string;
   order_id: string = '';
+  selected_table: Table|null = null;
   mobile_screen: boolean;
   public innerWidth: any;
 
@@ -39,8 +41,7 @@ export class HomeComponent {
                private orderService: OrdersService,
                private socketService: SocketService,
                private router: Router, 
-               private snackBar: MatSnackBar,
-               private breakpointObserver: BreakpointObserver) {
+               private snackBar: MatSnackBar) {
                 if (!this.userService.isLogged()) this.router.navigate(['login']);
                 this.innerWidth = window.innerWidth;
                 this.mobile_screen = this.innerWidth <= 780;
@@ -83,8 +84,8 @@ export class HomeComponent {
     }
   }
 
-  addOrder(newOrder: string) {
-    this.order_id = newOrder;
+  addOrder(table: Table) {
+    this.selected_table = table;
     this.loadedModule = 'foods';
   }
 

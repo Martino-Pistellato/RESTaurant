@@ -28,12 +28,12 @@
             <mat-panel-title>Create new table</mat-panel-title>
         </mat-expansion-panel-header>
         
-        <mat-form-field style="width:20vw; padding-left:10px;">
+        <mat-form-field style="padding-left:10px;" [style.width]="(is_mobile) ? '35vw' : '20vw'">
             <mat-label>Number</mat-label>
             <input matInput [(ngModel)]="table_number" placeholder="table number" type="number" required min="1">
         </mat-form-field>
 
-        <mat-form-field style="width:20vw">
+        <mat-form-field [style.width]="(is_mobile) ? '35vw' : '20vw'">
             <mat-label>Capacity</mat-label>
             <input [(ngModel)]="table_capacity" matInput placeholder="table capacity" type="number" required min="1">
         </mat-form-field>
@@ -49,12 +49,12 @@
             <mat-panel-title>Table {{table.number}}</mat-panel-title>
         </mat-expansion-panel-header>
         
-        <mat-form-field style="width:20vw; padding-left:10px;">
+        <mat-form-field style="padding-left:10px;" [style.width]="(is_mobile) ? '35vw' : '20vw'">
             <mat-label>Number</mat-label>
             <input matInput [(ngModel)]="table_number" placeholder="table.number" type="number" min="1">
         </mat-form-field>
 
-        <mat-form-field style="width:20vw">
+        <mat-form-field [style.width]="(is_mobile) ? '35vw' : '20vw'">
             <mat-label>Capacity</mat-label>
             <input [(ngModel)]="table_capacity" matInput placeholder="table.capacity" type="number" min="1">
         </mat-form-field>

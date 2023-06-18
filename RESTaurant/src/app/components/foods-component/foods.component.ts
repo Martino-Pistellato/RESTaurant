@@ -6,6 +6,7 @@ import { OrdersService } from 'src/app/services/orders-services/orders.service';
 import { UsersService, RoleTypes } from 'src/app/services/users-services/users.service';
 import { SocketService } from 'src/app/services/socket-services/socket.service';
 import { Events } from 'src/app/utils';
+import { Table } from 'src/app/services/tables-services/tables.service';
 
 @Component({
   selector: 'app-foods',
@@ -24,7 +25,8 @@ export class FoodsComponent {
   name: string|null = null;
   new_food_ingredients: string[] = [];
 
-  @Input() order_id: string = '';
+  @Input() is_mobile: boolean = false;
+  @Input() table: Table|null = null;
   @Output() changeModuleEvent = new EventEmitter<string>();
 
   constructor(private _foodService: FoodsService,
@@ -49,12 +51,20 @@ export class FoodsComponent {
     else this.selectedFoods.splice(this.selectedFoods.indexOf(food),1);
   }
 
-  updateOrder(){
-    this._orderService.updateOrder(this.selectedFoods)
-    .subscribe(()=> this.addNewOrder() );
+  createOrder(){
+    let selectedDrinks = this.selectedFoods.filter(food => food.type === FoodTypes.DRINK);
+    let selectedFoods = this.selectedFoods.filter(food => food.type !== FoodTypes.DRINK);
+
+    if (selectedDrinks.length > 0)
+      this._orderService.createOrder((this.table as Table), selectedDrinks).subscribe(() => {
+        if (selectedFoods.length > 0)
+          this._orderService.createOrder((this.table as Table), selectedFoods).subscribe(() => this.changePage());
+      });
+    else if (selectedFoods.length > 0)
+      this._orderService.createOrder((this.table as Table), selectedFoods).subscribe(()=> this.changePage());
   }
 
-  addNewOrder() {
+  changePage() {
     this.changeModuleEvent.emit('orders');
   }
 

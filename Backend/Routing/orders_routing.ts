@@ -15,7 +15,7 @@ router.get('/', my_authorize([]), (req, res) => {
             let my_orders: order.Order[] = [];
             orders.forEach(order => {
                 if (order.status !== orderStatus.TERMINATED && (order.cook_id === null || order.cook_id === req.auth.id)){
-                    let my_foods = order.foods;
+                    let my_foods = [...order.foods];
                     order.queue_time = 0;
 
                     my_foods.forEach(food => {
@@ -33,7 +33,8 @@ router.get('/', my_authorize([]), (req, res) => {
                         }
                     })
 
-                    my_orders.push(order);
+                    if (order.foods.length > 0)
+                        my_orders.push(order);
                 }
             });
 
@@ -147,11 +148,24 @@ router.post('/', my_authorize([roleTypes.WAITER]), (req, res) => {
     else {
         let my_table = req.body.table;
         let my_covers = my_table.occupancy;
+        let my_foods = [...req.body.foods];
         if (my_table.linked_tables.length > 0)
             my_table.linked_tables.forEach(table => my_covers += table.occupancy ); 
         
-        let my_order = order.newOrder({ table: my_table, covers: my_covers });
+        let my_order = order.newOrder({ 
+            table:  my_table, 
+            covers: my_covers, 
+            foods:  my_foods
+        });
+
+        my_order.status = orderStatus.RECEIVED;
         my_order.save().then((order) => { 
+            let has_food = order.foods.some(food => food['type'] !== foodTypes.DRINK);
+            
+            if (has_food) get_socket().emit(Events.NEW_ORDER_RECEIVED, roleTypes.COOK);
+            else get_socket().emit(Events.NEW_ORDER_RECEIVED, roleTypes.BARMAN);
+            get_socket().emit(Events.UPDATE_ORDERS_LIST);
+
             userModel.findById(req.auth.id).then((user) => {
                 user.totalWorks.push(order._id);
                 user.save().then(data=>res.send(order));
@@ -160,7 +174,7 @@ router.post('/', my_authorize([roleTypes.WAITER]), (req, res) => {
     }
 })
 
-router.put('/', my_authorize([roleTypes.COOK, roleTypes.BARMAN, roleTypes.CASHIER, roleTypes.WAITER]), (req, res) => {
+router.put('/', my_authorize([roleTypes.COOK, roleTypes.BARMAN, roleTypes.CASHIER]), (req, res) => {
     order.orderModel.findById(req.body.order_id).populate('table').then((selected_order) => {
         let my_order = selected_order as order.Order;
         if (req.auth.role === roleTypes.COOK || req.auth.role === roleTypes.BARMAN){
@@ -184,25 +198,6 @@ router.put('/', my_authorize([roleTypes.COOK, roleTypes.BARMAN, roleTypes.CASHIE
                         });
                         res.send(order_saved);
                     }));
-                }); //maybe add a notification for the waiter
-            }
-        }
-        else if (req.auth.role === roleTypes.WAITER){
-            if (req.body.foods.length === 0)
-                return res.status(500).json({ error: true, errormessage: "No foods or beverages selected" });
-            else {
-                my_order.foods.push(...req.body.foods);
-                my_order.status = orderStatus.RECEIVED;
-                my_order.save().then((order) => { 
-                    get_socket().emit(Events.UPDATE_ORDERS_LIST);
-                    let has_food = false, has_drink = false;
-                    has_food = order.foods.some(food => food['type'] !== foodTypes.DRINK);
-                    has_drink = order.foods.some(food => food['type'] === foodTypes.DRINK);
-                    if (has_food)
-                        get_socket().emit(Events.NEW_ORDER_RECEIVED, roleTypes.COOK);
-                    if (has_drink)
-                        get_socket().emit(Events.NEW_ORDER_RECEIVED, roleTypes.BARMAN);
-                    res.send(order); 
                 });
             }
         }

@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter  } from '@angular/core';
+import { Component, Output, EventEmitter, Input  } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 
@@ -38,7 +38,8 @@ export class OrdersComponent {
   protected preparingGroups: Group[] = [];
   protected terminatedGroups: Group[] = [];
 
-  @Output() newOrderEvent = new EventEmitter<string>();
+  @Input()  is_mobile: boolean = false;
+  @Output() newOrderEvent = new EventEmitter<Table>();
   
   constructor(private tablesService: TablesService, 
               private ordersService: OrdersService,
@@ -207,18 +208,11 @@ export class OrdersComponent {
 
   createOrder(): void{
     if (this.selectedTables.length === 1)
-      this.ordersService.createOrder((this.selectedTables.at(0) as Table)).subscribe(order => {
-        this.ordersService.selectedOrder = order._id;
-        this.addNewOrder(order._id);
-      });
-    else {
+      this.addNewOrder(this.selectedTables[0]);
+    else 
       this.tablesService.linkTables(this.selectedTables).subscribe(main_table =>{
-        this.ordersService.createOrder(main_table).subscribe(order => {
-          this.ordersService.selectedOrder = order._id;
-          this.addNewOrder(order._id);
-        })}
-      );
-    }
+          this.addNewOrder(main_table);
+      })
   }
 
   updateOrder(order: Order): void{
@@ -229,7 +223,7 @@ export class OrdersComponent {
     this.ordersService.deleteOrder(order_id).subscribe();
   }
 
-  addNewOrder(value: string) {
+  addNewOrder(value: Table) {
     this.newOrderEvent.emit(value);
   }
 

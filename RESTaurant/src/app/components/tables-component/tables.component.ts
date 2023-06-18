@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { Router } from '@angular/router';
 
@@ -18,6 +18,7 @@ export class TablesComponent {
   protected role: RoleTypes;
   protected table_number: number | null = null;
   protected table_capacity: number | null = null;
+  @Input() is_mobile: boolean = false;
 
   constructor(private tablesService: TablesService, private usersService: UsersService, 
               private socketService: SocketService, private router: Router,

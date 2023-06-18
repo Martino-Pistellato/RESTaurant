@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { UsersService, RoleTypes } from '../../services/users-services/users.service';
+import { Component, HostListener } from '@angular/core';
+import { UsersService } from '../../services/users-services/users.service';
 import { Router } from '@angular/router';
 import { FormControl, Validators } from '@angular/forms';
 
@@ -10,12 +10,17 @@ import { FormControl, Validators } from '@angular/forms';
 })
 export class LoginComponent {
   public errmessage: string | undefined = undefined;
-  //public role: RoleTypes | null = null;
   protected email:string = '';
   protected password: string = '';
   public emailControl: FormControl;
   public passwordControl: FormControl;
-  hide:boolean=true;
+  hide:boolean = true;
+  is_mobile: boolean;
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event:any) {
+    this.is_mobile = event.target.innerWidth <= 780;
+  }
 
   getEmailErrorMessage() {
     return  this.emailControl.hasError('required') ? 'Email must be provided' : 
@@ -32,6 +37,7 @@ export class LoginComponent {
   constructor( private us: UsersService, private router: Router  ) { 
     this.emailControl = new FormControl('', [Validators.required, Validators.email]);
     this.passwordControl = new FormControl('', [Validators.required, Validators.minLength(6)]);
+    this.is_mobile = window.innerWidth <= 780;
   }
 
   ngOnInit() {

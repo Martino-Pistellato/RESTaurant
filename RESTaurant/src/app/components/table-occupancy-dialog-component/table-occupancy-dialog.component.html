@@ -1,20 +1,17 @@
 <p mat-dialog-title>Select the seats</p>
+<mat-form-field style="padding-left:1%">
+    <mat-label>Max number of occupied seats: {{data.table.capacity}}</mat-label>
+    <input matInput type="number" placeholder=1 [formControl]="occupancyControl" [(ngModel)]="data.occupancy" required min="1">
+    <mat-error *ngIf="occupancyControl.invalid">{{getErrorMessage()}}</mat-error>
+</mat-form-field>
 
-<mat-dialog-actions>
-    <mat-form-field>
-        <mat-label>Max number of occupied seats: {{data.table.capacity}}</mat-label>
-        <input matInput type="number" placeholder=1 [formControl]="occupancyControl" [(ngModel)]="data.occupancy" required min="1">
-        <mat-error *ngIf="occupancyControl.invalid">{{getErrorMessage()}}</mat-error>
-    </mat-form-field>
-    <mat-dialog-content>
-        <button mat-stroked-button color="primary" (click)="close()">
-            CANCEL
-        </button>
-        <button mat-raised-button color="primary" 
-                [disabled]="occupancyControl.invalid" 
-                [mat-dialog-close]="data.occupancy">
-            CONFIRM
-        </button>
-    </mat-dialog-content>
-    
+<mat-dialog-actions align="end">
+    <button mat-stroked-button color="primary" (click)="close()">
+        CANCEL
+    </button>
+    <button mat-raised-button color="primary" 
+            [disabled]="occupancyControl.invalid" 
+            [mat-dialog-close]="data.occupancy">
+        CONFIRM
+    </button>
 </mat-dialog-actions>

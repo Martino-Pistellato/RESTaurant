@@ -1,4 +1,4 @@
-<mat-tab-group  mat-stretch-tabs="false" mat-align-tabs="center" style="width:80vw;">
+<mat-tab-group  mat-stretch-tabs="false" mat-align-tabs="center" [style.width]="(is_mobile) ? '85vw' : '65vw'">
     <mat-tab *ngIf="role !== 4" label="Received Orders" >
         <mat-accordion *ngIf="receivedGroups.length > 0" style="padding:0 2%">
             <mat-expansion-panel *ngFor="let group of receivedGroups">

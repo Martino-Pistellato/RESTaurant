@@ -4,18 +4,18 @@
             <mat-panel-title>Create new user</mat-panel-title>
         </mat-expansion-panel-header>
         
-        <mat-form-field style="width:20vw; padding-left:10px;">
+        <mat-form-field style="padding-left:10px;" [style.width]="(is_mobile) ? '35vw' : '20vw'">
             <mat-label>Name</mat-label>
             <input matInput [(ngModel)]="name" placeholder="Mario Rossi" required [formControl]="nameControl">
         </mat-form-field>
 
-        <mat-form-field style="width:20vw">
+        <mat-form-field [style.width]="(is_mobile) ? '35vw' : '20vw'">
             <mat-label>Email</mat-label>
             <input [(ngModel)]="email" matInput placeholder="mario@role.RESTaurant.it" type="email" required
                    [formControl]="emailControl">
         </mat-form-field>
 
-        <mat-form-field style="width: 20vw">
+        <mat-form-field [style.width]="(is_mobile) ? '35vw' : '20vw'">
             <mat-label>Role</mat-label>
             <mat-select matNativeControl [(ngModel)]="role" required [formControl]="roleControl">
               <mat-option value="0">Admin</mat-option>
@@ -26,7 +26,7 @@
             </mat-select>
         </mat-form-field>
 
-        <mat-form-field style="width: 20vw">
+        <mat-form-field [style.width]="(is_mobile) ? '35vw' : '20vw'">
             <mat-label>Password</mat-label>
             <input [(ngModel)]="password" matInput [type]="hide ? 'password' : 'text'" required
                    [formControl]="passwordControl">
@@ -47,17 +47,17 @@
             <mat-panel-title>{{user.name}}</mat-panel-title>
         </mat-expansion-panel-header>
         
-        <mat-form-field style="width:20vw; padding-left:10px;">
+        <mat-form-field style="padding-left:10px;" [style.width]="(is_mobile) ? '35vw' : '20vw'">
             <mat-label>Name</mat-label>
             <input matInput [(ngModel)]="name" placeholder="user.name">
         </mat-form-field>
 
-        <mat-form-field style="width:20vw">
+        <mat-form-field [style.width]="(is_mobile) ? '35vw' : '20vw'">
             <mat-label>Email</mat-label>
             <input [(ngModel)]="email" matInput placeholder="user.email" type="email">
         </mat-form-field>
 
-        <mat-form-field style="width: 20vw">
+        <mat-form-field [style.width]="(is_mobile) ? '35vw' : '20vw'">
             <mat-label>Role</mat-label>
             <mat-select matNativeControl [(ngModel)]="role" >
               <mat-option value="" selected></mat-option>
@@ -69,7 +69,7 @@
             </mat-select>
         </mat-form-field>
 
-        <mat-form-field style="width: 20vw">
+        <mat-form-field [style.width]="(is_mobile) ? '35vw' : '20vw'">
             <mat-label>Password</mat-label>
             <input [(ngModel)]="password" matInput [type]="hide ? 'password' : 'text'">
             <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">

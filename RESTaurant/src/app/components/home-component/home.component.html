@@ -26,10 +26,10 @@
                 <tr>
                     <mat-card>
                         <mat-card-content>
-                            <app-orders (newOrderEvent)="addOrder($event)" *ngIf="loadedModule === 'orders'"></app-orders>
-                            <app-tables *ngIf="loadedModule === 'tables'" ></app-tables>
-                            <app-foods (changeModuleEvent)="changeModuleEvent($event)" [order_id] = "order_id" *ngIf="loadedModule === 'foods'"></app-foods>
-                            <app-users *ngIf="loadedModule === 'users'"></app-users>
+                            <app-orders (newOrderEvent)="addOrder($event)" [is_mobile] = "mobile_screen" *ngIf="loadedModule === 'orders'"></app-orders>
+                            <app-tables *ngIf="loadedModule === 'tables'" [is_mobile] = "mobile_screen"></app-tables>
+                            <app-foods (changeModuleEvent)="changeModuleEvent($event)" [is_mobile] = "mobile_screen" [table]="selected_table" *ngIf="loadedModule === 'foods'"></app-foods>
+                            <app-users *ngIf="loadedModule === 'users'" [is_mobile] = "mobile_screen"></app-users>
                             <app-stats [total_profit] = "profit" *ngIf="loadedModule === 'stats'"></app-stats>
                         </mat-card-content>
                     </mat-card>

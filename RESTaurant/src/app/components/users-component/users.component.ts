@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormControl, Validators } from '@angular/forms';
 
@@ -24,6 +24,8 @@ export class UsersComponent {
   protected passwordControl: FormControl;
   protected nameControl: FormControl;
   protected roleControl: FormControl;
+
+  @Input() is_mobile: boolean = false;
 
   constructor(private socketService: SocketService, 
               private usersService: UsersService,

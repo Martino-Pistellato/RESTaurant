@@ -17,15 +17,16 @@
 
         <div *ngIf="role === 0">
             <div>
-                <mat-form-field style="width: 20vw; margin-right: 2%;">
+                <mat-form-field style="margin-right: 2%;" [style.width]="(is_mobile) ? '45vw' : '20vw'">
                     <mat-label>Ingredients</mat-label>
                     <mat-select matNativeControl [(ngModel)]="remove_ingredient">
-                    <mat-option *ngFor="let ingredient of new_food_ingredients" value={{ingredient}} >
-                        {{ingredient}}
-                    </mat-option>
+                        <mat-option value='' > </mat-option>
+                        <mat-option *ngFor="let ingredient of new_food_ingredients" value={{ingredient}} >
+                            {{ingredient}}
+                        </mat-option>
                     </mat-select>
                 </mat-form-field>
-                <button mat-stroked-button color = "warn" style = "width: 20vw"
+                <button mat-stroked-button color = "warn" [style.width]="(is_mobile) ? '25vw' : '20vw'"
                         [disabled]="remove_ingredient===''" 
                         (click)="toggleIngredient(remove_ingredient, null)"> 
                     REMOVE
@@ -33,18 +34,18 @@
             </div>
         
             <div>
-                <mat-form-field style="width:20vw; margin-right: 2%;">
+                <mat-form-field style="margin-right: 2%;" [style.width]="(is_mobile) ? '45vw' : '20vw'">
                     <mat-label>New Ingredient</mat-label>
                     <input [(ngModel)]="add_ingredient" matInput>
                 </mat-form-field>
-                <button mat-stroked-button color="primary" style="width: 20vw"
+                <button mat-stroked-button color="primary" [style.width]="(is_mobile) ? '25vw' : '20vw'"
                         [disabled]="add_ingredient===''" 
                         (click)="toggleIngredient(add_ingredient, null)"> 
                     ADD 
                 </button>
             </div>
 
-            <mat-form-field style="width: 20vw; margin-right: 2%;">
+            <mat-form-field style="margin-right: 2%;" [style.width]="(is_mobile) ? '35vw' : '20vw'">
                 <mat-label>Food type</mat-label>
                 <mat-select matNativeControl [(ngModel)]="food_type" required>
                     <mat-option value=0>Appetizer</mat-option>
@@ -56,17 +57,17 @@
                 </mat-select>
             </mat-form-field>
 
-            <mat-form-field style="width:20vw; margin-right: 2%;">
+            <mat-form-field style="margin-right: 2%;" [style.width]="(is_mobile) ? '35vw' : '20vw'">
                 <mat-label>Name</mat-label>
                 <input [(ngModel)]="name" matInput type="text" required>
             </mat-form-field>
 
-            <mat-form-field style="width:20vw; margin-right: 2%;">
+            <mat-form-field style="margin-right: 2%;" [style.width]="(is_mobile) ? '35vw' : '20vw'">
                 <mat-label>Price</mat-label>
                 <input [(ngModel)]="price" matInput type="number" min="1" required>
             </mat-form-field>
 
-            <mat-form-field style="width:20vw">
+            <mat-form-field [style.width]="(is_mobile) ? '35vw' : '20vw'">
                 <mat-label>Prepare time in min</mat-label>
                 <input [(ngModel)]="prepare_time" matInput type="number" min="1" required>
             </mat-form-field>
@@ -99,15 +100,16 @@
 
         <div *ngIf="role === 0">
             <div>
-                <mat-form-field style="width: 20vw; margin-right: 2%;">
+                <mat-form-field style="margin-right: 2%;" [style.width]="(is_mobile) ? '45vw' : '20vw'">
                     <mat-label>Ingredients</mat-label>
                     <mat-select matNativeControl [(ngModel)]="remove_ingredient">
+                    <mat-option value='' > </mat-option>
                     <mat-option *ngFor="let ingredient of food.ingredients" value={{ingredient}} >
                         {{ingredient}}
                     </mat-option>
                     </mat-select>
                 </mat-form-field>
-                <button mat-stroked-button color = "warn" style = "width: 20vw"
+                <button mat-stroked-button color = "warn" [style.width]="(is_mobile) ? '25vw' : '20vw'"
                         [disabled]="remove_ingredient===''" 
                         (click)="toggleIngredient(remove_ingredient, food._id)"> 
                     REMOVE
@@ -115,18 +117,18 @@
             </div>
         
             <div>
-                <mat-form-field style="width:20vw; margin-right: 2%;">
+                <mat-form-field style="margin-right: 2%;"  [style.width]="(is_mobile) ? '45vw' : '20vw'">
                     <mat-label>New Ingredient</mat-label>
                     <input [(ngModel)]="add_ingredient" matInput>
                 </mat-form-field>
-                <button mat-stroked-button color="primary" style="width: 20vw"
+                <button mat-stroked-button color="primary"  [style.width]="(is_mobile) ? '25vw' : '20vw'"
                         [disabled]="add_ingredient===''" 
                         (click)="toggleIngredient(add_ingredient, food._id)"> 
                     ADD 
                 </button>
             </div>
 
-            <mat-form-field style="width: 20vw; margin-right: 2%;">
+            <mat-form-field style="margin-right: 2%;" [style.width]="(is_mobile) ? '35vw' : '20vw'">
                 <mat-label>Food type</mat-label>
                 <mat-select matNativeControl [(ngModel)]="food_type">
                     <mat-option value=0>Appetizer</mat-option>
@@ -138,17 +140,17 @@
                 </mat-select>
             </mat-form-field>
 
-            <mat-form-field style="width:20vw; margin-right: 2%;">
+            <mat-form-field style="margin-right: 2%;" [style.width]="(is_mobile) ? '35vw' : '20vw'">
                 <mat-label>Name</mat-label>
                 <input [(ngModel)]="name" matInput placeholder={{food.name}} type="text">
             </mat-form-field>
 
-            <mat-form-field style="width:20vw; margin-right: 2%;">
+            <mat-form-field style="margin-right: 2%;"  [style.width]="(is_mobile) ? '35vw' : '20vw'">
                 <mat-label>Price</mat-label>
                 <input [(ngModel)]="price" matInput placeholder={{food.price}} type="number" min="1">
             </mat-form-field>
 
-            <mat-form-field style="width:20vw">
+            <mat-form-field [style.width]="(is_mobile) ? '35vw' : '20vw'">
                 <mat-label>Prepare time in min</mat-label>
                 <input [(ngModel)]="prepare_time" matInput placeholder={{food.prepare_time}} type="number" min="1">
             </mat-form-field>
@@ -174,7 +176,7 @@
 </mat-accordion>
 
 <mat-action-row>
-    <button *ngIf="role === 4" [disabled]="selectedFoods.length <= 0" mat-raised-button color="primary" (click)="updateOrder()">
+    <button *ngIf="role === 4" [disabled]="selectedFoods.length <= 0" mat-raised-button color="primary" (click)="createOrder()">
         ADD TO ORDER
     </button>
 </mat-action-row>
