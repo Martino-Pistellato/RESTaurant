@@ -49,7 +49,7 @@ router.get('/', my_authorize([]), (req, res) => {
             let my_orders: order.Order[] = [];
 
             orders.forEach((my_order) => {
-                if (!my_order.is_payed)// && (new Date(my_order.insertion_date as Date).setHours(0, 0, 0, 0) >= new Date().setHours(0, 0, 0, 0)))
+                if (!my_order.is_payed && my_order.table !== null)// && (new Date(my_order.insertion_date as Date).setHours(0, 0, 0, 0) >= new Date().setHours(0, 0, 0, 0)))
                     my_orders.push(my_order);
             });
 

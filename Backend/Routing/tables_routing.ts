@@ -77,18 +77,6 @@ router.put('/', my_authorize([roleTypes.WAITER, roleTypes.ADMIN, roleTypes.CASHI
         } catch (error: any) {
             return res.status(500).json({ error: true, errormessage: error.message });
         }
-        
-    })
-})
-
-router.put('/link', my_authorize([roleTypes.WAITER, roleTypes.ADMIN, roleTypes.CASHIER]), (req, res, next) => {
-    let main_table: table.Table = req.body.tables.shift();
-
-    table.tableModel.findById(main_table._id).then(my_table => {
-        my_table?.linked_tables.push(...req.body.tables);
-        my_table?.save().then(saved_table => 
-            table.tableModel.findById(saved_table._id).populate('linked_tables').then(full_table=> res.send(full_table))
-        );        
     })
 })
 

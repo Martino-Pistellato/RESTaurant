@@ -45,14 +45,8 @@ server.listen(3000, () => console.log("HTTPS Server started on port 3000"));
 set_socket(server);
 let io = get_socket();
 
-io.on('connection', (socket: any) => {
-    console.log("connected to the socket")
-})
-
 passport.use( new passportHTTP.BasicStrategy(
     function(email: string, password: string, done: Function) {
-        console.log("New login attempt from " + email );
-
         userModel.findOne({ email: email }).then((user)=>{
             if( !user ) 
                 return done(null,false,{statusCode: 500, error: true, errormessage:"Invalid user"});

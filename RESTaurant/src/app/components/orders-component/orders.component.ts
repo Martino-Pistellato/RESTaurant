@@ -1,6 +1,6 @@
 import { Component, Output, EventEmitter, Input  } from '@angular/core';
-import { Router } from '@angular/router';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { ReceiptDialogComponent } from '../receipt-dialog-component/receipt-dialog.component';
 import { TablesService, Table } from 'src/app/services/tables-services/tables.service';
@@ -44,8 +44,8 @@ export class OrdersComponent {
   constructor(private tablesService: TablesService, 
               private ordersService: OrdersService,
               private usersService: UsersService, 
-              private socketService: SocketService,
-              private router: Router,
+              private socketService: SocketService, 
+              private snackBar: MatSnackBar,
               private dialog: MatDialog) {
     this.role = this.usersService.role;
   }
@@ -62,6 +62,7 @@ export class OrdersComponent {
   }
 
   updateServingTablesList(){
+    if(this.usersService.role !== RoleTypes.WAITER) return;
     this.tablesService.getServingTables().subscribe(tables => {
       this.myTables = tables;
       this.ordersService.getOrders().subscribe(orders => {
@@ -244,6 +245,17 @@ export class OrdersComponent {
   }
 
   getReceipt(table: Table){
-    this.ordersService.getReceipt(table).subscribe((receipt)=>this.openDialog(receipt));
+    let unfinished = this.preparingGroups.some(group => group.main_table._id === table._id);
+    unfinished = unfinished || this.receivedGroups.some(group => group.main_table._id === table._id);
+    if (!unfinished)
+      this.ordersService.getReceipt(table).subscribe((receipt)=>this.openDialog(receipt));
+    else 
+      this.openSnackBar('Cannot pay an order which is not terminated','CLOSE');
+  }
+
+  openSnackBar(message: string, action: string) {
+    this.snackBar.open(message, action,{
+      verticalPosition:'top'
+    });
   }
 }

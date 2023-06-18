@@ -14,7 +14,7 @@
     <p>Total: {{data.receipt.total}}</p>
 </mat-dialog-content>
 
-<mat-dialog-actions>
-    <button mat-button (click)="close()">CLOSE</button>
-    <button mat-button (click)="pay(data.receipt.order)">PAY</button>
+<mat-dialog-actions align="end">
+    <button mat-stroked-button color="warn" (click)="close()">CLOSE</button>
+    <button mat-raised-button color="primary" (click)="pay(data.receipt.order)">PAY</button>
 </mat-dialog-actions>

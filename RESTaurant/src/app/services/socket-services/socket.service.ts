@@ -16,7 +16,6 @@ export class SocketService {
     this.socket = io('https://localhost:3000');
     return new Observable( (observer) => {
       this.socket.on(connection, (arg: any) => {
-        console.log('Socket.io message received: ' + JSON.stringify(arg));
         observer.next(arg);
       });
 
