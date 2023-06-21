@@ -1,7 +1,8 @@
 import { Component, HostListener } from '@angular/core';
-import { UsersService } from '../../services/users-services/users.service';
+import { RoleTypes, UsersService } from '../../services/users-services/users.service';
 import { Router } from '@angular/router';
 import { FormControl, Validators } from '@angular/forms';
+import { OrdersService } from 'src/app/services/orders-services/orders.service';
 
 @Component({
   selector: 'app-login',
@@ -34,7 +35,7 @@ export class LoginComponent {
             'Unknown error';
   }
 
-  constructor( private us: UsersService, private router: Router  ) { 
+  constructor( private us: UsersService, private router: Router, private orderService:OrdersService) { 
     this.emailControl = new FormControl('', [Validators.required, Validators.email]);
     this.passwordControl = new FormControl('', [Validators.required, Validators.minLength(6)]);
     this.is_mobile = window.innerWidth <= 780;
@@ -48,6 +49,8 @@ export class LoginComponent {
     this.us.login(mail, password).subscribe({
       next: (d) => {
         console.log('Login granted: ' + JSON.stringify(d));
+        if(this.us.role === RoleTypes.ADMIN || this.us.role === RoleTypes.CASHIER)
+          this.orderService.deleteOld().subscribe();
         this.errmessage = undefined;
         this.router.navigate(['home']);
       },

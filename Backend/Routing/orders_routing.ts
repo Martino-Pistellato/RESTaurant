@@ -230,11 +230,28 @@ router.put('/', my_authorize([roleTypes.COOK, roleTypes.BARMAN, roleTypes.CASHIE
     });
 })
 
-router.delete('/:orderId', my_authorize([roleTypes.ADMIN]), (req, res) => {
-    order.orderModel.findByIdAndDelete(req.params.order_id).then(order => {
-        get_socket().emit(Events.UPDATE_ORDERS_LIST);
-        res.send(order)
-    });
+router.delete('/:order_id', my_authorize([roleTypes.ADMIN, roleTypes.CASHIER]), (req, res) => {
+    if (req.params.order_id !== 'old'){
+        if(req.auth.role === roleTypes.ADMIN)
+            order.orderModel.findByIdAndDelete(req.params.order_id).then(order => {
+                get_socket().emit(Events.UPDATE_ORDERS_LIST);
+                res.send(order)
+            });
+        else return res.status(401).json({ 
+            error: true, 
+            errormessage: "Unauthorized" 
+        });
+    }
+    else {
+        order.orderModel.find().then(async orders => {
+            await order.orderModel.deleteMany({_id: { $in: [...orders.filter(ord => {
+                return ((new Date()).valueOf() - ord.insertion_date.valueOf() >= 1209600000)  //1.209.600.000 is two weeks in milliseconds
+                        && ord.is_payed;        
+            }).map(ord => ord._id)] }});
+
+            res.send({message: "Deleted older orders"})
+        });
+    }
 })
 
 export default router;

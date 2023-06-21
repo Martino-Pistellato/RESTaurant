@@ -112,4 +112,10 @@ export class OrdersService {
       catchError(handleError)
     );
   }
+
+  deleteOld(){
+    return this.http.delete('https://localhost:3000/orders/old', createOptions({},this.usersService.token)).pipe(
+      catchError(handleError)
+    );
+  }
 }
