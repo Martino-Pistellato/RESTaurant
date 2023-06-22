@@ -4,6 +4,7 @@ import * as https from 'https'
 
 //In this file we define some useful data/method used in different points of the application's backend
 
+const result = require('dotenv').config();
 const { expressjwt: jwt } = require('express-jwt');
 const auth = jwt({
     secret: process.env.JWT_SECRET, 
