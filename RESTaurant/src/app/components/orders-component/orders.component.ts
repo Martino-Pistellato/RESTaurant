@@ -124,7 +124,7 @@ export class OrdersComponent {
     this.groupOrders();
   }
 
-  //?
+  //groups order by table. Since multiple orders can be made referring to the same table, this function groups them
   groupOrders(){
     let filteredGroups = [];
     this.receivedGroups = [];
@@ -234,7 +234,7 @@ export class OrdersComponent {
     this.ordersService.deleteOrder(order_id).subscribe();
   }
 
-  //??
+  //notify the home module that the tables have been selected and that it should now display the menu
   addNewOrder(value: Table) {
     this.newOrderEvent.emit(value);
   }

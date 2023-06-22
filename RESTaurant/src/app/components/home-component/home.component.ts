@@ -108,7 +108,7 @@ export class HomeComponent {
     if (logout) this.userService.logout()
   }
 
-  //??
+  //if a cook or a barman clicks on the notification, it will automatically bring them in the correct page
   focusOrder(){
     if (this.role === RoleTypes.COOK || this.role === RoleTypes.BARMAN)
       this.loadedModule = 'orders';
