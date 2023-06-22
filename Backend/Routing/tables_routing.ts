@@ -13,7 +13,7 @@ const router = Router();
 router.delete('/:table_id', my_authorize([roleTypes.ADMIN]), async (req, res) => {
     await table.tableModel.findByIdAndDelete(req.params.table_id);
     get_socket().emit(Events.UPDATE_TABLES_LIST);
-    res.send("table deleted");
+    res.send("Table deleted");
 })
 
 //This route gets a list of all the tables

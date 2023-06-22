@@ -251,7 +251,7 @@ router.delete('/:order_id', my_authorize([roleTypes.ADMIN, roleTypes.CASHIER]), 
         if(req.auth.role === roleTypes.ADMIN)
             order.orderModel.findByIdAndDelete(req.params.order_id).then(order => {
                 get_socket().emit(Events.UPDATE_ORDERS_LIST);
-                res.send(order)
+                res.send("Order deleted")
             });
         else return res.status(401).json({ 
             error: true, 
