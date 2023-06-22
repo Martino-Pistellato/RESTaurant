@@ -1,6 +1,9 @@
 import { roleTypes } from './Database/User';
 import { Server } from 'socket.io';
 import * as https from 'https'
+
+//In this file we define some useful data/method used in different points of our backend
+
 const result = require('dotenv').config();
 const { expressjwt: jwt } = require('express-jwt');
 const auth = jwt({
@@ -19,6 +22,7 @@ export const set_socket = (server: https.Server) => {
 
 export const get_socket = () => io;
 
+//Authorization/authentication middleware used in every route except login
 export const my_authorize = (roles: roleTypes[] = []) => {
     return [
         auth,
@@ -30,6 +34,7 @@ export const my_authorize = (roles: roleTypes[] = []) => {
     ];
 }
 
+//Events the socket listens to
 export const Events = {
     UPDATE_TABLES_LIST:     'update_tables_list',
     UPDATE_ORDERS_LIST:     'update_orders_list',

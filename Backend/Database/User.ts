@@ -2,6 +2,8 @@ import mongoose = require('mongoose');
 import Ajv from 'ajv';
 const bcrypt = require("bcrypt")
 
+//User model definition
+
 export enum roleTypes{
     ADMIN,
     CASHIER,
@@ -12,7 +14,7 @@ export enum roleTypes{
 
 export interface User extends mongoose.Document {
     name: string,
-    email: string, //make it primary key
+    email: string, 
     role: roleTypes,
     password: string,
     totalWorks: string[]

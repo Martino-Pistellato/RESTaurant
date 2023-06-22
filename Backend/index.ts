@@ -4,7 +4,7 @@ import mongoose = require('mongoose');
 import cors = require('cors');  
 import express = require('express');
 import cookieParser = require('cookie-parser');
-import jsonwebtoken = require('jsonwebtoken');  // JWT generation
+import jsonwebtoken = require('jsonwebtoken');  
 import passport = require('passport');           
 import passportHTTP = require('passport-http');
 
@@ -26,17 +26,19 @@ if( !process.env.JWT_SECRET ) {
     process.exit(-1);
 }
 
-mongoose.connect('mongodb+srv://Furellato:XV5Nbg3sRBz5flZN@restaurant.bqyjdfs.mongodb.net/RESTaurant_db?retryWrites=true&w=majority');
+mongoose.connect(process.env.DB_URI);
 
 app.use( cors({origin: "https://localhost:4200"}) );
 app.use( express.json( ) );
 app.use( cookieParser() );
 
+//We set all the routes defined in the Routing folder so the app can use them
 app.use( '/users',  users_router );
 app.use( '/orders', orders_router );
 app.use( '/foods',  foods_router );
 app.use( '/tables', tables_router );
 
+//We create a server and we set it to listen on port 3000. Certification are specified since we will use HTTPS protocol. We also create a socket used to listen to certain events (i.e. notifications)
 let server = https.createServer({
   key: fs.readFileSync('keys/key.pem'),
   cert: fs.readFileSync('keys/cert.pem')
@@ -45,6 +47,7 @@ server.listen(3000, () => console.log("HTTPS Server started on port 3000"));
 set_socket(server);
 let io = get_socket();
 
+//We use passport middleware for login authentication
 passport.use( new passportHTTP.BasicStrategy(
     function(email: string, password: string, done: Function) {
         userModel.findOne({ email: email }).then((user)=>{
@@ -59,7 +62,8 @@ passport.use( new passportHTTP.BasicStrategy(
     }
 ));
 
-//Login route
+//This route handles the login phase.
+//If the user is authenticated, a JWT valid for the next 9 hours is generated
 app.get('/login', passport.authenticate('basic', { session: false }),(req, res) => {
     console.log("Login granted. Generating token" );
     

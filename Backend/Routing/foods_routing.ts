@@ -4,14 +4,16 @@ import { roleTypes } from '../Database/User'
 import * as food from '../Database/Food'
 import { my_authorize, get_socket, Events } from '../utils';
 
+//In this file we define routes for Food
+
 const router = Router();
 
-//Get all foods and drinks in the menu route
+//This route gets all food and drinks in the menu
 router.get('/', my_authorize([roleTypes.ADMIN, roleTypes.WAITER, roleTypes.CASHIER]), (req, res) => {
     food.foodModel.find().then((foods) => { res.send(foods); });
 })
 
-//Create new food/drink route
+//This route creates a new food/drink
 router.post('/', my_authorize([roleTypes.ADMIN]), (req, res) => {
     let newFood = food.newFood({
         name: req.body.name,
@@ -26,7 +28,7 @@ router.post('/', my_authorize([roleTypes.ADMIN]), (req, res) => {
     });  
 })
 
-//Delete food/drink route
+//This route deletes a food/drink
 router.delete('/:food_id', my_authorize([roleTypes.ADMIN]), (req, res) => {
     food.foodModel.findByIdAndDelete(req.params.food_id).then(() => { 
         get_socket().emit(Events.UPDATE_FOODS_LIST);
@@ -34,6 +36,7 @@ router.delete('/:food_id', my_authorize([roleTypes.ADMIN]), (req, res) => {
     });
 })
 
+//This route updates a food/drink
 router.patch('/:food_id', my_authorize([roleTypes.ADMIN]), (req, res) => {
     food.foodModel.findById(req.params.food_id).then((my_food) => { 
         if(req.body.name)

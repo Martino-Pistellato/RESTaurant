@@ -5,14 +5,18 @@ import * as orders from '../Database/Order';
 import { roleTypes } from '../Database/User';
 import { my_authorize, get_socket, Events } from '../utils';
 
+//In this file we define routes for Table
+
 const router = Router();
 
+//This route deletes a table
 router.delete('/:table_id', my_authorize([roleTypes.ADMIN]), async (req, res) => {
     await table.tableModel.findByIdAndDelete(req.params.table_id);
     get_socket().emit(Events.UPDATE_TABLES_LIST);
     res.send("table deleted");
 })
 
+//This route gets a list of all the tables
 router.get('/', my_authorize([roleTypes.ADMIN, roleTypes.WAITER, roleTypes.CASHIER]), (req, res) => {
     table.tableModel.find()
     .populate('waiter_id')
@@ -20,12 +24,14 @@ router.get('/', my_authorize([roleTypes.ADMIN, roleTypes.WAITER, roleTypes.CASHI
     .then(tables => res.send(tables));
 })
 
+//This route gets a list of all the tables served by a certain waiter
 router.get('/serving', my_authorize([roleTypes.WAITER]), (req, res) => {
     table.tableModel.find({waiter_id: req.auth.id})
     .populate('linked_tables')
     .then(tables => res.send(tables));
 })
 
+//This route updates the table field "linked_tables"
 router.put('/link', my_authorize([roleTypes.WAITER, roleTypes.ADMIN, roleTypes.CASHIER]), (req, res, next) => {
     let main_table: table.Table = req.body.tables.shift();
 
@@ -37,12 +43,14 @@ router.put('/link', my_authorize([roleTypes.WAITER, roleTypes.ADMIN, roleTypes.C
     })
 })
 
+//This route gets a table
 router.get('/:table_id', my_authorize([]), (req, res) => {
     table.tableModel.findById(req.params.table_id)
     .populate('linked_tables')
     .then(table => res.send(table));
 })
 
+//This route updates a table
 router.patch('/:table_id', my_authorize([roleTypes.ADMIN]), (req, res, next) => { 
     table.tableModel.findById(req.params.table_id).then(my_table => {
         if(req.body.table_number)
@@ -56,6 +64,8 @@ router.patch('/:table_id', my_authorize([roleTypes.ADMIN]), (req, res, next) => 
     })
 })
 
+//This route changes the table status (FREE <--> OCCUPIED).
+//If a table is occupied and has some not yet paid orders, only and admin can free it
 router.put('/', my_authorize([roleTypes.WAITER, roleTypes.ADMIN, roleTypes.CASHIER]), (req, res, next) => { 
     table.tableModel.findById(req.body.table_id).then(my_table => {
         try {
@@ -80,6 +90,7 @@ router.put('/', my_authorize([roleTypes.WAITER, roleTypes.ADMIN, roleTypes.CASHI
     })
 })
 
+//This route creates a new table
 router.post('/', my_authorize([roleTypes.ADMIN]), (req, res) => {
     table.tableModel.findOne({number: req.body.number}).then((found_table) => {
         if (found_table) return res.status(400).json({ error: true, errormessage: 'Table already exists' });

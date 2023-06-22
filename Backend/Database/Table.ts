@@ -1,6 +1,8 @@
 import mongoose = require('mongoose');
 import Ajv from 'ajv';
 
+//Table model definition
+
 export interface Table extends mongoose.Document{
     number:         number,
     capacity:       number,
@@ -8,7 +10,6 @@ export interface Table extends mongoose.Document{
     waiter_id:       string,
     occupancy:      number,
     linked_tables:  string[]
-    //isReserved: boolean;
 
     changeStatus: (waiter_id: string | null, occupancy: number) => void
 }
@@ -47,7 +48,7 @@ const tableSchema = new mongoose.Schema<Table>({
     }
 });
 
-//handle case of cashier freeing table --> what about admin?
+
 tableSchema.methods.changeStatus = function(waiter_id: string | null, occupancy: number) { 
     if (occupancy > this.capacity) throw new Error("Occupancy cannot be greater than capacity");
     if(!this.is_free){

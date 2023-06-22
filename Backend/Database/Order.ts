@@ -1,6 +1,8 @@
 import mongoose = require('mongoose');
 import Ajv from 'ajv';
 
+//Order model definition
+
 export enum orderStatus {
     RECEIVED,
     PREPARING,

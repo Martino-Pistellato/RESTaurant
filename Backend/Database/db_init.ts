@@ -6,18 +6,30 @@ import * as food from './Food';
 import * as table from './Table';
 import * as order from './Order';
 
-//first, we connect to the cluster
-//Use MongoClient because mongoose gave problem getting the list of databases in the cluster. even if it's possible to use it for this purpose
-const clusterURI = 'mongodb+srv://Furellato:XV5Nbg3sRBz5flZN@restaurant.bqyjdfs.mongodb.net/?retryWrites=true&w=majority';
-const client = new MongoClient(clusterURI);
-const dbURI = 'mongodb+srv://Furellato:XV5Nbg3sRBz5flZN@restaurant.bqyjdfs.mongodb.net/RESTaurant_db?retryWrites=true&w=majority';
+//This file is used to check if the database already exists in the MongoDB cluster. If not, it is created and populated with some data.
+
+//first, we connect to the cluster (use MongoClient because mongoose gave problem getting the list of databases in the cluster. even if it's possible to use it for this purpose)
+//const clusterURI = 'mongodb+srv://Furellato:XV5Nbg3sRBz5flZN@restaurant.bqyjdfs.mongodb.net/?retryWrites=true&w=majority';
+//const dbURI = 'mongodb+srv://Furellato:XV5Nbg3sRBz5flZN@restaurant.bqyjdfs.mongodb.net/RESTaurant_db?retryWrites=true&w=majority';
+
+const result = require('dotenv').config();
+if( result.error ) {
+    console.log("Unable to load \".env\" file. Please provide one");
+    process.exit(-1);
+}
+if( !process.env.DB_URI || !process.env.CLUSTER_URI ) {
+    console.log("\".env\" file loaded but connections URI were not found");
+    process.exit(-1);
+}
+
+const client = new MongoClient(process.env.CLUSTER_URI);
 
 client.connect()
 .then(() => {
     searchDB(client)
 })
 
-//we collect the databases present in the cluster and search for RESTaurant_db. If is not present, we create it and its collections
+//We collect the databases present in the cluster and search for RESTaurant_db.
 function searchDB(client: any){
     client.db().admin().listDatabases()
     .then((list: any) => {
@@ -36,8 +48,8 @@ function searchDB(client: any){
 function createDB(){
     console.log("DB not found, let's create it");
 
-    //by simply connecting to the db, we create it
-    mongoose.connect(dbURI)
+    //By simply connecting to the database URI, we create the database
+    mongoose.connect(process.env.DB_URI)
     .then(() => {
         user.userModel.createCollection()
         .then(() => {
@@ -51,7 +63,7 @@ function createDB(){
                     order.orderModel.createCollection()
                     .then(() => {
                         console.log("Collection Orders created");
-                        //populate collections with some datas
+                        //Populate collections with some data
                         populateUsers().then(() => {
                             populateTables().then(() => {
                                 populateFoods().then(() => {

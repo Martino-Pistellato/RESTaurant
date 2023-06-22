@@ -1,6 +1,8 @@
 import mongoose = require('mongoose');
 import Ajv from 'ajv';
 
+//Food model definition
+
 export enum foodTypes{
     APPETIZER,
     FIRST_COURSE,

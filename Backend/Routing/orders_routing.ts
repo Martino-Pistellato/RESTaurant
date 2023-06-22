@@ -6,9 +6,16 @@ import { roleTypes, userModel } from '../Database/User'
 import { foodTypes, Food } from '../Database/Food'
 import { get_socket, my_authorize, Events } from '../utils';
 
+//In this file we define routes for Order
+
 const router = Router();
 const orderStatus = order.orderStatus;
 
+/*This route gets a list of orders depending on the user's role:
+ - A cook/barman gets a list containing all the received orders waiting to be taken and all the orders he is preparing
+ - A waiter gets a list containing all the orders he has taken that have not been paid yet
+ - A cashier/admin gets a list containing all the orders that have not been paid yet
+*/
 router.get('/', my_authorize([]), (req, res) => {
     if (req.auth.role === roleTypes.COOK || req.auth.role === roleTypes.BARMAN)
         order.orderModel.find().populate('foods').populate('table').then(orders => {
@@ -73,10 +80,12 @@ router.get('/', my_authorize([]), (req, res) => {
         });
 })
 
+//This route gets all the orders
 router.get('/all', my_authorize([roleTypes.CASHIER, roleTypes.ADMIN]), (req, res) => {
     order.orderModel.find().populate('foods').populate('table').then(orders => res.send(orders))
 })
 
+//This route calculates and returns the receipt for a certain table
 router.get('/receipt/:table_id', my_authorize([roleTypes.CASHIER]), async (req, res) => {
     tableModel.findById(req.params.table_id).populate('linked_tables').then(table =>{
         let my_table = (table as Table);
@@ -122,6 +131,7 @@ router.get('/receipt/:table_id', my_authorize([roleTypes.CASHIER]), async (req, 
     })
 })
 
+//This route calculates and returns the total profit of the day
 router.get('/totalprofit', my_authorize([roleTypes.CASHIER, roleTypes.ADMIN]), (req, res) => {
     order.orderModel.find()
     .populate('foods')
@@ -142,6 +152,7 @@ router.get('/totalprofit', my_authorize([roleTypes.CASHIER, roleTypes.ADMIN]), (
     })
 })
 
+//This route creates a new order. The newly created order is added to the waiter's totalWorks. A notification is sent to the kitchen/bar
 router.post('/', my_authorize([roleTypes.WAITER]), (req, res) => {
     if (req.body.table === null)
         return res.status(500).json({ error: true, errormessage: "No tables selected" });
@@ -174,6 +185,10 @@ router.post('/', my_authorize([roleTypes.WAITER]), (req, res) => {
     }
 })
 
+/*This route updates an order depending on the user's role:
+- A cook/barman can update the order status (RECEIVED -> PREPARING -> TERMINATED). If the order is terminated, the food/drinks in it are added to the cook/barman's totalWorks and a notification is sent to the waiter who took the order 
+- A cashier can set the order as payed. The order is added to the cashier's totalworks. All the tables related to the order are freed.
+*/
 router.put('/', my_authorize([roleTypes.COOK, roleTypes.BARMAN, roleTypes.CASHIER]), (req, res) => {
     order.orderModel.findById(req.body.order_id).populate('table').then((selected_order) => {
         let my_order = selected_order as order.Order;
@@ -230,6 +245,7 @@ router.put('/', my_authorize([roleTypes.COOK, roleTypes.BARMAN, roleTypes.CASHIE
     });
 })
 
+//This route is used both to delete an order and to delete orders older than two weeks
 router.delete('/:order_id', my_authorize([roleTypes.ADMIN, roleTypes.CASHIER]), (req, res) => {
     if (req.params.order_id !== 'old'){
         if(req.auth.role === roleTypes.ADMIN)
