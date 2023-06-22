@@ -49,7 +49,8 @@ export class OrdersComponent {
               private dialog: MatDialog) {
     this.role = this.usersService.role;
   }
-
+  
+  //Collects table associated with a waiter or the orders a cook/barman can prepare/is preparing and tells socket to listen for certain events
   ngOnInit(): void {
     if (this.role === RoleTypes.WAITER){
       this.updateServingTablesList(); //it also updates orders
@@ -61,6 +62,7 @@ export class OrdersComponent {
     }
   }
 
+  //Gets table associated with a waiter and dispatches them by checking if they have orders or not
   updateServingTablesList(){
     if(this.usersService.role !== RoleTypes.WAITER) return;
     this.tablesService.getServingTables().subscribe(tables => {
@@ -72,6 +74,7 @@ export class OrdersComponent {
     })
   }
 
+  //Gets the orders and dispatches them based on their status
   updateOrdersList(){
     this.ordersService.getOrders().subscribe(orders => {
       this.myOrders = orders;
@@ -79,6 +82,7 @@ export class OrdersComponent {
     })
   }
 
+  //Dispatches table by checking if they have orders or not
   dispatchTables(): void{
     this.tablesWithOrders = [];
     this.tablesWithoutOrders = [...this.myTables];
@@ -102,6 +106,7 @@ export class OrdersComponent {
     });
   }
 
+  //Dispatches orders based on their status (RECEIVED, PREPARING, TERMINATED)
   dispatchOrders(): void {
     this.receivedOrders = [];
     this.preparingOrders = [];
@@ -119,6 +124,7 @@ export class OrdersComponent {
     this.groupOrders();
   }
 
+  //?
   groupOrders(){
     let filteredGroups = [];
     this.receivedGroups = [];
@@ -174,6 +180,7 @@ export class OrdersComponent {
     );
   }
 
+  //Selects one or more table to create an order   
   selectTable(selected_table: Table): void {
     let index = this.tablesWithoutOrders.findIndex(table => table.number === selected_table.number);
     if (index >= 0){
@@ -207,6 +214,7 @@ export class OrdersComponent {
     });
   }
 
+  //Creates a new order
   createOrder(): void{
     if (this.selectedTables.length === 1)
       this.addNewOrder(this.selectedTables[0]);
@@ -216,18 +224,22 @@ export class OrdersComponent {
       })
   }
 
+  //Updates an order
   updateOrder(order: Order): void{
     this.ordersService.updateOrder(order).subscribe({ });
   }
 
+  //Deletes an order
   deleteOrder(order_id: string){
     this.ordersService.deleteOrder(order_id).subscribe();
   }
 
+  //??
   addNewOrder(value: Table) {
     this.newOrderEvent.emit(value);
   }
 
+  //Opens a dialog to show receipt for a table
   openDialog(receipt: Receipt) {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.disableClose = false;
@@ -244,6 +256,7 @@ export class OrdersComponent {
     ); 
   }
 
+  //Calculates the receipt for a table
   getReceipt(table: Table){
     let unfinished = this.preparingGroups.some(group => group.main_table._id === table._id);
     unfinished = unfinished || this.receivedGroups.some(group => group.main_table._id === table._id);
@@ -253,6 +266,7 @@ export class OrdersComponent {
       this.openSnackBar('Cannot pay an order which is not terminated','CLOSE');
   }
 
+  //Opens a snack bar to show a notification
   openSnackBar(message: string, action: string) {
     this.snackBar.open(message, action,{
       verticalPosition:'top'

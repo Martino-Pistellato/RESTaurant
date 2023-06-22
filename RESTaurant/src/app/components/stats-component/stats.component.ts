@@ -23,7 +23,8 @@ export class StatsComponent {
               private tablesService: TablesService,
               private foodsService: FoodsService,
               private ordersService: OrdersService){}
-
+  
+  //Gets all data present on the database
   ngOnInit(){
     this.usersService.getUsers().subscribe(users => {
       this.users = users;
@@ -41,7 +42,9 @@ export class StatsComponent {
     });
   }
 
+  //Draws the stats charts
   drawCharts(){
+    //A chart that shows stats regarding waiters (n. of tables currently served/n. of clients currently served)
     new chart.Chart((document.getElementById('waiters') as chart.ChartItem),{
       type: 'bar',
       data: {
@@ -71,6 +74,7 @@ export class StatsComponent {
       }
     });
 
+    //A chart showing stats regarding cashiers (how much money they registered in today's total profit)
     new chart.Chart((document.getElementById('cashiers') as chart.ChartItem),{
       type: 'bar',
       data: {
@@ -92,6 +96,7 @@ export class StatsComponent {
       }
     });
 
+    //A chart showing stats regarding cooks (which food and how many portions of it a cook prepared)
     new chart.Chart((document.getElementById('cooks') as chart.ChartItem),{
       type: 'bar',
       data: {
@@ -108,6 +113,7 @@ export class StatsComponent {
       } 
     });
 
+    //A chart showing stats regarding barmen (which drink and how many of it a barman prepared)
     new chart.Chart((document.getElementById('barmen') as chart.ChartItem),{
       type: 'bar',
       data: {

@@ -57,6 +57,7 @@ export class OrdersService {
 
   constructor(private http: HttpClient, private usersService: UsersService) { }
 
+  //Updates an order
   updateOrder(firstItem: Order | string): Observable<Order>{
     if (this.usersService.role === RoleTypes.COOK || this.usersService.role === RoleTypes.BARMAN)
       return this.http.put<Order>('https://localhost:3000/orders', {
@@ -72,18 +73,21 @@ export class OrdersService {
       );
   }
 
+  //Gets orders based on role
   getOrders(): Observable<Order[]>{
     return this.http.get<Order[]>('https://localhost:3000/orders',  createOptions({},this.usersService.token)).pipe(
       catchError(handleError)
     );
   }
 
+  //Gets all orders
   getAllOrders(): Observable<Order[]>{
     return this.http.get<Order[]>('https://localhost:3000/orders/all',  createOptions({},this.usersService.token)).pipe(
       catchError(handleError)
     );
   }
 
+  //Creates a new order
   createOrder(table: Table, foods: Food[]): Observable<Order>{
     return this.http.post<Order>('https://localhost:3000/orders', {
       table: table,
@@ -93,6 +97,7 @@ export class OrdersService {
     );
   }
 
+  //Gets the receipt for a table
   getReceipt(table: Table): Observable<Receipt>{
     return this.http.get<Receipt>('https://localhost:3000/orders/receipt/'+table._id, createOptions({
       table_id: table._id
@@ -101,18 +106,21 @@ export class OrdersService {
     );
   }
 
+  //Gets today's total profit
   getTotalProfit(): Observable<Profit>{
     return this.http.get<Profit>('https://localhost:3000/orders/totalprofit',  createOptions({},this.usersService.token)).pipe(
       catchError(handleError)
     );
   }
 
+  //Deletes an order
   deleteOrder(order_id: string){
     return this.http.delete('https://localhost:3000/orders/'+order_id,  createOptions({},this.usersService.token)).pipe(
       catchError(handleError)
     );
   }
 
+  //Deletes orders older than two weeks
   deleteOld(){
     return this.http.delete('https://localhost:3000/orders/old', createOptions({},this.usersService.token)).pipe(
       catchError(handleError)

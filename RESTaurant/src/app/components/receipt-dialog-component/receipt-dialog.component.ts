@@ -12,10 +12,12 @@ export class ReceiptDialogComponent {
     private dialogRef: MatDialogRef<ReceiptDialogComponent>,
     @Inject(MAT_DIALOG_DATA) protected data: {receipt: Receipt}) { }
 
+  //Closes dialog
   close() {
     this.dialogRef.close(null);
   }
 
+  //Closes dialog indicating to set the order as paid
   pay(order_id: string) {
     this.dialogRef.close(order_id);
   }

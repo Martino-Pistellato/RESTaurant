@@ -12,6 +12,7 @@ export class SocketService {
     this.socket = io('https://localhost:3000');
   }
 
+  //Tell the socket to listen for something (i.e. notification events)
   listenToServer(connection: string): Observable<any>{
     this.socket = io('https://localhost:3000');
     return new Observable( (observer) => {
@@ -33,6 +34,7 @@ export class SocketService {
     });
   }
 
+  //Disconnets the socket
   disconnect(){
     this.socket.disconnect();
   }

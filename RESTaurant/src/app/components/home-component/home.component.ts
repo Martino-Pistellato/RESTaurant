@@ -46,6 +46,7 @@ export class HomeComponent {
                 this.mobile_screen = this.innerWidth <= 780;
               }
 
+  //Show user name and role and tells the socket to listen for certain events based on user role
   ngOnInit() {
     this.name = this.userService.user_data?.name
     this.role = this.userService.role;
@@ -83,19 +84,23 @@ export class HomeComponent {
     }
   }
 
+  //Selects a table for creating an order
   addOrder(table: Table) {
     this.selected_table = table;
     this.loadedModule = 'foods';
   }
 
+  //Sets the exposed module in the home page
   changeModuleEvent(module: string) {
     this.loadedModule = module;
   }
 
+  //Updates total profit of the day
   updateTotalProfit(){
     this.orderService.getTotalProfit().subscribe((data) => this.profit = data.total);
   }
 
+  //Open a snack bar to show a notification
   openSnackBar(message: string, action: string, logout: boolean) {
     this.snackBar.open(message, action,{
       verticalPosition:'top'
@@ -103,6 +108,7 @@ export class HomeComponent {
     if (logout) this.userService.logout()
   }
 
+  //??
   focusOrder(){
     if (this.role === RoleTypes.COOK || this.role === RoleTypes.BARMAN)
       this.loadedModule = 'orders';

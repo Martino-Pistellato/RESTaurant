@@ -21,24 +21,28 @@ export class TablesService {
 
   constructor(private http: HttpClient, private usersService: UsersService) { }
 
+  //Gets all tables
   getTables(): Observable<Table[]>{
     return this.http.get<Table[]>('https://localhost:3000/tables', createOptions({},this.usersService.token)).pipe(
       catchError(handleError)
     );
   }
 
+  //Gets a table
   getTable(table_id: string): Observable<Table>{
     return this.http.get<Table>('https://localhost:3000/tables/'+table_id, createOptions({table_id: table_id},this.usersService.token)).pipe(
       catchError(handleError)
     );
   }
 
+  //Gets all tables served by a certain waiter
   getServingTables(): Observable<Table[]>{
     return this.http.get<Table[]>('https://localhost:3000/tables/serving', createOptions({},this.usersService.token)).pipe(
       catchError(handleError)
     );
   }
 
+  //Changes table's status (FREE <--> OCCUPIED)
   changeStatus(table_id: string, id: string | null, occupancy: number): Observable<Table>{
     return this.http.put<Table>('https://localhost:3000/tables',{
       table_id: table_id,
@@ -49,6 +53,7 @@ export class TablesService {
     );
   }
 
+  //Updates the table's filed "linked_tables"
   linkTables(tables: Table[]){
     return this.http.put<Table>('https://localhost:3000/tables/link',{
       tables: tables
@@ -57,6 +62,7 @@ export class TablesService {
     );
   }
 
+  //Creates a new table
   createTable(table_capacity: number | null, table_number: number | null): Observable<Table>{
     return this.http.post<Table>('https://localhost:3000/tables',{
       table_capacity: table_capacity,
@@ -66,6 +72,7 @@ export class TablesService {
     );
   }
 
+  //Updates a table
   updateTable(table_id: string, table_capacity: number | null, table_number: number | null): Observable<Table>{
     return this.http.patch<Table>('https://localhost:3000/tables/'+table_id,{
       table_capacity: table_capacity,
@@ -75,6 +82,7 @@ export class TablesService {
     );
   }
 
+  //Deletes a table
   deleteTable(table_id: string){
     return this.http.delete('https://localhost:3000/tables/'+table_id,createOptions({},this.usersService.token)).pipe(
       catchError(handleError)

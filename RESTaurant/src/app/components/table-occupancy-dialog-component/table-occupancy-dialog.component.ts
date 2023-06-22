@@ -12,6 +12,7 @@ import { Table } from 'src/app/services/tables-services/tables.service';
 export class TableOccupancyDialogComponent{
     occupancyControl: FormControl;
 
+    //Checks if the number of clients for a table is valid (occupancy <= capacity and occupancy > 0)
     getErrorMessage() {
       return this.occupancyControl.hasError('max') ? 'Occupancy cannot be greater than capacity' : this.occupancyControl.hasError('min') ? 'Occupancy cannot be empty' : 'Unknown error';
     }
@@ -22,6 +23,7 @@ export class TableOccupancyDialogComponent{
         this.occupancyControl = new FormControl('', [Validators.max(data.table.capacity), Validators.min(1)]);
     }
 
+    //Closes dialog
     close() {
         this.dialogRef.close(null);
     }

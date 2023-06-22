@@ -23,12 +23,14 @@ export class LoginComponent {
     this.is_mobile = event.target.innerWidth <= 780;
   }
 
+  //Used to check if email inserted in form field respects constraints
   getEmailErrorMessage() {
     return  this.emailControl.hasError('required') ? 'Email must be provided' : 
             this.emailControl.hasError('email') ? 'An email shoud have one @' : 
             'Unknown error';
   }
 
+  //Used to check if password inserted in form field respects constraints
   getPasswordErrorMessage() {
     return  this.passwordControl.hasError('required') ? 'Password must be provided' : 
             this.passwordControl.hasError('minlength') ? 'Password must be at least 6 characters long' : 
@@ -45,6 +47,7 @@ export class LoginComponent {
     //this.role = this.us.role;
   }
 
+  //Used to handle login. If an admin or cashier login, older orders are deleted
   login(mail: string, password: string) {
     this.us.login(mail, password).subscribe({
       next: (d) => {

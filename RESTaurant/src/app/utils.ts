@@ -1,6 +1,10 @@
 import { HttpHeaders, HttpParams, HttpErrorResponse } from '@angular/common/http';
 import { throwError } from 'rxjs';
 
+//In this file we define useful data/methods used in different points of the application's frontend
+
+
+
 export function handleError(error: HttpErrorResponse) {
   if (error.error instanceof ErrorEvent) {
     console.error('An error occurred:', error.error.message);
@@ -37,3 +41,4 @@ export const Events = {
 
     FORCE_LOGOUT:           'force_logout'
 }
+

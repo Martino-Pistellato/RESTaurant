@@ -28,15 +28,18 @@ export class TablesComponent {
       this.router.navigate(['home']);
   }
 
+  //Gets the list of tables and tells the socket to listen for changes in the table list
   ngOnInit(): void {
     this.getTables();
     this.socketService.listenToServer(Events.UPDATE_TABLES_LIST).subscribe((data: any) => this.getTables());
   }
 
+  //Gets the name of the table's waiter
   getWaiterName(table: Table): string{
     return (table.waiter_id as User).name;
   }
 
+  //Opens a dialog to indicate number of clients for a table and updates table's status
   openDialog(table: Table) {
     if (!table.is_free){
       this.changeStatus(table._id, 0);
@@ -59,6 +62,7 @@ export class TablesComponent {
     ); 
   }
 
+  //Gets all the tables
   getTables(): void {
     this.tablesService.getTables().subscribe({
       next: (tables) => this.tables = tables,
@@ -66,22 +70,27 @@ export class TablesComponent {
     });
   }
   
+  //Changes the table's status
   changeStatus(table_id: string, occupancy: number): void {
     this.tablesService.changeStatus(table_id, (this.role === RoleTypes.WAITER)? this.usersService.id : null, occupancy).subscribe();
   }
 
+  //Creates a new table
   createTable(table_capacity: number | null, table_number: number | null): void {
     this.tablesService.createTable(table_capacity, table_number).subscribe(() => this.resetField());
   }
 
+  //Updates a table
   updateTable(table_id: string, table_capacity: number | null, table_number: number | null): void {
     this.tablesService.updateTable(table_id, table_capacity, table_number).subscribe(() => this.resetField());
   }
 
+  //Deletes a table
   deleteTable(table_id: string): void {
     this.tablesService.deleteTable(table_id).subscribe();
   }
 
+  //Resets form fields after creating/updating a table
   resetField(){
     this.table_capacity = null;
     this.table_number = null;

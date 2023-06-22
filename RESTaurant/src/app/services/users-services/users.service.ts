@@ -22,7 +22,7 @@ export interface TokenData{
   name:   string,  
   role:   RoleTypes,
   email:  string,
-  id:    string
+  id:     string
 };
 
 export interface User{
@@ -44,6 +44,7 @@ export class UsersService {
   constructor(private http: HttpClient, private router: Router, private socketService: SocketService) { 
     const loadedtoken = localStorage.getItem('user_token');
 
+    //Gets user JWT if already saved in browser
     if ( !loadedtoken || loadedtoken.length < 1 ) {
       console.log("No token found in local storage");
       this._token = "";
@@ -55,6 +56,7 @@ export class UsersService {
     }
   }
 
+  //Handles login phase. If successful, a JWT is stored in the client browser
   login(email: string, password: string): Observable<any>{
     const options = {
       headers: new HttpHeaders({
@@ -78,26 +80,32 @@ export class UsersService {
     );
   }
 
+  //Gets user's role
   get role(): RoleTypes{
     return (this._user_data as TokenData).role;
   }
 
+  //Gets user's token
   get token(): string{
     return this._token;
   }
 
+  //Gets user's data (name, email, role, id)
   get user_data(): TokenData | null{
     return this._user_data;
   }
 
+  //Gets user's id
   get id(): string{
     return (this._user_data as TokenData).id;
   }
 
+  //Checks if user is logged in
   isLogged(): boolean{
     return this._token !== "";
   }
 
+  //Performs a logout
   logout(): void{
     this._token = "";
     this._user_data = null;
@@ -106,18 +114,21 @@ export class UsersService {
     this.router.navigate(['login']);
   }
 
+  //Gets all users
   getUsers(): Observable<User[]>{
     return this.http.get<User[]>('https://localhost:3000/users', createOptions({}, this.token)).pipe(
       catchError(handleError)
     );
   }
 
+  //Deletes a user
   deleteUser(user_id: string){
     return this.http.delete('https://localhost:3000/users/'+user_id, createOptions({}, this.token)).pipe(
       catchError(handleError)
     );
   }
 
+  //Updates a user
   updateUser(user_id: string, name: string | null, email: string | null, role: number | null, password: string | null): Observable<User>{
     return this.http.put<User>('https://localhost:3000/users/'+user_id,{
       name: name,
@@ -129,6 +140,7 @@ export class UsersService {
     );
   }
 
+  //Creates a new user
   createUser(name: string | null, email: string | null, role: RoleTypes | null, password: string | null): Observable<User>{
     return this.http.post<User>('https://localhost:3000/users',{
       name: name,
